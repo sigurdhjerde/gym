@@ -1,0 +1,5 @@
+hovorka.egg-info/PKG-INFO
+hovorka.egg-info/SOURCES.txt
+hovorka.egg-info/dependency_links.txt
+hovorka.egg-info/requires.txt
+hovorka.egg-info/top_level.txt
