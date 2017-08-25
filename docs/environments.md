@@ -1,8 +1,8 @@
 # Environments
 
-The gym comes prepackaged with many many environments. It's this common api around many environments that makes the gym so great. Here we will list additional environments that do not come prepacked with the gym. Submit another to this list via a pull-request. 
+The gym comes prepackaged with many many environments. It's this common API around many environments that makes the gym so great. Here we will list additional environments that do not come prepacked with the gym. Submit another to this list via a pull-request. 
 
-_**NOTICE**: Its possible that in time OpenAI will develop a full fledged repository of suplimental environments. Until this this bit of markdown will suffice._
+_**NOTICE**: Its possible that in time OpenAI will develop a full fledged repository of supplemental environments. Until then this bit of markdown will suffice._
 
 ## PGE: Parallel Game Engine
 
@@ -22,3 +22,8 @@ gym-gazebo presents an extension of the initial OpenAI gym for robotics using RO
 rendering  tool.
 
 Learn more here: https://github.com/erlerobot/gym-gazebo/
+
+## gym-maze: 2D maze environment
+A simple 2D maze environment where an agent finds its way from the start position to the goal. 
+
+Learn more here: https://github.com/tuzzer/gym-maze/

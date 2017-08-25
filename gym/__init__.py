@@ -1,10 +1,12 @@
 import distutils.version
 import logging
+import os
 import sys
 
 from gym import error
 from gym.configuration import logger_setup, undo_logger_setup
 from gym.utils import reraise
+from gym.version import VERSION as __version__
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +40,9 @@ def sanity_check_dependencies():
 # Gym's design goal generally is to be simple and intuitive, and while
 # the tradeoff is definitely not obvious in this case, we've come down
 # on the side of auto-configuring the logger.
-logger_setup()
+
+if not os.environ.get('GYM_NO_LOGGER_SETUP'):
+    logger_setup()
 del logger_setup
 
 sanity_check_dependencies()
@@ -47,5 +51,6 @@ from gym.core import Env, Space, Wrapper, ObservationWrapper, ActionWrapper, Rew
 from gym.benchmarks import benchmark_spec
 from gym.envs import make, spec
 from gym.scoreboard.api import upload
+from gym import wrappers
 
-__all__ = ["Env", "Space", "Wrapper", "make", "spec", "upload"]
+__all__ = ["Env", "Space", "Wrapper", "make", "spec", "upload", "wrappers"]

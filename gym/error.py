@@ -125,3 +125,16 @@ class VideoRecorderError(Error):
 
 class InvalidFrame(Error):
     pass
+
+# Wrapper errors
+
+class DoubleWrapperError(Error):
+    pass
+
+
+class WrapAfterConfigureError(Error):
+    pass
+
+
+class RetriesExceededError(Error):
+    pass

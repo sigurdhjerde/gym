@@ -23,9 +23,13 @@ class AcrobotEnv(core.Env):
     Both links can swing freely and can pass by each other, i.e., they don't
     collide when they have the same angle.
     **STATE:**
-    The state consists of the two rotational joint angles and their velocities
-    [theta1 theta2 thetaDot1 thetaDot2]. An angle of 0 corresponds to corresponds
-    to the respective link pointing downwards (angles are in world coordinates).
+    The state consists of the sin() and cos() of the two rotational joint
+    angles and the joint angular velocities :
+    [cos(theta1) sin(theta1) cos(theta2) sin(theta2) thetaDot1 thetaDot2].
+    For the first link, an angle of 0 corresponds to the link pointing downwards.
+    The angle of the second link is relative to the angle of the first link.
+    An angle of 0 corresponds to having the same angle between the two links.
+    A state of [1, 0, 1, 0, ..., ...] means that both links point downwards.
     **ACTIONS:**
     The action is either applying +1, 0 or -1 torque on the joint between
     the two pendulum links.
@@ -85,6 +89,7 @@ class AcrobotEnv(core.Env):
         low = -high
         self.observation_space = spaces.Box(low, high)
         self.action_space = spaces.Discrete(3)
+        self.state = None
         self._seed()
 
     def _seed(self, seed=None):
@@ -181,6 +186,8 @@ class AcrobotEnv(core.Env):
         if self.viewer is None:
             self.viewer = rendering.Viewer(500,500)
             self.viewer.set_bounds(-2.2,2.2,-2.2,2.2)
+
+        if s is None: return None
 
         p1 = [-self.LINK_LENGTH_1 *
               np.cos(s[0]), self.LINK_LENGTH_1 * np.sin(s[0])]
