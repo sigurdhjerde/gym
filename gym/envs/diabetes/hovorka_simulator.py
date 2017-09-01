@@ -18,7 +18,9 @@ dt = 1
 t_end = 1440
 
 # insulin variables
-basal_init = 5.76 + .9
+# basal_init = 6.66
+basal_init = 5.99
+
 
 # Patient and patient parameters
 body_weight = 70
@@ -174,7 +176,7 @@ def simulate_one_step(basal_rate, simulator_state):
     the number of iterations (minutes) reaches 2880.
     '''
 
-    X0, _, integrator, _, P = simulation_setup(1)
+    _, _, integrator, _, P = simulation_setup(1)
 
     # Only basal rate at the moment from unit pr day to mU/min
     insulin_rate = basal_rate * 1000 / 1440
