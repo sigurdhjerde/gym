@@ -6,9 +6,12 @@ Converted/inspired from cartpole to Hovorka model!
 import logging
 import gym
 from gym import spaces
-from gym.utils import seeding
+# from gym.utils import seeding
 import numpy as np
 import numpy.matlib
+
+# Plotting for the rendering
+import matplotlib.pyplot as plt
 
 # Hovorka simulator
 import sys
@@ -16,8 +19,8 @@ sys.path.append('~/gym/envs/diabetes')
 import hovorka_simulator as hs
 
 # ODE solver stuff
-from scipy.integrate import ode
-from scipy.optimize import fsolve
+# from scipy.integrate import ode
+# from scipy.optimize import fsolve
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +37,10 @@ class HovorkaDiabetes(gym.Env):
         """
 
         # Action space (increase .1, decrease .1, or do nothing)
-        self.action_space = spaces.Discrete(3)
+        # self.action_space = spaces.Discrete(3)
+
+        # Continuous action space
+        self.action_space = spaces.Box(0, 40, 1)
 
         # Observation space -- bg between 0 and 500, measured every five minutes (1440 mins per day / 5 = 288)
         # self.observation_space = spaces.Box(0, 500, 288)
@@ -44,6 +50,7 @@ class HovorkaDiabetes(gym.Env):
         # Initial glucose regulation parameters
         self.basal = 8.3
         self.bolus = 8.8
+
 
         self._seed()
         self.viewer = None
@@ -56,15 +63,27 @@ class HovorkaDiabetes(gym.Env):
         # self.simulation_state = init_simulation_state
 
         # Initial state using cont measurements
-        X0, _, integrator, _, P = hs.simulation_setup()
+        X0, _, _, _, _ = hs.simulation_setup(1)
 
         # State is BG, simulation_state is parameters of hovorka model
         self.state = X0[4]
         self.simulation_state = X0
+        # Keeping track of entire blood glucose level for each episode
+        self.bg_history = [X0[4]]
+
+        # Counter for number of iterations
+        self.num_iters = 0
 
         # If blood glucose is less than zero, the simulator is out of bounds.
-        self.bg_threshold = 0
+        self.bg_threshold_low = 0
+        self.bg_threshold_high = 500
+
+        self.max_iter = 2880
+
+
         self.steps_beyond_done = None
+
+        # Plotting 
 
     # def _seed(self, seed=None):
         # """
@@ -83,29 +102,42 @@ class HovorkaDiabetes(gym.Env):
         # Variables
         state = self.state
         simulation_state = self.simulation_state
-        bolus = self.bolus
-        basal = self.basal
+        # bolus = self.bolus
+        # basal = self.basal
 
         # New bolus rate from action
-        if action == 0:
-            bolus_new = bolus - .1
-        elif  action == 1:
-            bolus_new = bolus
-        elif action == 2:
-            bolus_new = bolus + .1
+        # if action == 0:
+            # bolus_new = bolus - .1
+        # elif  action == 1:
+            # bolus_new = bolus
+        # elif action == 2:
+            # bolus_new = bolus + .1
 
         # Take a step with the new action -- run the simulation for one day with new bolus amount
-        bg, simulation_state_new = hs.simulate_one_day(basal, bolus_new, simulation_state)
+        # bg, simulation_state_new = hs.simulate_one_day(basal, bolus_new, simulation_state)
+
+        bg, simulation_state_new = hs.simulate_one_step(action, simulation_state)
+        self.num_iters += 1
 
         # Updating environment parameters
         self.simulation_state = simulation_state_new
-        self.bolus = bolus_new
+        # self.bolus = bolus_new
+        self.basal = action
+        self.bg_history.append(bg)
 
         # Updating state
-        self.state = bg[0:len(bg):5]
+        # self.state = bg[0:len(bg):5]
+        self.state = bg
 
         #Set environment done = True if blood_glucose_level is negative
-        done = any(state < -self.bg_threshold)
+        done = 0
+
+        if (bg > self.bg_threshold_high or bg < self.bg_threshold_low):
+            done = 1
+
+        if self.num_iters > self.max_iter:
+            done = 1
+
         done = bool(done)
 
         # Calculate Reward  (and give error if action is taken after terminal state)
@@ -126,18 +158,43 @@ class HovorkaDiabetes(gym.Env):
     def _reset(self):
         #TODO: Insert init code here!
 
+        # Initial state using cont measurements
+        X0, _, _, _, _ = hs.simulation_setup(1)
+
+        # State is BG, simulation_state is parameters of hovorka model
+        self.state = X0[4]
+        self.simulation_state = X0
+        self.bg_history = [X0[4]]
+
         self.steps_beyond_done = None
         return np.array(self.state)
 
 
     def render(self, mode='human'):
-        #TODO: Add plotting here!
+        #TODO: Clean up plotting routine
 
         if mode == 'rgb_array':
             return None
         elif mode is 'human':
+            if not bool(plt.get_fignums()):
+                plt.ion()
+                self.fig = plt.figure()
+                self.ax = self.fig.add_subplot(111)
+                # self.line1, = ax.plot(self.bg_history)
+                self.ax.plot(self.bg_history)
+                plt.show()
+            else:
+                # self.line1.set_ydata(self.bg_history)
+                # self.fig.canvas.draw()
+                self.ax.clear()
+                self.ax.plot(self.bg_history)
+
+            plt.pause(0.0000001)
+            plt.show()
+
             return None
         else:
             super(HovorkaDiabetes, self).render(mode=mode) # just raise an exception
 
-
+            plt.ion()
+            plt.plot(self.bg_history)
