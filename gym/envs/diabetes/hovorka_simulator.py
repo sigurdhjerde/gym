@@ -18,8 +18,8 @@ dt = 1
 t_end = 1440
 
 # insulin variables
-# basal_init = 6.66
-basal_init = 5.99
+basal_init = 6.66
+# basal_init = 5.99
 
 
 # Patient and patient parameters
@@ -283,7 +283,8 @@ def calculate_reward(blood_glucose_level):
         bg_ref = 80
         h = 10
 
-        reward =  np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2);
+        # reward =  10 * np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2) - 5
+        reward =  np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2)
 
 
     return reward
@@ -499,18 +500,20 @@ def bgplot(blood_glucose_level):
 if __name__ == '__main__':
     # """ Main method testing the simulator """
 
+    # TODO: This is no longer in use!
     # Insulin parameters
-    basal = 8.3 # units per day
-    bolus = 8.8 # [mU/mmol]
+    # basal = 8.3 # units per day
+    # bolus = 8.8 # [mU/mmol]
 
-    n_days = 10
-    # Running simulation
-    blood_glucose_level = simulate(bolus, basal, n_days)
+    # n_days = 10
+    # # Running simulation
+    # blood_glucose_level = simulate(bolus, basal, n_days)
 
-    # Calculating reward
-    r = calculate_reward(blood_glucose_level)
-    print('Reward is:', r)
+    # # Calculating reward
+    # r = calculate_reward(blood_glucose_level)
+    # print('Reward is:', r)
 
-    # Plotting
-    bgplot(blood_glucose_level)
+    # # Plotting
+    # bgplot(blood_glucose_level)
+    print('Hello')
 
