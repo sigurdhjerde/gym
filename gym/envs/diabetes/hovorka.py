@@ -49,7 +49,7 @@ class HovorkaDiabetes(gym.Env):
 
         # Initial glucose regulation parameters
         self.basal = 8.3
-        self.bolus = 8.8
+        # self.bolus = 8.8
 
 
         self._seed()
@@ -63,13 +63,13 @@ class HovorkaDiabetes(gym.Env):
         # self.simulation_state = init_simulation_state
 
         # Initial state using cont measurements
-        X0, _, _, _, _ = hs.simulation_setup(1)
+        X0, _, _, _, P = hs.simulation_setup(1)
 
         # State is BG, simulation_state is parameters of hovorka model
-        self.state = X0[4]
+        self.state = X0[4] * 18 / P[12]
         self.simulation_state = X0
         # Keeping track of entire blood glucose level for each episode
-        self.bg_history = [X0[4]]
+        self.bg_history = [X0[4] * 18 / P[12]]
 
         # Counter for number of iterations
         self.num_iters = 0
@@ -78,7 +78,10 @@ class HovorkaDiabetes(gym.Env):
         self.bg_threshold_low = 0
         self.bg_threshold_high = 500
 
-        self.max_iter = 2880
+        self.bg_threshold_low = 50
+        self.bg_threshold_high = 180
+
+        self.max_iter = 1000
 
 
         self.steps_beyond_done = None
@@ -159,18 +162,21 @@ class HovorkaDiabetes(gym.Env):
         #TODO: Insert init code here!
 
         # Initial state using cont measurements
-        X0, _, _, _, _ = hs.simulation_setup(1)
+        X0, _, _, _, P = hs.simulation_setup(1)
 
         # State is BG, simulation_state is parameters of hovorka model
-        self.state = X0[4]
+        self.state = X0[4] * 18 / P[12]
         self.simulation_state = X0
-        self.bg_history = [X0[4]]
+        self.bg_history = [X0[4] * 18 / P[12] ]
+
+        self.num_iters = 0
+        self.basal = 8.8
 
         self.steps_beyond_done = None
         return np.array(self.state)
 
 
-    def render(self, mode='human'):
+    def render(self, mode='human', close=False):
         #TODO: Clean up plotting routine
 
         if mode == 'rgb_array':
