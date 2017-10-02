@@ -269,9 +269,10 @@ def calculate_reward(blood_glucose_level):
     Positive reward if within normal glycemic range, zero otherwise. If reward_flag is zero then De Paula's method is used
     """
 
-    reward_flag = 0
+    reward_flag = 2
 
     if reward_flag == 1:
+        ''' Binary reward function'''
         low_bg = 70
         high_bg = 170
 
@@ -279,9 +280,15 @@ def calculate_reward(blood_glucose_level):
             reward = 1
         else:
             reward = 0
-    else:
+    elif reward_flag == 2:
+        ''' Squared cost function '''
         bg_ref = 80
-        h = 10
+
+        reward = - (blood_glucose_level - bg_ref)**2
+    else:
+        ''' Gaussian reward function '''
+        bg_ref = 80
+        h = 30
 
         # reward =  10 * np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2) - 5
         reward =  np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2)

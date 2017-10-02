@@ -8,3 +8,9 @@ register(
         timestep_limit = 1440,
         max_episode_steps=1440
         )
+register(
+        id = 'MinimalDiabetes-v0',
+        entry_point = 'diabetes.minimal_env:MinimalDiabetes',
+        timestep_limit = 1440,
+        max_episode_steps = 1440
+        )
