@@ -32,16 +32,16 @@ def meal_setup(n_days):
     # TODO: add noise perturbation
 
     # Meal parameters -- Mosching/Bastani setup
-    # meal_times = [8*60, 12*60, 16*60]
-    # meal_amounts = [40, 70, 70]
+    meal_times = [8*60, 14*60, 18*60]
+    meal_amounts = [40, 70, 70]
 
     # A single meal
     # meal_times = [8*60]
     # meal_amounts = [80]
 
     # No meal
-    meal_times = [0]
-    meal_amounts = [0]
+    # meal_times = [0]
+    # meal_amounts = [0]
 
     # Meal vector
     meals = np.zeros(t_end)
@@ -190,6 +190,7 @@ def simulate_one_step(basal_rate, simulator_state):
 
     # Updating parameters
     integrator.set_f_params(insulin_rate, 0, P)
+
     # Integrating the ODE
     integrator.integrate(integrator.t+dt)
 
@@ -269,7 +270,7 @@ def calculate_reward(blood_glucose_level):
     Positive reward if within normal glycemic range, zero otherwise. If reward_flag is zero then De Paula's method is used
     """
 
-    reward_flag = 2
+    reward_flag = 3
 
     if reward_flag == 1:
         ''' Binary reward function'''
@@ -285,6 +286,18 @@ def calculate_reward(blood_glucose_level):
         bg_ref = 80
 
         reward = - (blood_glucose_level - bg_ref)**2
+
+    elif reward_flag == 3:
+        ''' Absolute cost function '''
+        bg_ref = 80
+
+        reward = - abs(blood_glucose_level - bg_ref)
+
+    # elif reward_flag == 4:
+        # ''' Squared cost with insulin constraint '''
+        # bg_ref = 80
+
+        # reward = - (blood_glucose_level - bg_ref)**2 - 
     else:
         ''' Gaussian reward function '''
         bg_ref = 80
