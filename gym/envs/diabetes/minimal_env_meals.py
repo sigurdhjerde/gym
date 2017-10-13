@@ -1,5 +1,5 @@
 """
-OPENAI gym environment for the minimal model
+OPENAI gym environment for the minimal model -- with meals
 """
 
 import logging
@@ -21,7 +21,7 @@ import hovorka_simulator as hs
 
 logger = logging.getLogger(__name__)
 
-class MinimalDiabetes(gym.Env):
+class MinimalDiabetesMeals(gym.Env):
     # TODO: fix metadata
     metadata = {
         'render.modes': ['human', 'rgb_array'],
@@ -77,6 +77,10 @@ class MinimalDiabetes(gym.Env):
         self.steps_beyond_done = None
 
 
+        # Meal information
+        self.meals = hs.meal_setup(1)
+
+
     def _step(self, action):
         """
         Take action. In the diabetes simulation this means increase, decrease or do nothing
@@ -87,7 +91,8 @@ class MinimalDiabetes(gym.Env):
         # Running the simulation for one step
 
         # The action is the insulin pump ratio
-        self.integrator_carb.set_f_params(0, self.P)
+        carbs = self.meals[self.num_iters]
+        self.integrator_carb.set_f_params(carbs, self.P)
         self.integrator_carb.integrate(self.integrator_carb.t + 1)
 
         self.integrator_insulin.set_f_params(action, self.integrator_carb.y[2], self.P)
