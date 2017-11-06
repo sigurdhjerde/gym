@@ -72,13 +72,17 @@ class MinimalDiabetesMeals(gym.Env):
 
         self.bg_history = []
 
-        self.max_iter = 1000
+        self.max_iter = 1440
 
         self.steps_beyond_done = None
 
 
         # Meal information
+        self.IC = 8.8
         self.meals = hs.meal_setup(1)
+
+        # keeping track if insulin action
+        self.insulin = None
 
 
     def _step(self, action):
@@ -95,12 +99,16 @@ class MinimalDiabetesMeals(gym.Env):
         self.integrator_carb.set_f_params(carbs, self.P)
         self.integrator_carb.integrate(self.integrator_carb.t + 1)
 
-        self.integrator_insulin.set_f_params(action, self.integrator_carb.y[2], self.P)
+        # TODO: Insert meal bolus here!
+        bolus = self.meals[self.num_iters] * self.IC
+        logging.info('Calculating bolus')
+        self.integrator_insulin.set_f_params(action + bolus, self.integrator_carb.y[2], self.P)
         self.integrator_insulin.integrate(self.integrator_insulin.t + 1)
 
         # Updating state
         bg = self.integrator_insulin.y[0] + 80
         self.state = [bg]
+        self.insulin = action + bolus
 
         self.num_iters += 1
 

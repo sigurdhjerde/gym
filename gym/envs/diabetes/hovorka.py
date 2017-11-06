@@ -14,8 +14,6 @@ import numpy.matlib
 import matplotlib.pyplot as plt
 
 # Hovorka simulator
-import sys
-sys.path.append('~/gym/envs/diabetes')
 import hovorka_simulator as hs
 
 # ODE solver stuff
