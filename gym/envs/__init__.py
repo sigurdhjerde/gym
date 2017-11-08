@@ -2,19 +2,25 @@ from gym.envs.registration import registry, register, make, spec
 
 # Diabetes!
 # ----------------------------------------
-# register(
-    # id='hovorka-v0',
-    # entry_point='gym.envs.diabetes.hovorka:HovorkaDiabetes',
-    # timestep_limit=200,
-    # reward_threshold=25.0,
-# )
 register(
         id = 'HovorkaDiabetes-v0',
         entry_point = 'gym.envs.diabetes.hovorka:HovorkaDiabetes',
         timestep_limit = 1440,
         max_episode_steps=1440
         )
+register(
+        id = 'MinimalDiabetes-v0',
+        entry_point = 'gym.envs.diabetes.minimal_env:MinimalDiabetes',
+        timestep_limit = 1440,
+        max_episode_steps=1440
+        )
 
+register(
+        id = 'MinimalDiabetesMeals-v0',
+        entry_point = 'gym.envs.diabetes.minimal_env_meals:MinimalDiabetesMeals',
+        timestep_limit = 1440,
+        max_episode_steps=1440
+        )
 # Algorithmic
 # ----------------------------------------
 
