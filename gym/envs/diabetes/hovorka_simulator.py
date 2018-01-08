@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Importing relevant stuff
 from scipy.integrate import ode
 from scipy.optimize import fsolve
@@ -30,24 +28,26 @@ def meal_setup(n_days):
     ''' Setting meal parameters '''
 
     # TODO: add noise perturbation
+    # Meal vector
+    meals = np.zeros(t_end)
 
     # Meal parameters -- Mosching/Bastani setup
-    meal_times = [8*60, 14*60, 18*60]
-    meal_amounts = [40, 70, 70]
+    # meal_times = [8*60, 14*60, 18*60]
+    # meal_amounts = [40, 70, 70]
 
     # A single meal
-    # meal_times = [8*60]
-    # meal_amounts = [80]
+    meal_times = [8*60]
+    meal_amounts = [50]
+
+    meals[meal_times[0]:meal_times[0]+eating_time] = meal_amounts[0] / eating_time * 1000 / 180
 
     # No meal
     # meal_times = [0]
     # meal_amounts = [0]
 
-    # Meal vector
-    meals = np.zeros(t_end)
 
-    for i in range(len(meal_times)):
-        meals[meal_times[i]-1 : meal_times[i]-1 + eating_time] = meal_amounts[i]/eating_time * 1000 /180
+    # for i in range(len(meal_times)):
+        # meals[meal_times[i] : meal_times[i] + eating_time] = meal_amounts[i]/eating_time * 1000 /180
 
     # Repeating if multiple days
     if n_days > 1:
@@ -271,25 +271,26 @@ def calculate_reward(blood_glucose_level):
     """
 
     reward_flag = 3
+    # reward_flag = 4
 
     if reward_flag == 1:
         ''' Binary reward function'''
         low_bg = 70
-        high_bg = 170
+        high_bg = 120
 
-        if max(blood_glucose_level) < high_bg and min(blood_glucose_level) > low_bg:
+        if np.max(blood_glucose_level) < high_bg and np.min(blood_glucose_level) > low_bg:
             reward = 1
         else:
             reward = 0
     elif reward_flag == 2:
         ''' Squared cost function '''
-        bg_ref = 80
+        bg_ref = 90
 
         reward = - (blood_glucose_level - bg_ref)**2
 
     elif reward_flag == 3:
         ''' Absolute cost function '''
-        bg_ref = 80
+        bg_ref = 90
 
         reward = - abs(blood_glucose_level - bg_ref)
 
@@ -300,7 +301,7 @@ def calculate_reward(blood_glucose_level):
         # reward = - (blood_glucose_level - bg_ref)**2 - 
     else:
         ''' Gaussian reward function '''
-        bg_ref = 80
+        bg_ref = 90
         h = 30
 
         # reward =  10 * np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2) - 5

@@ -1,6 +1,7 @@
 from gym.envs.diabetes.hovorka import HovorkaDiabetes
 from gym.envs.diabetes.minimal_env import MinimalDiabetes
 from gym.envs.diabetes.minimal_env_meals import MinimalDiabetesMeals
+from gym.envs.diabetes.minimal_env_mod import MinimalDiabetesMod
 
 # from gym.envs.registration import register
 

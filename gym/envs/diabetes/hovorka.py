@@ -174,7 +174,7 @@ class HovorkaDiabetes(gym.Env):
         return np.array(self.state)
 
 
-    def render(self, mode='human', close=False):
+    def _render(self, mode='human', close=False):
         #TODO: Clean up plotting routine
 
         if mode == 'rgb_array':
