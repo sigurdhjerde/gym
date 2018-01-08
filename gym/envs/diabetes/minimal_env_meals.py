@@ -14,8 +14,6 @@ from scipy.integrate import ode
 import matplotlib.pyplot as plt
 
 # Hovorka simulator
-import sys
-sys.path.append('~/gym/envs/diabetes')
 import minimal_model as mm
 import hovorka_simulator as hs
 
@@ -35,7 +33,7 @@ class MinimalDiabetesMeals(gym.Env):
 
         # Continuous action space -- change in basal rate
         # self.action_space = spaces.Box(0, 40, 1)
-        self.action_space = spaces.Box(-80, 500, 1)
+        self.action_space = spaces.Box(0, 500, 1)
 
         # Continuous observation space
         self.observation_space = spaces.Box(0, 500, 1)
@@ -60,7 +58,7 @@ class MinimalDiabetesMeals(gym.Env):
         self.integrator_carb.set_initial_value(np.array([0, 0, 0]))
         self.integrator_insulin.set_initial_value(np.array([self.init_deviation, 0]))
 
-        # Hovorka parameters
+        # Hovorka parameters  -- 70 kg male?
         self.P = hs.hovorka_parameters(70)
 
         # Counter for number of iterations
@@ -78,10 +76,10 @@ class MinimalDiabetesMeals(gym.Env):
 
 
         # Meal information
-        self.IC = 8.8
+        self.IC = 0
         self.meals = hs.meal_setup(1)
 
-        # keeping track if insulin action
+        # keeping track of insulin action
         self.insulin = None
 
 
@@ -99,14 +97,14 @@ class MinimalDiabetesMeals(gym.Env):
         self.integrator_carb.set_f_params(carbs, self.P)
         self.integrator_carb.integrate(self.integrator_carb.t + 1)
 
-        # TODO: Insert meal bolus here!
+        # Meal info
         bolus = self.meals[self.num_iters] * self.IC
-        logging.info('Calculating bolus')
+
         self.integrator_insulin.set_f_params(action + bolus, self.integrator_carb.y[2], self.P)
         self.integrator_insulin.integrate(self.integrator_insulin.t + 1)
 
         # Updating state
-        bg = self.integrator_insulin.y[0] + 80
+        bg = self.integrator_insulin.y[0] + 90
         self.state = [bg]
         self.insulin = action + bolus
 
@@ -151,7 +149,7 @@ class MinimalDiabetesMeals(gym.Env):
         self.integrator_insulin.set_initial_value(np.array([self.init_deviation, 0]))
 
         # self.state = [90]
-        self.state = [self.init_deviation + 80]
+        self.state = [self.init_deviation + 90]
 
         self.bg_history = []
 
@@ -162,7 +160,7 @@ class MinimalDiabetesMeals(gym.Env):
         return np.array(self.state)
 
 
-    def render(self, mode='human', close=False):
+    def _render(self, mode='human', close=False):
         #TODO: Clean up plotting routine
 
         if mode == 'rgb_array':

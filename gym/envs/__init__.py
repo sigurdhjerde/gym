@@ -21,6 +21,13 @@ register(
         timestep_limit = 1440,
         max_episode_steps=1440
         )
+
+register(
+        id = 'MinimalDiabetesMod-v0',
+        entry_point = 'gym.envs.diabetes.minimal_env_mod:MinimalDiabetesMod',
+        timestep_limit = 1440,
+        max_episode_steps=1440
+        )
 # Algorithmic
 # ----------------------------------------
 
