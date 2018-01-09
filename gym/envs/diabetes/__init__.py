@@ -3,6 +3,8 @@ from gym.envs.diabetes.minimal_env import MinimalDiabetes
 from gym.envs.diabetes.minimal_env_meals import MinimalDiabetesMeals
 from gym.envs.diabetes.minimal_env_mod import MinimalDiabetesMod
 
+import gym.envs.diabetes.hovorka_simulator
+
 # from gym.envs.registration import register
 
 # register(
