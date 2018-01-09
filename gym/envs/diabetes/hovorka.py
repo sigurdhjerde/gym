@@ -143,7 +143,7 @@ class HovorkaDiabetes(gym.Env):
             self.steps_beyond_done += 1
             reward = 0.0
 
-        return np.array(self.state), reward, done, {}
+        return np.array([self.state]), reward, done, {}
 
     def _reset(self):
         #TODO: Insert init code here!
@@ -160,7 +160,7 @@ class HovorkaDiabetes(gym.Env):
         self.basal = 8.8
 
         self.steps_beyond_done = None
-        return np.array(self.state)
+        return np.array([self.state])
 
 
     def _render(self, mode='human', close=False):
