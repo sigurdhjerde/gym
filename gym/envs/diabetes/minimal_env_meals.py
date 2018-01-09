@@ -14,8 +14,8 @@ from scipy.integrate import ode
 import matplotlib.pyplot as plt
 
 # Hovorka simulator
-import minimal_model as mm
-import hovorka_simulator as hs
+from gym.envs.diabetes import minimal_model as mm
+from gym.envs.diabetes import hovorka_simulator as hs
 
 logger = logging.getLogger(__name__)
 

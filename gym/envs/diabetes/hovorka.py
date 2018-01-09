@@ -14,7 +14,8 @@ import numpy.matlib
 import matplotlib.pyplot as plt
 
 # Hovorka simulator
-import hovorka_simulator as hs
+from gym.envs.diabetes import hovorka_simulator as hs
+# import hovorka_simulator as hs
 
 # ODE solver stuff
 # from scipy.integrate import ode
