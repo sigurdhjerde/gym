@@ -1,5 +1,4 @@
 from gym.envs.registration import registry, register, make, spec
-import gym.envs.diabetes.hovorka_simulator
 
 # Diabetes!
 # ----------------------------------------
