@@ -77,22 +77,10 @@ class HovorkaDiabetes(gym.Env):
         self.bg_threshold_low = 0
         self.bg_threshold_high = 500
 
-        self.bg_threshold_low = 50
-        self.bg_threshold_high = 180
-
-        self.max_iter = 1000
+        self.max_iter = 3000
 
 
         self.steps_beyond_done = None
-
-        # Plotting 
-
-    # def _seed(self, seed=None):
-        # """
-        # Do we really need this?
-        # """
-        # self.np_random, seed = seeding.np_random(seed)
-        # return [seed]
 
     def _step(self, action):
         """
@@ -148,7 +136,7 @@ class HovorkaDiabetes(gym.Env):
         elif self.steps_beyond_done is None:
             # Blood glucose below zero -- simulation out of bounds
             self.steps_beyond_done = 0
-            reward = 1.0
+            reward = 0.0
         else:
             if self.steps_beyond_done == 0:
                 logger.warning("You are calling 'step()' even though this environment has already returned done = True. You should always call 'reset()' once you receive 'done = True' -- any further steps are undefined behavior.")
