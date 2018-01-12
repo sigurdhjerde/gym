@@ -56,7 +56,7 @@ class MinimalDiabetes(gym.Env):
         self.integrator_insulin.set_integrator('dop853')
 
         # Initial values
-        self.init_deviation = 30
+        self.init_deviation = 0
         self.integrator_carb.set_initial_value(np.array([0, 0, 0]))
         self.integrator_insulin.set_initial_value(np.array([self.init_deviation, 0]))
 
