@@ -37,6 +37,9 @@ def insulin_model(t, xk, uk, U_G, P):
     xdot = np.zeros([2,1])
     xdot[0] = (-p1*xk[0] - xk[1]*(xk[0] + gb) + U_G/(V_G)*18)
     # xdot[0] = (-p1*xk[0] - xk[1]*(xk[0] + gb) + xk[2]/(V_G)*18)
-    xdot[1] = (-p2*xk[1] + p3*V_G*uk)
+
+    # Basal insulin rate i 5 mu/Min
+    I_b = 5
+    xdot[1] = (-p2*xk[1] + p3*V_G*(uk-I_b))
 
     return xdot
