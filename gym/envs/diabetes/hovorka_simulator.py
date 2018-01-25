@@ -20,6 +20,9 @@ basal_init = 6.66
 # basal_init = 5.99
 
 
+# pre meal bolus announcement
+premeal_bolus_time = 30
+
 # Patient and patient parameters
 body_weight = 70
 eating_time = 30
@@ -30,30 +33,33 @@ def meal_setup(n_days):
     # TODO: add noise perturbation
     # Meal vector
     meals = np.zeros(t_end)
+    meal_indicator = np.zeros(t_end)
 
     # Meal parameters -- Mosching/Bastani setup
-    # meal_times = [8*60, 14*60, 18*60]
-    # meal_amounts = [40, 70, 70]
+    # meal_times = [8*60, 14*60, 19*60]
+    meal_times = [2*60, 8*60, 13*60]
+    meal_amounts = [40, 70, 70]
 
     # A single meal
-    meal_times = [8*60]
-    meal_amounts = [50]
+    # meal_times = [8*60]
+    # meal_amounts = [50]
 
-    meals[meal_times[0]:meal_times[0]+eating_time] = meal_amounts[0] / eating_time * 1000 / 180
+    # meals[meal_times[0]:meal_times[0]+eating_time] = meal_amounts[0] / eating_time * 1000 / 180
 
     # No meal
     # meal_times = [0]
     # meal_amounts = [0]
 
 
-    # for i in range(len(meal_times)):
-        # meals[meal_times[i] : meal_times[i] + eating_time] = meal_amounts[i]/eating_time * 1000 /180
+    for i in range(len(meal_times)):
+        meals[meal_times[i] : meal_times[i] + eating_time] = meal_amounts[i]/eating_time * 1000 /180
+        meal_indicator[meal_times[i]-premeal_bolus_time:meal_times[i]] = meal_amounts[i] * 1000 / 180
 
     # Repeating if multiple days
     if n_days > 1:
         meals = np.ravel(np.matlib.repmat(meals, 1, n_days))
 
-    return meals
+    return meals, meal_indicator
 
 def carb_rate(IC):
     ''' Converting carb rate to mmol/min'''
@@ -85,7 +91,7 @@ def simulation_setup(n_days):
     # Meal setup
     meals = meal_setup(n_days)
 
-    return X0, meals, integrator, times, P
+    return X0, meals[0], integrator, times, P
 
 def simulate_first_day(BR, IC):
     ''' Running the Hovorka simulation for the first day'''
@@ -202,6 +208,44 @@ def simulate_one_step(basal_rate, simulator_state):
 
     return blood_glucose_level, integrator.y
 
+def simulate_one_step_with_meals(BR, IC, num_iter, simulator_state):
+    '''
+    Running the Hovorka simulation for a single step
+
+    The episode stops if BG is below zero or above 300, or
+    the number of iterations (minutes) reaches 2880.
+    '''
+
+    _, _, integrator, _, P = simulation_setup(1)
+
+    meals, meal_indicator = meal_setup(1)
+
+    # Only basal rate at the moment from unit pr day to mU/min
+    basal_rate = BR * 1000 / 1440
+
+    insulin_rate = basal_rate + (meal_indicator[num_iter] * IC)/premeal_bolus_time
+
+    # Running the simulation
+
+    # initial value
+    integrator.set_initial_value(simulator_state, 0)
+
+    blood_glucose_level = [simulator_state[4]]
+
+    # Updating parameters
+    integrator.set_f_params(insulin_rate, meals[num_iter], P)
+
+    # Integrating the ODE
+    integrator.integrate(integrator.t+dt)
+
+    # blood glucose level
+    blood_glucose_level = integrator.y[4]
+
+    # Converting to mg/dl
+    blood_glucose_level = np.asarray(blood_glucose_level) * 18 / P[12]
+
+    return blood_glucose_level, integrator.y
+
 def simulate_one_day(BR, IC, simulator_state):
     ''' Running the Hovorka simulation for a single day'''
 
@@ -271,7 +315,7 @@ def calculate_reward(blood_glucose_level):
     """
 
     reward_flag = 3
-    # reward_flag = 4
+    # reward_flag = 1
 
     if reward_flag == 1:
         ''' Binary reward function'''
@@ -281,7 +325,7 @@ def calculate_reward(blood_glucose_level):
         if np.max(blood_glucose_level) < high_bg and np.min(blood_glucose_level) > low_bg:
             reward = 1
         else:
-            reward = 0
+            reward = -1
     elif reward_flag == 2:
         ''' Squared cost function '''
         bg_ref = 90

@@ -48,7 +48,7 @@ class HovorkaDiabetes(gym.Env):
 
         # Initial glucose regulation parameters
         self.basal = 8.3
-        # self.bolus = 8.8
+        self.bolus = 8.8
 
 
         self._seed()
@@ -92,7 +92,7 @@ class HovorkaDiabetes(gym.Env):
         # Variables
         state = self.state
         simulation_state = self.simulation_state
-        # bolus = self.bolus
+        IC = self.bolus
         # basal = self.basal
 
         # New bolus rate from action
@@ -106,7 +106,7 @@ class HovorkaDiabetes(gym.Env):
         # Take a step with the new action -- run the simulation for one day with new bolus amount
         # bg, simulation_state_new = hs.simulate_one_day(basal, bolus_new, simulation_state)
 
-        bg, simulation_state_new = hs.simulate_one_step(action, simulation_state)
+        bg, simulation_state_new = hs.simulate_one_step_with_meals(action, IC, self.num_iters, simulation_state)
         self.num_iters += 1
 
         # Updating environment parameters
@@ -116,7 +116,6 @@ class HovorkaDiabetes(gym.Env):
         self.bg_history.append(bg)
 
         # Updating state
-        # self.state = bg[0:len(bg):5]
         self.state = bg
 
         #Set environment done = True if blood_glucose_level is negative
