@@ -49,6 +49,7 @@ class HovorkaDiabetes(gym.Env):
         # Initial glucose regulation parameters
         self.basal = 8.3
         self.bolus = 8.8
+        self.init_basal = 6.66
 
 
         self._seed()
@@ -62,7 +63,7 @@ class HovorkaDiabetes(gym.Env):
         # self.simulation_state = init_simulation_state
 
         # Initial state using cont measurements
-        X0, _, _, _, P = hs.simulation_setup(1)
+        X0, _, _, _, P = hs.simulation_setup(1, self.init_basal)
 
         # State is BG, simulation_state is parameters of hovorka model
         self.state = X0[4] * 18 / P[12]
@@ -148,7 +149,7 @@ class HovorkaDiabetes(gym.Env):
         #TODO: Insert init code here!
 
         # Initial state using cont measurements
-        X0, _, _, _, P = hs.simulation_setup(1)
+        X0, _, _, _, P = hs.simulation_setup(1, self.init_basal)
 
         # State is BG, simulation_state is parameters of hovorka model
         self.state = X0[4] * 18 / P[12]

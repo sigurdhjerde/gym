@@ -66,7 +66,7 @@ def carb_rate(IC):
     carb_ratio = IC / eating_time *1000 / 180
     return carb_ratio
 
-def simulation_setup(n_days):
+def simulation_setup(n_days, basal_init):
     """
     Initializing the Hovorka simulation.
     """
@@ -182,7 +182,7 @@ def simulate_one_step(basal_rate, simulator_state):
     the number of iterations (minutes) reaches 2880.
     '''
 
-    _, _, integrator, _, P = simulation_setup(1)
+    _, _, integrator, _, P = simulation_setup(1, 6.66)
 
     # Only basal rate at the moment from unit pr day to mU/min
     insulin_rate = basal_rate * 1000 / 1440
@@ -216,7 +216,7 @@ def simulate_one_step_with_meals(BR, IC, num_iter, simulator_state):
     the number of iterations (minutes) reaches 2880.
     '''
 
-    _, _, integrator, _, P = simulation_setup(1)
+    _, _, integrator, _, P = simulation_setup(1, 6.66)
 
     meals, meal_indicator = meal_setup(1)
 
