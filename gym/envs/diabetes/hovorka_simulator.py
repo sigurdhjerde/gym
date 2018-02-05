@@ -230,8 +230,6 @@ def simulate_one_step_with_meals(BR, IC, num_iter, simulator_state):
     # initial value
     integrator.set_initial_value(simulator_state, 0)
 
-    blood_glucose_level = [simulator_state[4]]
-
     # Updating parameters
     integrator.set_f_params(insulin_rate, meals[num_iter], P)
 

@@ -44,7 +44,7 @@ class HovorkaDiabetes(gym.Env):
         # Observation space -- bg between 0 and 500, measured every five minutes (1440 mins per day / 5 = 288)
         # self.observation_space = spaces.Box(0, 500, 288)
 
-        self.observation_space = spaces.Box(0, 500, 1)
+        self.observation_space = spaces.Box(0, 500, 2)
 
         # Initial glucose regulation parameters
         self.basal = 8.3
@@ -66,10 +66,15 @@ class HovorkaDiabetes(gym.Env):
         X0, _, _, _, P = hs.simulation_setup(1, self.init_basal)
 
         # State is BG, simulation_state is parameters of hovorka model
-        self.state = X0[4] * 18 / P[12]
+        self.state = [X0[4] * 18 / P[12], X0[6]]
+
+        # self.state[0] = X0[4] * 18 / P[12]
+        # self.state[1] = X0[6]
+
         self.simulation_state = X0
         # Keeping track of entire blood glucose level for each episode
         self.bg_history = [X0[4] * 18 / P[12]]
+        self.insulin_history = [X0[6]]
 
         # Counter for number of iterations
         self.num_iters = 0
@@ -91,7 +96,6 @@ class HovorkaDiabetes(gym.Env):
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
         # Variables
-        state = self.state
         simulation_state = self.simulation_state
         IC = self.bolus
         # basal = self.basal
@@ -115,9 +119,11 @@ class HovorkaDiabetes(gym.Env):
         # self.bolus = bolus_new
         self.basal = action
         self.bg_history.append(bg)
+        self.insulin_history.append(simulation_state_new[6])
 
         # Updating state
-        self.state = bg
+        self.state[0] = bg
+        self.state[1] = simulation_state_new[6]
 
         #Set environment done = True if blood_glucose_level is negative
         done = 0
@@ -132,7 +138,7 @@ class HovorkaDiabetes(gym.Env):
 
         # Calculate Reward  (and give error if action is taken after terminal state)
         if not done:
-            reward = hs.calculate_reward(state)
+            reward = hs.calculate_reward(self.state[0])
         elif self.steps_beyond_done is None:
             # Blood glucose below zero -- simulation out of bounds
             self.steps_beyond_done = 0
@@ -143,7 +149,7 @@ class HovorkaDiabetes(gym.Env):
             self.steps_beyond_done += 1
             reward = 0.0
 
-        return np.array([self.state]), reward, done, {}
+        return np.array(self.state), reward, done, {}
 
     def _reset(self):
         #TODO: Insert init code here!
@@ -152,15 +158,17 @@ class HovorkaDiabetes(gym.Env):
         X0, _, _, _, P = hs.simulation_setup(1, self.init_basal)
 
         # State is BG, simulation_state is parameters of hovorka model
-        self.state = X0[4] * 18 / P[12]
+        self.state[0] = X0[4] * 18 / P[12]
+        self.state[1] = X0[6]
         self.simulation_state = X0
         self.bg_history = [X0[4] * 18 / P[12] ]
+        self.insulin_history = [X0[6]]
 
         self.num_iters = 0
         self.basal = 8.8
 
         self.steps_beyond_done = None
-        return np.array([self.state])
+        return np.array(self.state)
 
 
     def _render(self, mode='human', close=False):
