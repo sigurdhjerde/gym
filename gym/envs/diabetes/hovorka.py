@@ -49,7 +49,8 @@ class HovorkaDiabetes(gym.Env):
         # Initial glucose regulation parameters
         self.basal = 8.3
         self.bolus = 8.8
-        self.init_basal = 6.66
+        # self.init_basal = 6.66
+        self.init_basal = np.random.choice(range(1, 10), 1)
 
 
         self._seed()
@@ -166,6 +167,7 @@ class HovorkaDiabetes(gym.Env):
 
         self.num_iters = 0
         self.basal = 8.8
+        self.init_basal = np.random.choice(range(1, 10), 1)
 
         self.steps_beyond_done = None
         return np.array(self.state)

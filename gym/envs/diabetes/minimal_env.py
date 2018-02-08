@@ -38,7 +38,7 @@ class MinimalDiabetes(gym.Env):
         self.action_space = spaces.Box(0, 500, 1)
 
         # Continuous observation space
-        self.observation_space = spaces.Box(0, 500, 1)
+        self.observation_space = spaces.Box(0, 500, 2)
 
         self._seed()
         self.viewer = None
@@ -94,7 +94,8 @@ class MinimalDiabetes(gym.Env):
 
         # Updating state
         bg = self.integrator_insulin.y[0] + 90
-        self.state = [bg]
+        insulin = self.integrator_insulin.y[1]
+        self.state = [bg, insulin]
 
         self.num_iters += 1
 
@@ -140,7 +141,7 @@ class MinimalDiabetes(gym.Env):
         self.integrator_insulin.set_initial_value(np.array([self.init_deviation, 0]))
 
         # self.state = [90]
-        self.state = [self.init_deviation + 90]
+        self.state = [self.init_deviation + 90, 0]
 
         self.bg_history = []
 

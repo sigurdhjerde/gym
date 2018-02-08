@@ -37,8 +37,8 @@ def meal_setup(n_days):
 
     # Meal parameters -- Mosching/Bastani setup
     # meal_times = [8*60, 14*60, 19*60]
-    meal_times = [2*60, 8*60, 13*60]
-    meal_amounts = [40, 70, 70]
+    # meal_times = [2*60, 8*60, 13*60]
+    # meal_amounts = [40, 70, 70]
 
     # A single meal
     # meal_times = [8*60]
@@ -47,8 +47,8 @@ def meal_setup(n_days):
     # meals[meal_times[0]:meal_times[0]+eating_time] = meal_amounts[0] / eating_time * 1000 / 180
 
     # No meal
-    # meal_times = [0]
-    # meal_amounts = [0]
+    meal_times = [0]
+    meal_amounts = [0]
 
 
     for i in range(len(meal_times)):
@@ -312,7 +312,7 @@ def calculate_reward(blood_glucose_level):
     Positive reward if within normal glycemic range, zero otherwise. If reward_flag is zero then De Paula's method is used
     """
 
-    reward_flag = 3
+    reward_flag = 1
     # reward_flag = 1
 
     if reward_flag == 1:
@@ -321,9 +321,10 @@ def calculate_reward(blood_glucose_level):
         high_bg = 120
 
         if np.max(blood_glucose_level) < high_bg and np.min(blood_glucose_level) > low_bg:
-            reward = 1
+            reward = 0
         else:
             reward = -1
+
     elif reward_flag == 2:
         ''' Squared cost function '''
         bg_ref = 90
