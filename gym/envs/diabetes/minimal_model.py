@@ -26,7 +26,7 @@ def insulin_model(t, xk, uk, U_G, P):
 # def insulin_model(t, xk, uk, P):
     '''Copied from (matlab)Phuong Ngo - UiT 04/2017 '''
 
-    # Parameters
+    # From Hovorka parameters
     p1 = 0.02; p2 = 0.028; p3 = 1e-4
 
     # Reference BG value
@@ -35,11 +35,14 @@ def insulin_model(t, xk, uk, U_G, P):
     # tau_G = P[1] # Time-to-glucose absorption [min]
     V_G = P[12] # Glucose Volume Distribution (L)
     xdot = np.zeros([2,1])
-    xdot[0] = (-p1*xk[0] - xk[1]*(xk[0] + gb) + U_G/(V_G)*18)
-    # xdot[0] = (-p1*xk[0] - xk[1]*(xk[0] + gb) + xk[2]/(V_G)*18)
+
+    # xdot[0] = -p1*xk[0] - xk[1]*(xk[0] + gb) + U_G/(V_G)*18
+    xdot[0] = -p1*(xk[0] - gb) - xk[1]*xk[0] + U_G/(V_G)*18
+
 
     # Basal insulin rate i 5 mu/Min
     I_b = 5
-    xdot[1] = (-p2*xk[1] + p3*V_G*(uk-I_b))
+    # xdot[1] = -p2*xk[1] + p3*V_G*(uk-I_b)
+    xdot[1] = -p2*xk[1] + p3*(uk-I_b)
 
     return xdot

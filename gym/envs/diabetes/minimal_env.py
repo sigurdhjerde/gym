@@ -56,7 +56,8 @@ class MinimalDiabetes(gym.Env):
         self.integrator_insulin.set_integrator('dop853')
 
         # Initial values
-        self.init_deviation = 0
+        self.init_deviation = np.random.choice(range(20, 150, 1), 1)
+        # self.init_deviation = 300
         self.integrator_carb.set_initial_value(np.array([0, 0, 0]))
         self.integrator_insulin.set_initial_value(np.array([self.init_deviation, 0]))
 
@@ -71,6 +72,7 @@ class MinimalDiabetes(gym.Env):
         self.bg_threshold_high = 500
 
         self.bg_history = []
+        self.insulin_history = []
 
         self.max_iter = 1000
 
@@ -93,7 +95,8 @@ class MinimalDiabetes(gym.Env):
         self.integrator_insulin.integrate(self.integrator_insulin.t + 1)
 
         # Updating state
-        bg = self.integrator_insulin.y[0] + 90
+        # bg = self.integrator_insulin.y[0] + 90
+        bg = self.integrator_insulin.y[0]
         insulin = self.integrator_insulin.y[1]
         self.state = [bg, insulin]
 
@@ -101,6 +104,7 @@ class MinimalDiabetes(gym.Env):
 
         # Updating environment parameters
         self.bg_history.append(bg)
+        self.insulin_history.append(insulin)
 
 
         #Set environment done = True if blood_glucose_level is negative
@@ -135,15 +139,20 @@ class MinimalDiabetes(gym.Env):
     def _reset(self):
         #TODO: Insert init code here!
 
+        self.init_deviation = np.random.choice(range(20, 150, 1), 1)
+        # self.init_deviation = 300
+
         # Initial values
         self.integrator_carb.set_initial_value(np.array([0, 0, 0]))
 
         self.integrator_insulin.set_initial_value(np.array([self.init_deviation, 0]))
 
         # self.state = [90]
-        self.state = [self.init_deviation + 90, 0]
+        # self.state = [self.init_deviation + 90, 0]
+        self.state = [self.init_deviation, 0]
 
         self.bg_history = []
+        self.insulin_history = []
 
         self.num_iters = 0
 
@@ -184,4 +193,4 @@ class MinimalDiabetes(gym.Env):
 
     def _close(self):
         ''' closing the rendering'''
-        plt.close(999)
+        plt.close(1000)
