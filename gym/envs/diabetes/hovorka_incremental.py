@@ -1,30 +1,35 @@
 """
-OPENAI gym environment for the Hovorka model
+OPENAI gym environment for the incremental Hovorka model
 Converted/inspired from cartpole to Hovorka model!
+
+The actions are: increase insulin by 20%, decrease by 20%, do nothing, reset to init basal
+and set insulin to zero.
 """
 
 import logging
 import gym
 from gym import spaces
-
+# from gym.utils import seeding
 import numpy as np
 import numpy.matlib
 
 # Plotting for the rendering
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
 
 # Hovorka simulator
-# from gym.envs.diabetes import hovorka_simulator as hs
-from gym.envs.diabetes.hovorka_model import hovorka_parameters, hovorka_model, hovorka_model_tuple
+from gym.envs.diabetes import hovorka_simulator as hs
+# import hovorka_simulator as hs
 
 # ODE solver stuff
-from scipy.integrate import ode
-from scipy.optimize import fsolve
+# from scipy.integrate import ode
+# from scipy.optimize import fsolve
 
 logger = logging.getLogger(__name__)
 
-class HovorkaDiabetes(gym.Env):
-    # TODO: fix metadata??
+class HovorkaDiabetesIncremental(gym.Env):
+    # TODO: fix metadata
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second' : 50
@@ -39,7 +44,8 @@ class HovorkaDiabetes(gym.Env):
         # self.action_space = spaces.Discrete(3)
 
         # Continuous action space
-        self.action_space = spaces.Box(0, 200, 1)
+        # self.action_space = spaces.Box(0, 200, 1)
+        self.action_space = spaces.Discrete(5)
 
         # Observation space -- bg between 0 and 500, measured every five minutes (1440 mins per day / 5 = 288)
         # self.observation_space = spaces.Box(0, 500, 288)
@@ -55,30 +61,15 @@ class HovorkaDiabetes(gym.Env):
         self._seed()
         self.viewer = None
 
-        # ==========================================
-        # Setting up the Hovorka simulator
-        # ==========================================
+        # Initial state
+        X0, _, _, _, P = hs.simulation_setup(1, self.init_basal)
 
-        # Patient parameters
-        P = hovorka_parameters(70)
-        self.P = P
-
-        # Initial values for parameters
-        initial_pars = (self.init_basal, 0, P)
-
-        # Initial value
-        X0 = fsolve(hovorka_model_tuple, np.zeros(10), args=initial_pars)
-        self.X0 = X0
-
-        # Simulation setup
-        self.integrator = ode(hovorka_model)
-        self.integrator.set_integrator('vode', method='bdf', order=5)
-        self.integrator.set_initial_value(X0, 0)
-
-        # State is BG, simulation_state is parameters of hovorka model
+        # State is BG and plasma insulin concentration, simulation_state is parameters of hovorka model
         self.state = [X0[4] * 18 / P[12], X0[6]]
-
         self.simulation_state = X0
+
+        # self.state[0] = X0[4] * 18 / P[12]
+        # self.state[1] = X0[6]
 
         # Keeping track of entire blood glucose level for each episode
         self.bg_history = [X0[4] * 18 / P[12]]
@@ -91,6 +82,7 @@ class HovorkaDiabetes(gym.Env):
         self.bg_threshold_low = 0
         self.bg_threshold_high = 500
 
+        # Arbitrary number to end episode
         self.max_iter = 3000
 
         self.steps_beyond_done = None
@@ -103,31 +95,35 @@ class HovorkaDiabetes(gym.Env):
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
         # Variables
+        simulation_state = self.simulation_state
         IC = self.bolus
-        # basal = self.basal
 
-        # ===============================================
-        # Solving one step of the Hovorka model
-        # ===============================================
-        self.integrator.set_initial_value(self.simulation_state, self.num_iters)
+        if action == 0:
+            self.basal = self.basal * .8
+        elif action == 1:
+            self.basal = self.basal * 1.2
+        elif action == 2:
+            self.basal = self.basal * 1
+        elif action == 3:
+            self.basal = 0
+        elif action == 4:
+            self.basal = 8.3
 
-        self.integrator.set_f_params(action, 0, self.P)
 
-        self.integrator.integrate(self.integrator.t + 1)
-
+        # Hovorka model with meals
+        bg, simulation_state_new = hs.simulate_one_step_with_meals(self.basal, IC, self.num_iters, simulation_state)
         self.num_iters += 1
 
         # Updating environment parameters
-        self.simulation_state = self.integrator.y
-
-        bg = self.integrator.y[4] * 18 / self.P[12]
-
+        self.simulation_state = simulation_state_new
+        # self.bolus = bolus_new
+        # self.basal = action
         self.bg_history.append(bg)
-        self.insulin_history.append(self.integrator.y[6])
+        self.insulin_history.append(simulation_state_new[6])
 
         # Updating state
         self.state[0] = bg
-        self.state[1] = self.integrator.y[6]
+        self.state[1] = simulation_state_new[6]
 
         #Set environment done = True if blood_glucose_level is negative
         done = 0
@@ -142,45 +138,7 @@ class HovorkaDiabetes(gym.Env):
 
         # Calculate Reward  (and give error if action is taken after terminal state)
         if not done:
-
-            reward_flag = 3
-
-            if reward_flag == 1:
-                ''' Binary reward function'''
-                low_bg = 70
-                high_bg = 120
-
-                if np.max(bg) < high_bg and np.min(bg) > low_bg:
-                    reward = 1
-                else:
-                    reward = 0
-
-            elif reward_flag == 2:
-                ''' Squared cost function '''
-                bg_ref = 90
-
-                reward = - (bg - bg_ref)**2
-
-            elif reward_flag == 3:
-                ''' Absolute cost function '''
-                bg_ref = 90
-
-                reward = - abs(bg - bg_ref)
-
-            # elif reward_flag == 4:
-                # ''' Squared cost with insulin constraint '''
-                # bg_ref = 80
-
-                # reward = - (bg - bg_ref)**2 - 
-            else:
-                ''' Gaussian reward function '''
-                bg_ref = 90
-                h = 30
-
-                # reward =  10 * np.exp(-0.5 * (bg - bg_ref)**2 /h**2) - 5
-                reward =  np.exp(-0.5 * (bg - bg_ref)**2 /h**2)
-
-
+            reward = hs.calculate_reward(self.state[0])
         elif self.steps_beyond_done is None:
             # Blood glucose below zero -- simulation out of bounds
             self.steps_beyond_done = 0
@@ -196,25 +154,23 @@ class HovorkaDiabetes(gym.Env):
     def _reset(self):
         #TODO: Insert init code here!
 
-        # re init -- in case the init basal has been changed
-        P = self.P
-        initial_pars = (self.init_basal, 0, P)
-
-        X0 = fsolve(hovorka_model_tuple, np.zeros(10), args=initial_pars)
-        self.X0 = X0
-        self.integrator.set_initial_value(self.X0, 0)
+        # Initial state using cont measurements
+        X0, _, _, _, P = hs.simulation_setup(1, self.init_basal)
 
         # State is BG, simulation_state is parameters of hovorka model
         self.state[0] = X0[4] * 18 / P[12]
         self.state[1] = X0[6]
         self.simulation_state = X0
+
         self.bg_history = [X0[4] * 18 / P[12] ]
         self.insulin_history = [X0[6]]
 
         self.num_iters = 0
-        self.basal = 8.8
+        self.basal = 8.3
         # self.init_basal = np.random.choice(range(1, 10), 1)
         # self.init_basal = np.random.choice(np.concatenate((np.linspace(.5, 4, 15), np.arange(4, 7, .5), np.arange(7,15, 1))), 1)
+        # self.basal = self.init_basal
+
 
         self.steps_beyond_done = None
         return np.array(self.state)
@@ -244,7 +200,7 @@ class HovorkaDiabetes(gym.Env):
 
             return None
         else:
-            super(HovorkaDiabetes, self).render(mode=mode) # just raise an exception
+            super(HovorkaDiabetesIncremental, self).render(mode=mode) # just raise an exception
 
             plt.ion()
             plt.plot(self.bg_history)

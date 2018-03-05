@@ -1,5 +1,6 @@
 """
 OPENAI gym environment for the minimal model
+as found in the Yasini paper.
 """
 
 import logging
@@ -14,13 +15,13 @@ from scipy.integrate import ode
 import matplotlib.pyplot as plt
 
 # Hovorka simulator
-from gym.envs.diabetes import minimal_model as mm
+from gym.envs.diabetes import minimal_model_yasini as mm
 from gym.envs.diabetes import hovorka_simulator as hs
 
 
 logger = logging.getLogger(__name__)
 
-class MinimalDiabetes(gym.Env):
+class MinimalDiabetesYasini(gym.Env):
     # TODO: fix metadata
     metadata = {
         'render.modes': ['human', 'rgb_array'],
@@ -37,7 +38,7 @@ class MinimalDiabetes(gym.Env):
         # 583 mU/min. We round down to a max rate of 500
         self.action_space = spaces.Box(0, 500, 1)
 
-        # Continuous observation space
+        # Continuous observation space -- blood glucose and plasma insulin rate
         self.observation_space = spaces.Box(0, 500, 2)
 
         self._seed()
@@ -56,10 +57,12 @@ class MinimalDiabetes(gym.Env):
         self.integrator_insulin.set_integrator('dop853')
 
         # Initial values
-        self.init_deviation = np.random.choice(range(70, 150, 1), 1)
-        # self.init_deviation = 300
         self.integrator_carb.set_initial_value(np.array([0, 0, 0]))
-        self.integrator_insulin.set_initial_value(np.array([self.init_deviation, 0]))
+
+        self.init_bg = 120
+        self.init_insulin = 0
+
+        self.integrator_insulin.set_initial_value(np.array([self.init_bg, 0, self.init_insulin]))
 
         # Hovorka parameters
         self.P = hs.hovorka_parameters(70)
@@ -74,7 +77,7 @@ class MinimalDiabetes(gym.Env):
         self.bg_history = []
         self.insulin_history = []
 
-        self.max_iter = 3000
+        self.max_iter = 1500
 
         self.steps_beyond_done = None
 
@@ -95,9 +98,10 @@ class MinimalDiabetes(gym.Env):
         self.integrator_insulin.integrate(self.integrator_insulin.t + 1)
 
         # Updating state
-        # bg = self.integrator_insulin.y[0] + 90
         bg = self.integrator_insulin.y[0]
-        insulin = self.integrator_insulin.y[1]
+
+
+        insulin = self.integrator_insulin.y[2]
         self.state = [bg, insulin]
 
         self.num_iters += 1
@@ -132,25 +136,20 @@ class MinimalDiabetes(gym.Env):
             if self.steps_beyond_done == 0:
                 logger.warning("You are calling 'step()' even though this environment has already returned done = True. You should always call 'reset()' once you receive 'done = True' -- any further steps are undefined behavior.")
             self.steps_beyond_done += 1
-            reward = -1000
+            reward = 0.0
 
         return np.array(self.state), reward, done, {}
 
     def _reset(self):
         #TODO: Insert init code here!
 
-        # self.init_deviation = np.random.choice(range(20, 30, 20), 1)
-        self.init_deviation = np.random.choice(range(70, 150, 1), 1)
-        # self.init_deviation = 300
 
         # Initial values
         self.integrator_carb.set_initial_value(np.array([0, 0, 0]))
 
-        self.integrator_insulin.set_initial_value(np.array([self.init_deviation, 0]))
+        self.integrator_insulin.set_initial_value(np.array([self.init_bg, 0, self.init_insulin]))
 
-        # self.state = [90]
-        # self.state = [self.init_deviation + 90, 0]
-        self.state = [self.init_deviation, 0]
+        self.state = [self.init_bg, self.init_insulin]
 
         self.bg_history = []
         self.insulin_history = []

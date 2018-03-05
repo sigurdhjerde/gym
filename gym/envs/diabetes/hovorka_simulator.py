@@ -17,7 +17,6 @@ t_end = 1440
 
 # insulin variables
 basal_init = 6.66
-# basal_init = 5.99
 
 
 # pre meal bolus announcement
@@ -312,8 +311,8 @@ def calculate_reward(blood_glucose_level):
     Positive reward if within normal glycemic range, zero otherwise. If reward_flag is zero then De Paula's method is used
     """
 
-    reward_flag = 1
-    # reward_flag = 1
+    # reward_flag = 9
+    reward_flag = 3
 
     if reward_flag == 1:
         ''' Binary reward function'''
@@ -321,9 +320,9 @@ def calculate_reward(blood_glucose_level):
         high_bg = 120
 
         if np.max(blood_glucose_level) < high_bg and np.min(blood_glucose_level) > low_bg:
-            reward = 0
+            reward = 1
         else:
-            reward = -1
+            reward = 0
 
     elif reward_flag == 2:
         ''' Squared cost function '''
