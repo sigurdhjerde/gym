@@ -124,10 +124,49 @@ class MinimalDiabetes(gym.Env):
 
         if not done:
             reward = hs.calculate_reward(bg)
+
+            # reward_flag = 9
+            reward_flag = 3
+
+            if reward_flag == 1:
+                ''' Binary reward function'''
+                low_bg = 70
+                high_bg = 120
+
+                if np.max(blood_glucose_level) < high_bg and np.min(blood_glucose_level) > low_bg:
+                    reward = 1
+                else:
+                    reward = 0
+
+            elif reward_flag == 2:
+                ''' Squared cost function '''
+                bg_ref = 90
+
+                reward = - (blood_glucose_level - bg_ref)**2
+
+            elif reward_flag == 3:
+                ''' Absolute cost function '''
+                bg_ref = 90
+
+                reward = - abs(blood_glucose_level - bg_ref)
+
+            # elif reward_flag == 4:
+                # ''' Squared cost with insulin constraint '''
+                # bg_ref = 80
+
+                # reward = - (blood_glucose_level - bg_ref)**2
+            else:
+                ''' Gaussian reward function '''
+                bg_ref = 90
+                h = 30
+
+                # reward =  10 * np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2) - 5
+                reward =  np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2)
+
         elif self.steps_beyond_done is None:
             # Blood glucose below zero -- simulation out of bounds
             self.steps_beyond_done = 0
-            reward = hs.calculate_reward(bg)
+            reward = -1000
         else:
             if self.steps_beyond_done == 0:
                 logger.warning("You are calling 'step()' even though this environment has already returned done = True. You should always call 'reset()' once you receive 'done = True' -- any further steps are undefined behavior.")
