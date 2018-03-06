@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 # Hovorka simulator
 from gym.envs.diabetes import minimal_model as mm
-from gym.envs.diabetes import hovorka_simulator as hs
+from gym.envs.diabetes.hovorka_model import hovorka_parameters
 
 
 logger = logging.getLogger(__name__)
@@ -62,7 +62,7 @@ class MinimalDiabetes(gym.Env):
         self.integrator_insulin.set_initial_value(np.array([self.init_deviation, 0]))
 
         # Hovorka parameters
-        self.P = hs.hovorka_parameters(70)
+        self.P = hovorka_parameters(70)
 
         # Counter for number of iterations
         self.num_iters = 0
@@ -123,7 +123,6 @@ class MinimalDiabetes(gym.Env):
         # ====================================================================================
 
         if not done:
-            reward = hs.calculate_reward(bg)
 
             # reward_flag = 9
             reward_flag = 3
