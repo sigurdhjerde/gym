@@ -34,7 +34,7 @@ def insulin_model(t, xk, uk, U_G, P):
     '''
 
     # Reference basal values for BG and insulin
-    G_b = 80
+    G_b = 90
     I_b = 7
 
     # Parameters Normal
