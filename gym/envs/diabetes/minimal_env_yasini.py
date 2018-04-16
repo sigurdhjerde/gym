@@ -16,7 +16,8 @@ import matplotlib.pyplot as plt
 
 # Hovorka simulator
 from gym.envs.diabetes import minimal_model_yasini as mm
-from gym.envs.diabetes import hovorka_simulator as hs
+from gym.envs.diabetes.hovorka_model import hovorka_parameters
+from gym.envs.diabetes.reward_function import calculate_reward
 
 
 logger = logging.getLogger(__name__)
@@ -59,13 +60,13 @@ class MinimalDiabetesYasini(gym.Env):
         # Initial values
         self.integrator_carb.set_initial_value(np.array([0, 0, 0]))
 
-        self.init_bg = 120
+        self.init_bg = np.random.choice(range(70, 150, 1), 1)
         self.init_insulin = 0
 
         self.integrator_insulin.set_initial_value(np.array([self.init_bg, 0, self.init_insulin]))
 
         # Hovorka parameters
-        self.P = hs.hovorka_parameters(70)
+        self.P = hovorka_parameters(70)
 
         # Counter for number of iterations
         self.num_iters = 0
@@ -77,7 +78,8 @@ class MinimalDiabetesYasini(gym.Env):
         self.bg_history = []
         self.insulin_history = []
 
-        self.max_iter = 1500
+        self.max_iter = 3000
+        self.reward_flag = 3
 
         self.steps_beyond_done = None
 
@@ -99,8 +101,6 @@ class MinimalDiabetesYasini(gym.Env):
 
         # Updating state
         bg = self.integrator_insulin.y[0]
-
-
         insulin = self.integrator_insulin.y[2]
         self.state = [bg, insulin]
 
@@ -127,16 +127,16 @@ class MinimalDiabetesYasini(gym.Env):
         # ====================================================================================
 
         if not done:
-            reward = hs.calculate_reward(bg)
+            reward = calculate_reward(bg, 3, self.reward_flag)
         elif self.steps_beyond_done is None:
             # Blood glucose below zero -- simulation out of bounds
             self.steps_beyond_done = 0
-            reward = hs.calculate_reward(bg)
+            reward = -1000
         else:
             if self.steps_beyond_done == 0:
                 logger.warning("You are calling 'step()' even though this environment has already returned done = True. You should always call 'reset()' once you receive 'done = True' -- any further steps are undefined behavior.")
             self.steps_beyond_done += 1
-            reward = 0.0
+            reward = -1000
 
         return np.array(self.state), reward, done, {}
 
@@ -147,6 +147,7 @@ class MinimalDiabetesYasini(gym.Env):
         # Initial values
         self.integrator_carb.set_initial_value(np.array([0, 0, 0]))
 
+        self.init_bg = np.random.choice(range(70, 150, 1), 1)
         self.integrator_insulin.set_initial_value(np.array([self.init_bg, 0, self.init_insulin]))
 
         self.state = [self.init_bg, self.init_insulin]

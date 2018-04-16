@@ -8,7 +8,7 @@ import gym
 from gym import spaces
 
 import numpy as np
-import numpy.matlib
+# import numpy.matlib
 
 # Plotting for the rendering
 import matplotlib.pyplot as plt
@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 # Hovorka simulator
 # from gym.envs.diabetes import hovorka_simulator as hs
 from gym.envs.diabetes.hovorka_model import hovorka_parameters, hovorka_model, hovorka_model_tuple
+from gym.envs.diabetes.reward_function import calculate_reward
 
 # ODE solver stuff
 from scipy.integrate import ode
@@ -95,6 +96,7 @@ class HovorkaDiabetes(gym.Env):
 
         self.steps_beyond_done = None
 
+
     def _step(self, action):
         """
         Take action. In the diabetes simulation this means increase, decrease or do nothing
@@ -129,6 +131,9 @@ class HovorkaDiabetes(gym.Env):
         self.state[0] = bg
         self.state[1] = self.integrator.y[6]
 
+        # Reward flag
+        self.reward_flag = 'absolute'
+
         #Set environment done = True if blood_glucose_level is negative
         done = 0
 
@@ -140,58 +145,27 @@ class HovorkaDiabetes(gym.Env):
 
         done = bool(done)
 
+        # ====================================================================================
         # Calculate Reward  (and give error if action is taken after terminal state)
+        # ====================================================================================
+
         if not done:
 
-            reward_flag = 3
-
-            if reward_flag == 1:
-                ''' Binary reward function'''
-                low_bg = 70
-                high_bg = 120
-
-                if np.max(bg) < high_bg and np.min(bg) > low_bg:
-                    reward = 1
-                else:
-                    reward = 0
-
-            elif reward_flag == 2:
-                ''' Squared cost function '''
-                bg_ref = 90
-
-                reward = - (bg - bg_ref)**2
-
-            elif reward_flag == 3:
-                ''' Absolute cost function '''
-                bg_ref = 90
-
-                reward = - abs(bg - bg_ref)
-
-            # elif reward_flag == 4:
-                # ''' Squared cost with insulin constraint '''
-                # bg_ref = 80
-
-                # reward = - (bg - bg_ref)**2 - 
-            else:
-                ''' Gaussian reward function '''
-                bg_ref = 90
-                h = 30
-
-                # reward =  10 * np.exp(-0.5 * (bg - bg_ref)**2 /h**2) - 5
-                reward =  np.exp(-0.5 * (bg - bg_ref)**2 /h**2)
-
+            reward = calculate_reward(bg, self.reward_flag)
 
         elif self.steps_beyond_done is None:
             # Blood glucose below zero -- simulation out of bounds
             self.steps_beyond_done = 0
-            reward = 0.0
+            # reward = 0.0
+            reward = -1000
         else:
             if self.steps_beyond_done == 0:
                 logger.warning("You are calling 'step()' even though this environment has already returned done = True. You should always call 'reset()' once you receive 'done = True' -- any further steps are undefined behavior.")
             self.steps_beyond_done += 1
-            reward = 0.0
+            reward = -1000
 
         return np.array(self.state), reward, done, {}
+
 
     def _reset(self):
         #TODO: Insert init code here!

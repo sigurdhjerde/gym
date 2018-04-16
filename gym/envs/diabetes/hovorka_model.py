@@ -24,7 +24,7 @@ def hovorka_parameters(BW):
     k_b2 = S_ID*k_a2           # Activation rate of insulin on disposal
     k_a3 = 0.03                # Deactivation rate of insulin on EGP [1/min]
     k_b3 = S_IE*k_a3           # Activation rate of insulin on EGP
-    k_e = 0.138                # Insluin elimination from Plasma [1/min]
+    k_e = 0.138                # Insulin elimination from Plasma [1/min]
 
     # Summary of the patient's values:
     P = [tau_G, tau_I, A_G, k_12, k_a1, k_b1, k_a2, k_b2, k_a3, k_b3, k_e, V_I, V_G, F_01, EGP_0]

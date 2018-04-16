@@ -7,15 +7,15 @@ from pylab import plot, figure, title, show
 
 env = gym.make('HovorkaDiabetes-v0')
 # env = gym.make('MinimalDiabetes-v0')
-# env = gym.make('HovorkaDiabetesIncremental-v0')
+# env = gym.make('MinimalDiabetesYasini-v0')
 
 
-basal = 6.66
-env.env.init_basal = basal
+basal = 0
+env.env.init_bg = 110
 
 env.reset()
 
-for i in range(100):
+for i in range(3000):
 
     # Step for the minimal/hovorka model
     env.step(np.array([basal]))

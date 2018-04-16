@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 # Hovorka simulator
 from gym.envs.diabetes import minimal_model as mm
 from gym.envs.diabetes.hovorka_model import hovorka_parameters
+from gym.envs.diabetes.reward_function import calculate_reward
 
 
 logger = logging.getLogger(__name__)
@@ -56,10 +57,10 @@ class MinimalDiabetes(gym.Env):
         self.integrator_insulin.set_integrator('dop853')
 
         # Initial values
-        self.init_deviation = np.random.choice(range(70, 150, 1), 1)
-        # self.init_deviation = 300
+        self.init_bg = np.random.choice(range(70, 150, 1), 1)
+
         self.integrator_carb.set_initial_value(np.array([0, 0, 0]))
-        self.integrator_insulin.set_initial_value(np.array([self.init_deviation, 0]))
+        self.integrator_insulin.set_initial_value(np.array([self.init_bg, 0]))
 
         # Hovorka parameters
         self.P = hovorka_parameters(70)
@@ -75,6 +76,7 @@ class MinimalDiabetes(gym.Env):
         self.insulin_history = []
 
         self.max_iter = 3000
+        self.reward_flag = 3
 
         self.steps_beyond_done = None
 
@@ -95,7 +97,6 @@ class MinimalDiabetes(gym.Env):
         self.integrator_insulin.integrate(self.integrator_insulin.t + 1)
 
         # Updating state
-        # bg = self.integrator_insulin.y[0] + 90
         bg = self.integrator_insulin.y[0]
         insulin = self.integrator_insulin.y[1]
         self.state = [bg, insulin]
@@ -123,45 +124,7 @@ class MinimalDiabetes(gym.Env):
         # ====================================================================================
 
         if not done:
-
-            # reward_flag = 9
-            reward_flag = 3
-
-            if reward_flag == 1:
-                ''' Binary reward function'''
-                low_bg = 70
-                high_bg = 120
-
-                if np.max(blood_glucose_level) < high_bg and np.min(blood_glucose_level) > low_bg:
-                    reward = 1
-                else:
-                    reward = 0
-
-            elif reward_flag == 2:
-                ''' Squared cost function '''
-                bg_ref = 90
-
-                reward = - (blood_glucose_level - bg_ref)**2
-
-            elif reward_flag == 3:
-                ''' Absolute cost function '''
-                bg_ref = 90
-
-                reward = - abs(blood_glucose_level - bg_ref)
-
-            # elif reward_flag == 4:
-                # ''' Squared cost with insulin constraint '''
-                # bg_ref = 80
-
-                # reward = - (blood_glucose_level - bg_ref)**2
-            else:
-                ''' Gaussian reward function '''
-                bg_ref = 90
-                h = 30
-
-                # reward =  10 * np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2) - 5
-                reward =  np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2)
-
+            reward = calculate_reward(bg, self.reward_flag, action)
         elif self.steps_beyond_done is None:
             # Blood glucose below zero -- simulation out of bounds
             self.steps_beyond_done = 0
@@ -177,18 +140,14 @@ class MinimalDiabetes(gym.Env):
     def _reset(self):
         #TODO: Insert init code here!
 
-        # self.init_deviation = np.random.choice(range(20, 30, 20), 1)
-        self.init_deviation = np.random.choice(range(70, 150, 1), 1)
-        # self.init_deviation = 300
 
         # Initial values
         self.integrator_carb.set_initial_value(np.array([0, 0, 0]))
 
-        self.integrator_insulin.set_initial_value(np.array([self.init_deviation, 0]))
+        self.init_bg = np.random.choice(range(70, 150, 1), 1)
+        self.integrator_insulin.set_initial_value(np.array([self.init_bg, 0]))
 
-        # self.state = [90]
-        # self.state = [self.init_deviation + 90, 0]
-        self.state = [self.init_deviation, 0]
+        self.state = [self.init_bg, 0]
 
         self.bg_history = []
         self.insulin_history = []

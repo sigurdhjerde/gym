@@ -33,57 +33,25 @@ def insulin_model(t, xk, uk, U_G, P):
 
     '''
 
-    # Parameters Normal
-    p1 = 0.0317
-    p2 = 0.0123
-    p3 = 4.92e-6
-    n = 0.2659
-    # gamma = 0.00039
-    gamma = 0.00001
-    h = 79.0353
-
-    # Parameters Patient 1
-    # p1 = 0.03
-    # p2 = 0.0107
-    # p3 = 5.3e-6
-    # n = 0.264
-    # # gamma = 0.0042
-    # gamma = 0
-    # h = 80.25
-
-    # Parameters patient 2
-    # p1 = 0
-    # p2 = 0.0072
-    # p3 = 2.16e-6
-    # n = 0.2465
-    # gamma = 0.0039
-    # # gamma = 0
-    # h = 77.5783
-
-    # Parameters patient 4
-    # p2 = 0.0316
-    # p2 = 0.0107
-    # p3 = 5.3e-6
-    # n = 0.2640
-    # gamma = 0.0042
-    # h = 80.2576
-
-    # Giovanni patient
-    # p1 = 0.000317
-    # p2 = 0.0123
-    # p3 = 4.92e-6
-    # n = 0.2569
-    # gamma = .0039 * 0.5
-    # # gamma = 0
-    # h = 79.0353
-
-
-    # From Hovorka parameters -- Phuong used these in his experiments
-    # p1 = 0.02; p2 = 0.028; p3 = 1e-4
-
     # Reference basal values for BG and insulin
     G_b = 80
     I_b = 7
+
+    # Parameters Normal
+    # p1 = 0.1
+    # p2 = 0.01
+    # p3 = 5e-6
+    # n = 0.3
+    # gamma = 0.002
+    # h = G_b
+
+    # Parameters diabetes
+    p1 = 0.0001
+    p2 = 0.01
+    p3 = 5e-6
+    n = 0.3
+    gamma = 0.00002
+    h = G_b
 
     # tau_G = P[1] # Time-to-glucose absorption [min]
     V_G = P[12] # Glucose Volume Distribution (L)
