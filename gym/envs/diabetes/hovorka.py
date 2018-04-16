@@ -94,6 +94,9 @@ class HovorkaDiabetes(gym.Env):
 
         self.max_iter = 3000
 
+        # Reward flag
+        self.reward_flag = 'absolute'
+
         self.steps_beyond_done = None
 
 
@@ -131,8 +134,6 @@ class HovorkaDiabetes(gym.Env):
         self.state[0] = bg
         self.state[1] = self.integrator.y[6]
 
-        # Reward flag
-        self.reward_flag = 'absolute'
 
         #Set environment done = True if blood_glucose_level is negative
         done = 0
