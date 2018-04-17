@@ -2,12 +2,20 @@ from gym.envs.registration import registry, register, make, spec
 
 # Diabetes!
 # ----------------------------------------
+# Hovorka model
 register(
         id = 'HovorkaDiabetes-v0',
         entry_point = 'gym.envs.diabetes.hovorka:HovorkaDiabetes',
         timestep_limit = 1440,
         max_episode_steps=1440
         )
+# register(
+        # id = 'HovorkaDiabetesIncremental-v0',
+        # entry_point = 'gym.envs.diabetes.hovorka_incremental:HovorkaDiabetesIncremental',
+        # timestep_limit = 1440,
+        # max_episode_steps=1440
+        # )
+# Minimal model
 register(
         id = 'MinimalDiabetes-v0',
         entry_point = 'gym.envs.diabetes.minimal_env:MinimalDiabetes',
@@ -16,18 +24,12 @@ register(
         )
 
 register(
-        id = 'MinimalDiabetesMeals-v0',
-        entry_point = 'gym.envs.diabetes.minimal_env_meals:MinimalDiabetesMeals',
+        id = 'MinimalDiabetesYasini-v0',
+        entry_point = 'gym.envs.diabetes.minimal_env_yasini:MinimalDiabetesYasini',
         timestep_limit = 1440,
         max_episode_steps=1440
         )
 
-register(
-        id = 'MinimalDiabetesMod-v0',
-        entry_point = 'gym.envs.diabetes.minimal_env_mod:MinimalDiabetesMod',
-        timestep_limit = 1440,
-        max_episode_steps=1440
-        )
 # Algorithmic
 # ----------------------------------------
 
