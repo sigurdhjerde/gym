@@ -76,7 +76,7 @@ class MinimalDiabetes(gym.Env):
         self.insulin_history = []
 
         self.max_iter = 3000
-        self.reward_flag = 3
+        self.reward_flag = 'absolute'
 
         self.steps_beyond_done = None
 
@@ -124,7 +124,7 @@ class MinimalDiabetes(gym.Env):
         # ====================================================================================
 
         if not done:
-            reward = calculate_reward(bg, self.reward_flag, action)
+            reward = calculate_reward(bg, self.reward_flag)
         elif self.steps_beyond_done is None:
             # Blood glucose below zero -- simulation out of bounds
             self.steps_beyond_done = 0
