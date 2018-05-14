@@ -9,12 +9,12 @@ register(
         timestep_limit = 1440,
         max_episode_steps=1440
         )
-# register(
-        # id = 'HovorkaDiabetesIncremental-v0',
-        # entry_point = 'gym.envs.diabetes.hovorka_incremental:HovorkaDiabetesIncremental',
-        # timestep_limit = 1440,
-        # max_episode_steps=1440
-        # )
+register(
+        id = 'HovorkaMeals-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_meals:HovorkaMeals',
+        timestep_limit = 1440,
+        max_episode_steps=1440
+        )
 # Minimal model
 register(
         id = 'MinimalDiabetes-v0',
@@ -26,6 +26,13 @@ register(
 register(
         id = 'MinimalDiabetesYasini-v0',
         entry_point = 'gym.envs.diabetes.minimal_env_yasini:MinimalDiabetesYasini',
+        timestep_limit = 1440,
+        max_episode_steps=1440
+        )
+
+register(
+        id = 'YasiniMeals-v0',
+        entry_point = 'gym.envs.diabetes.minimal_env_yasini_meals:YasiniMeals',
         timestep_limit = 1440,
         max_episode_steps=1440
         )

@@ -1,5 +1,6 @@
 """
-OPENAI gym environment for the minimal model -- with meals
+OPENAI gym environment for the minimal model with meals
+as found in the Yasini paper.
 """
 
 import logging
@@ -14,12 +15,14 @@ from scipy.integrate import ode
 import matplotlib.pyplot as plt
 
 # Hovorka simulator
-from gym.envs.diabetes import minimal_model as mm
-from gym.envs.diabetes import hovorka_simulator as hs
+from gym.envs.diabetes import minimal_model_yasini as mm
+from gym.envs.diabetes.hovorka_model import hovorka_parameters
+from gym.envs.diabetes.reward_function import calculate_reward
+
 
 logger = logging.getLogger(__name__)
 
-class MinimalDiabetesMeals(gym.Env):
+class YasiniMeals(gym.Env):
     # TODO: fix metadata
     metadata = {
         'render.modes': ['human', 'rgb_array'],
@@ -31,12 +34,13 @@ class MinimalDiabetesMeals(gym.Env):
         Initializing the simulation environment.
         """
 
-        # Continuous action space -- change in basal rate
-        # self.action_space = spaces.Box(0, 40, 1)
+        # Continuous action space -- pump rate
+        # The maximum rate on the Medtronic minimed pumps is
+        # 583 mU/min. We round down to a max rate of 500
         self.action_space = spaces.Box(0, 500, 1)
 
-        # Continuous observation space
-        self.observation_space = spaces.Box(0, 500, 1)
+        # Continuous observation space -- blood glucose and plasma insulin rate
+        self.observation_space = spaces.Box(0, 500, 2)
 
         self._seed()
         self.viewer = None
@@ -54,12 +58,15 @@ class MinimalDiabetesMeals(gym.Env):
         self.integrator_insulin.set_integrator('dop853')
 
         # Initial values
-        self.init_deviation = 30
         self.integrator_carb.set_initial_value(np.array([0, 0, 0]))
-        self.integrator_insulin.set_initial_value(np.array([self.init_deviation, 0]))
 
-        # Hovorka parameters  -- 70 kg male?
-        self.P = hs.hovorka_parameters(70)
+        self.init_bg = np.random.choice(range(70, 150, 1), 1)
+        self.init_insulin = 0
+
+        self.integrator_insulin.set_initial_value(np.array([self.init_bg, 0, self.init_insulin]))
+
+        # Hovorka parameters
+        self.P = hovorka_parameters(70)
 
         # Counter for number of iterations
         self.num_iters = 0
@@ -69,24 +76,36 @@ class MinimalDiabetesMeals(gym.Env):
         self.bg_threshold_high = 500
 
         self.bg_history = []
+        self.insulin_history = []
 
-        self.max_iter = 1440
+        self.max_iter = 3000
+        self.reward_flag = 'absolute'
 
         self.steps_beyond_done = None
 
+        # ====================
+        # Meal setup
+        # ====================
+        meal_times = [180]
+        meal_amounts = [50]
 
-        # Meal information
+        eating_time = 30
+
+        # Meals indicates the number of carbs taken at time t
+        meals = np.zeros(1440)
+        # 'meal_indicator' indicates time of bolus
+
+        for i in range(len(meal_times)):
+            meals[meal_times[i] : meal_times[i] + eating_time] = meal_amounts[i]/eating_time * 1000 /180
+
+        self.meals = meals
+        self.eating_time = eating_time
         self.IC = 0
-        self.meals = hs.meal_setup(1)
-
-        # keeping track of insulin action
-        self.insulin = None
 
 
     def _step(self, action):
         """
-        Take action. In the diabetes simulation this means increase, decrease or do nothing
-        to the insulin to carb ratio (bolus).
+        Set the insulin pump rate
         """
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
@@ -97,21 +116,22 @@ class MinimalDiabetesMeals(gym.Env):
         self.integrator_carb.set_f_params(carbs, self.P)
         self.integrator_carb.integrate(self.integrator_carb.t + 1)
 
-        # Meal info
+        # Meal bolus
         bolus = self.meals[self.num_iters] * self.IC
 
         self.integrator_insulin.set_f_params(action + bolus, self.integrator_carb.y[2], self.P)
         self.integrator_insulin.integrate(self.integrator_insulin.t + 1)
 
         # Updating state
-        bg = self.integrator_insulin.y[0] + 90
-        self.state = [bg]
-        self.insulin = action + bolus
+        bg = self.integrator_insulin.y[0]
+        insulin = self.integrator_insulin.y[2]
+        self.state = [bg, insulin]
 
         self.num_iters += 1
 
         # Updating environment parameters
         self.bg_history.append(bg)
+        self.insulin_history.append(insulin)
 
 
         #Set environment done = True if blood_glucose_level is negative
@@ -125,33 +145,38 @@ class MinimalDiabetesMeals(gym.Env):
 
         done = bool(done)
 
+        # ====================================================================================
         # Calculate Reward  (and give error if action is taken after terminal state)
+        # ====================================================================================
+
         if not done:
-            reward = hs.calculate_reward(bg)
+            reward = calculate_reward(bg, self.reward_flag)
         elif self.steps_beyond_done is None:
             # Blood glucose below zero -- simulation out of bounds
             self.steps_beyond_done = 0
-            reward = hs.calculate_reward(bg)
+            reward = -1000
         else:
             if self.steps_beyond_done == 0:
                 logger.warning("You are calling 'step()' even though this environment has already returned done = True. You should always call 'reset()' once you receive 'done = True' -- any further steps are undefined behavior.")
             self.steps_beyond_done += 1
-            reward = 0.0
+            reward = -1000
 
         return np.array(self.state), reward, done, {}
 
     def _reset(self):
         #TODO: Insert init code here!
 
+
         # Initial values
         self.integrator_carb.set_initial_value(np.array([0, 0, 0]))
 
-        self.integrator_insulin.set_initial_value(np.array([self.init_deviation, 0]))
+        self.init_bg = np.random.choice(range(70, 150, 1), 1)
+        self.integrator_insulin.set_initial_value(np.array([self.init_bg, 0, self.init_insulin]))
 
-        # self.state = [90]
-        self.state = [self.init_deviation + 90]
+        self.state = [self.init_bg, self.init_insulin]
 
         self.bg_history = []
+        self.insulin_history = []
 
         self.num_iters = 0
 
@@ -189,3 +214,7 @@ class MinimalDiabetesMeals(gym.Env):
 
             plt.ion()
             plt.plot(self.bg_history)
+
+    def _close(self):
+        ''' closing the rendering'''
+        plt.close(1000)
