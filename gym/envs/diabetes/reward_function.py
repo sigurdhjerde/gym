@@ -31,7 +31,11 @@ def calculate_reward(blood_glucose_level, reward_flag='absolute', bg_ref=90, act
         if action == None:
             action = [0, 0]
 
-        reward = - abs(blood_glucose_level - bg_ref) - abs(action[1]-action[0])
+        # Parameters
+        alpha = 1
+        beta = 1
+
+        reward = - alpha*(abs(blood_glucose_level - bg_ref)) - beta * (abs(action[1]-action[0]))
 
     elif reward_flag == 'gaussian':
         ''' Gaussian reward function '''

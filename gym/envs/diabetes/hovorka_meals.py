@@ -88,7 +88,7 @@ class HovorkaMeals(gym.Env):
         # ====================
         # Meal setup
         # ====================
-        meal_times = [180]
+        meal_times = [600]
         meal_amounts = [50]
 
         eating_time = 30

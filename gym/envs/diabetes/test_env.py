@@ -5,10 +5,10 @@ sns.set()
 
 from pylab import plot, figure, title, show
 
-# env = gym.make('HovorkaDiabetes-v0')
+env = gym.make('HovorkaDiabetes-v0')
 # env = gym.make('MinimalDiabetes-v0')
 # env = gym.make('MinimalDiabetesYasini-v0')
-env = gym.make('YasiniMeals-v0')
+# env = gym.make('YasiniMeals-v0')
 # env = gym.make('HovorkaMeals-v0')
 
 

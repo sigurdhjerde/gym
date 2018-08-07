@@ -41,17 +41,21 @@ class HovorkaDiabetes(gym.Env):
 
         # Continuous action space
         self.action_space = spaces.Box(0, 200, 1)
+        self.previous_action = 0
 
         # Observation space -- bg between 0 and 500, measured every five minutes (1440 mins per day / 5 = 288)
         # self.observation_space = spaces.Box(0, 500, 288)
 
-        self.observation_space = spaces.Box(0, 500, 2)
+        # self.observation_space = spaces.Box(0, 500, 2)
+        self.observation_space = spaces.Box(0, 500, 1)
 
         # Initial glucose regulation parameters
         self.basal = 8.3
         self.bolus = 8.8
-        self.init_basal = 6.66
-        # self.init_basal = np.random.choice(np.concatenate((np.linspace(.5, 4, 15), np.arange(4, 7, .5), np.arange(7,15, 1))), 1)
+        # self.init_basal = 6.66
+        self.init_basal = np.random.choice(np.concatenate((np.linspace(.5, 4, 15), np.arange(4, 7, .5), np.arange(7,15, 1))), 1)
+
+        self.reset_basal_manually = None
 
         self._seed()
         self.viewer = None
@@ -77,7 +81,8 @@ class HovorkaDiabetes(gym.Env):
         self.integrator.set_initial_value(X0, 0)
 
         # State is BG, simulation_state is parameters of hovorka model
-        self.state = [X0[4] * 18 / P[12], X0[6]]
+        # self.state = [X0[4] * 18 / P[12], X0[6]]
+        self.state = [X0[4] * 18 / P[12]]
 
         self.simulation_state = X0
 
@@ -132,7 +137,7 @@ class HovorkaDiabetes(gym.Env):
 
         # Updating state
         self.state[0] = bg
-        self.state[1] = self.integrator.y[6]
+        # self.state[1] = self.integrator.y[6]
 
 
         #Set environment done = True if blood_glucose_level is negative
@@ -153,6 +158,7 @@ class HovorkaDiabetes(gym.Env):
         if not done:
 
             reward = calculate_reward(bg, self.reward_flag)
+            # reward = calculate_reward(bg, 'absolute_with_insulin', 90, [action, self.previous_action])
 
         elif self.steps_beyond_done is None:
             # Blood glucose below zero -- simulation out of bounds
@@ -165,6 +171,8 @@ class HovorkaDiabetes(gym.Env):
             self.steps_beyond_done += 1
             reward = -1000
 
+        self.previous_action = action
+
         return np.array(self.state), reward, done, {}
 
 
@@ -172,6 +180,11 @@ class HovorkaDiabetes(gym.Env):
         #TODO: Insert init code here!
 
         # re init -- in case the init basal has been changed
+        if self.reset_basal_manually is None:
+            self.init_basal = np.random.choice(np.concatenate((np.linspace(.5, 4, 15), np.arange(4, 7, .5), np.arange(7,15, 1))), 1)
+        else:
+            self.init_basal = self.reset_basal_manually
+
         P = self.P
         initial_pars = (self.init_basal, 0, P)
 
@@ -181,15 +194,14 @@ class HovorkaDiabetes(gym.Env):
 
         # State is BG, simulation_state is parameters of hovorka model
         self.state[0] = X0[4] * 18 / P[12]
-        self.state[1] = X0[6]
+        # self.state[1] = X0[6]
+
         self.simulation_state = X0
         self.bg_history = [X0[4] * 18 / P[12] ]
         self.insulin_history = [X0[6]]
 
         self.num_iters = 0
-        self.basal = 8.8
         # self.init_basal = np.random.choice(range(1, 10), 1)
-        # self.init_basal = np.random.choice(np.concatenate((np.linspace(.5, 4, 15), np.arange(4, 7, .5), np.arange(7,15, 1))), 1)
 
         self.steps_beyond_done = None
         return np.array(self.state)
@@ -198,28 +210,29 @@ class HovorkaDiabetes(gym.Env):
     def _render(self, mode='human', close=False):
         #TODO: Clean up plotting routine
 
-        if mode == 'rgb_array':
-            return None
-        elif mode is 'human':
-            if not bool(plt.get_fignums()):
-                plt.ion()
-                self.fig = plt.figure()
-                self.ax = self.fig.add_subplot(111)
-                # self.line1, = ax.plot(self.bg_history)
-                self.ax.plot(self.bg_history)
-                plt.show()
-            else:
-                # self.line1.set_ydata(self.bg_history)
-                # self.fig.canvas.draw()
-                self.ax.clear()
-                self.ax.plot(self.bg_history)
+        return None
+        # if mode == 'rgb_array':
+            # return None
+        # elif mode is 'human':
+            # if not bool(plt.get_fignums()):
+                # plt.ion()
+                # self.fig = plt.figure()
+                # self.ax = self.fig.add_subplot(111)
+                # # self.line1, = ax.plot(self.bg_history)
+                # self.ax.plot(self.bg_history)
+                # plt.show()
+            # else:
+                # # self.line1.set_ydata(self.bg_history)
+                # # self.fig.canvas.draw()
+                # self.ax.clear()
+                # self.ax.plot(self.bg_history)
 
-            plt.pause(0.0000001)
-            plt.show()
+            # plt.pause(0.0000001)
+            # plt.show()
 
-            return None
-        else:
-            super(HovorkaDiabetes, self).render(mode=mode) # just raise an exception
+            # return None
+        # else:
+            # super(HovorkaDiabetes, self).render(mode=mode) # just raise an exception
 
-            plt.ion()
-            plt.plot(self.bg_history)
+            # plt.ion()
+            # plt.plot(self.bg_history)
