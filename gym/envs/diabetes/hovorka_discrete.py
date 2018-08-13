@@ -1,6 +1,6 @@
 """
 OPENAI gym environment for the Hovorka model
-Converted/inspired from cartpole to Hovorka model!
+In this case the action space is discrete
 """
 
 import logging
@@ -9,9 +9,6 @@ from gym import spaces
 
 import numpy as np
 # import numpy.matlib
-
-# Plotting for the rendering
-# import matplotlib.pyplot as plt
 
 # Hovorka simulator
 # from gym.envs.diabetes import hovorka_simulator as hs
@@ -24,7 +21,7 @@ from scipy.optimize import fsolve
 
 logger = logging.getLogger(__name__)
 
-class HovorkaDiabetes(gym.Env):
+class HovorkaDiscrete(gym.Env):
     # TODO: fix metadata??
     metadata = {
         'render.modes': ['human', 'rgb_array'],
@@ -37,17 +34,18 @@ class HovorkaDiabetes(gym.Env):
         """
 
         # Action space (increase .1, decrease .1, or do nothing)
-        # self.action_space = spaces.Discrete(3)
+        self.action_space = spaces.Discrete(20)
+        self.A = np.linspace(0, 10, num=20)
 
         # Continuous action space
-        self.action_space = spaces.Box(0, 15, 1)
-        self.previous_action = 0
+        # self.action_space = spaces.Box(0, 15, 1)
+        # self.previous_action = 0
 
         # Observation space -- bg between 0 and 500, measured every five minutes (1440 mins per day / 5 = 288)
         # self.observation_space = spaces.Box(0, 500, 288)
 
-        self.observation_space = spaces.Box(0, 500, 2)
-        # self.observation_space = spaces.Box(0, 500, 1)
+        # self.observation_space = spaces.Box(0, 500, 2)
+        self.observation_space = spaces.Box(0, 500, 1)
 
         # Initial glucose regulation parameters
         self.basal = 8.3
@@ -81,8 +79,8 @@ class HovorkaDiabetes(gym.Env):
         self.integrator.set_initial_value(X0, 0)
 
         # State is BG, simulation_state is parameters of hovorka model
-        self.state = [X0[4] * 18 / P[12], X0[6]]
-        # self.state = [X0[4] * 18 / P[12]]
+        # self.state = [X0[4] * 18 / P[12], X0[6]]
+        self.state = [X0[4] * 18 / P[12]]
 
         self.simulation_state = X0
 
@@ -100,7 +98,7 @@ class HovorkaDiabetes(gym.Env):
         self.max_iter = 3000
 
         # Reward flag
-        self.reward_flag = 'absolute'
+        self.reward_flag = 'gaussian'
 
         self.steps_beyond_done = None
 
@@ -121,7 +119,7 @@ class HovorkaDiabetes(gym.Env):
         # ===============================================
         self.integrator.set_initial_value(self.simulation_state, self.num_iters)
 
-        self.integrator.set_f_params(action, 0, self.P)
+        self.integrator.set_f_params(self.A[action], 0, self.P)
 
         self.integrator.integrate(self.integrator.t + 1)
 
@@ -137,7 +135,7 @@ class HovorkaDiabetes(gym.Env):
 
         # Updating state
         self.state[0] = bg
-        self.state[1] = self.integrator.y[6]
+        # self.state[1] = self.integrator.y[6]
 
 
         #Set environment done = True if blood_glucose_level is negative
@@ -171,7 +169,7 @@ class HovorkaDiabetes(gym.Env):
             self.steps_beyond_done += 1
             reward = -1000
 
-        self.previous_action = action
+        self.previous_action = self.A[action]
 
         return np.array(self.state), reward, done, {}
 
@@ -182,8 +180,7 @@ class HovorkaDiabetes(gym.Env):
         # re init -- in case the init basal has been changed
         if self.reset_basal_manually is None:
             # self.init_basal = np.random.choice(np.concatenate((np.linspace(.5, 4, 15), np.arange(4, 7, .5), np.arange(7,15, 1))), 1)
-            # slf.init_basal = np.random.normal(5, .6)
-            self.init_basal = 6
+            self.init_basal = np.random.normal(4, .5)
         else:
             self.init_basal = self.reset_basal_manually
 
