@@ -42,6 +42,12 @@ register(
         timestep_limit = 1440,
         max_episode_steps=1440
         )
+register(
+        id = 'HovorkaInterval-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval:HovorkaInterval',
+        timestep_limit = 48,
+        max_episode_steps=48
+        )
 # Padova model
 # register(
         # id = 'Padova-v0',
