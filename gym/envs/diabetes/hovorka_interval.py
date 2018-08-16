@@ -90,7 +90,7 @@ class HovorkaInterval(gym.Env):
         # self.state = [X0[4] * 18 / P[12]]
         initial_bg = X0[4] * 18 / P[12]
         initial_insulin = X0[6]
-        self.state = np.concatenate([np.repeat(initial_bg, 30), np.repeat(initial_insulin, 30)])
+        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), np.repeat(initial_insulin, self.simulation_time)])
 
         self.simulation_state = X0
 
@@ -221,7 +221,7 @@ class HovorkaInterval(gym.Env):
         # self.state[1] = X0[6]
         initial_bg = X0[4] * 18 / P[12]
         initial_insulin = X0[6]
-        self.state = np.concatenate([np.repeat(initial_bg, 30), np.repeat(initial_insulin, 30)])
+        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), np.repeat(initial_insulin, self.simulation_time)])
 
         self.simulation_state = X0
         # self.bg_history = [X0[4] * 18 / P[12] ]
@@ -231,6 +231,12 @@ class HovorkaInterval(gym.Env):
 
         self.num_iters = 0
         # self.init_basal = np.random.choice(range(1, 10), 1)
+
+
+        # changing observation space if simulation time is changed
+        if self.simulation_time != 30:
+            self.observation_space = spaces.Box(0, 500, self.simulation_time*2)
+
 
         self.steps_beyond_done = None
         return np.array(self.state)
