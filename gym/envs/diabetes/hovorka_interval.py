@@ -12,7 +12,7 @@ import numpy as np
 # import numpy.matlib
 
 # Plotting for the rendering
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 # Hovorka simulator
 # from gym.envs.diabetes import hovorka_simulator as hs
@@ -246,28 +246,28 @@ class HovorkaInterval(gym.Env):
         #TODO: Clean up plotting routine
 
         return None
-        # if mode == 'rgb_array':
-            # return None
-        # elif mode is 'human':
-            # if not bool(plt.get_fignums()):
-                # plt.ion()
-                # self.fig = plt.figure()
-                # self.ax = self.fig.add_subplot(111)
-                # # self.line1, = ax.plot(self.bg_history)
-                # self.ax.plot(self.bg_history)
-                # plt.show()
-            # else:
-                # # self.line1.set_ydata(self.bg_history)
-                # # self.fig.canvas.draw()
-                # self.ax.clear()
-                # self.ax.plot(self.bg_history)
+        if mode == 'rgb_array':
+            return None
+        elif mode is 'human':
+            if not bool(plt.get_fignums()):
+                plt.ion()
+                self.fig = plt.figure()
+                self.ax = self.fig.add_subplot(111)
+                # self.line1, = ax.plot(self.bg_history)
+                self.ax.plot(self.bg_history)
+                plt.show()
+            else:
+                # self.line1.set_ydata(self.bg_history)
+                # self.fig.canvas.draw()
+                self.ax.clear()
+                self.ax.plot(self.bg_history)
 
-            # plt.pause(0.0000001)
-            # plt.show()
+            plt.pause(0.0000001)
+            plt.show()
 
-            # return None
-        # else:
-            # super(HovorkaDiabetes, self).render(mode=mode) # just raise an exception
+            return None
+        else:
+            super(HovorkaInterval, self).render(mode=mode) # just raise an exception
 
-            # plt.ion()
-            # plt.plot(self.bg_history)
+            plt.ion()
+            plt.plot(self.bg_history)

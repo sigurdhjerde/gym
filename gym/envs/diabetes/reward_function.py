@@ -61,7 +61,7 @@ def calculate_reward(blood_glucose_level, reward_flag='absolute', bg_ref=90, act
         ''' Gaussian reward function '''
         h = 30
         # h = 15
-        alpha = .7
+        alpha = .5
 
         bg_reward =  np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2)
         insulin_reward =  -1/15 * action + 1
