@@ -28,8 +28,9 @@ for i in range(48):
     # env.step(2)
 
 
-# env.render()
-figure()
-plot(env.env.bg_history)
-show()
+
+env.render()
+# figure()
+# plot(env.env.bg_history)
+# show()
 

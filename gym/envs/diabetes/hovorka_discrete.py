@@ -155,8 +155,10 @@ class HovorkaDiscrete(gym.Env):
 
         if not done:
 
-            reward = calculate_reward(bg, self.reward_flag)
-            # reward = calculate_reward(bg, 'absolute_with_insulin', 90, [action, self.previous_action])
+            if self.reward_flag != 'gaussian_with_insulin':
+                reward = calculate_reward(np.array(bg), self.reward_flag, 108)
+            else:
+                reward = calculate_reward(np.array(bg), 'gaussian_with_insulin', 108, action)
 
         elif self.steps_beyond_done is None:
             # Blood glucose below zero -- simulation out of bounds

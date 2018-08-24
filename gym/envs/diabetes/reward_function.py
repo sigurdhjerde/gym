@@ -1,6 +1,6 @@
 import numpy as np
 
-def calculate_reward(blood_glucose_level, reward_flag='absolute', bg_ref=90, action=None):
+def calculate_reward(blood_glucose_level, reward_flag='absolute', bg_ref=108, action=None):
     """
     Calculating rewards for the given blood glucose level
     """
@@ -19,8 +19,8 @@ def calculate_reward(blood_glucose_level, reward_flag='absolute', bg_ref=90, act
         ''' Tighter version of the binary reward function,
         the bounds are [-5, 5] around the optimal rate.
         '''
-        low_bg = 85
-        high_bg = 95
+        low_bg = bg_ref - 5
+        high_bg = bg_ref + 5
 
         if np.max(blood_glucose_level) < high_bg and np.min(blood_glucose_level) > low_bg:
             reward = 1

@@ -110,7 +110,7 @@ class HovorkaInterval(gym.Env):
         self.max_iter = 3000
 
         # Reward flag
-        self.reward_flag = 'absolute'
+        self.reward_flag = 'gaussian'
 
         self.steps_beyond_done = None
 
@@ -179,8 +179,10 @@ class HovorkaInterval(gym.Env):
 
         if not done:
 
-            # reward = calculate_reward(np.array(bg), self.reward_flag)
-            reward = calculate_reward(np.array(bg), 'gaussian_with_insulin', 90, action)
+            if self.reward_flag != 'gaussian_with_insulin':
+                reward = calculate_reward(np.array(bg), self.reward_flag, 108)
+            else:
+                reward = calculate_reward(np.array(bg), 'gaussian_with_insulin', 108, action)
 
         elif self.steps_beyond_done is None:
             # Blood glucose below zero -- simulation out of bounds
@@ -245,7 +247,7 @@ class HovorkaInterval(gym.Env):
     def _render(self, mode='human', close=False):
         #TODO: Clean up plotting routine
 
-        return None
+        # return None
         if mode == 'rgb_array':
             return None
         elif mode is 'human':
@@ -265,7 +267,7 @@ class HovorkaInterval(gym.Env):
             plt.pause(0.0000001)
             plt.show()
 
-            return None
+            # return None
         else:
             super(HovorkaInterval, self).render(mode=mode) # just raise an exception
 
