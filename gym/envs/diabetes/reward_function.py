@@ -1,6 +1,6 @@
 import numpy as np
 
-def calculate_reward(blood_glucose_level, reward_flag='absolute', bg_ref=108, action=None):
+def calculate_reward(blood_glucose_level, reward_flag='absolute', bg_ref=108, action=None, blood_glucose_level_start=None):
     """
     Calculating rewards for the given blood glucose level
     """
@@ -67,6 +67,29 @@ def calculate_reward(blood_glucose_level, reward_flag='absolute', bg_ref=108, ac
         insulin_reward =  -1/15 * action + 1
 
         reward = alpha * bg_reward + (1 - alpha) * insulin_reward
+
+    elif reward_flag == 'hovorka':
+        ''' Sum of squared distances from target trajectory in Hovorka 2014 '''
+        trgt = 6 #bg_ref/18? target bg is 6 mmol/l in Hovorka 2014
+
+        # starting state added as input to calculate_reward
+        y0 = blood_glucose_level_start/18
+
+        # time until blood glucose has decreased to trgt+2 if y0 > trgt+2
+        t1 = np.max((y0-trgt-2)/2,0)
+
+        # exponential half-time is 15 minutes (1/4h)
+        r = 4*np.log(2)
+
+        # target trajectory where starting bg is y0, time is in hours
+        y = lambda t: trgt + (y0-trgt-2*t)*(y0-2*t>trgt+2) + (y0-trgt-t1-t)*(trgt<y0-t1-t<=trgt+2) - (trgt-y0)*np.exp(-r*t)*(y0<trgt)
+
+        #how the index in blood_glucose_level relates to time in hours
+        t = lambda i: i/60
+
+        reward = 0
+        for i in range(len(blood_glucose_level)):
+            reward = reward - (blood_glucose_level[i]/18 - y(t(i)))**2
 
 
     return reward
