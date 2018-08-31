@@ -89,25 +89,25 @@ register(
 # Hovorka random interval with different rewards
 register(
         id = 'HovorkaRandomGaussian-v0',
-        entry_point = 'gym.envs.diabetes.hovorka_interval_gaussian:HovorkaIntervalGaussian',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_random_gaussian:HovorkaRandomGaussian',
         timestep_limit = 96,
         max_episode_steps= 96
         )
 register(
         id = 'HovorkaRandomGaussianInsulin-v0',
-        entry_point = 'gym.envs.diabetes.hovorka_interval_gaussian_with_insulin:HovorkaIntervalGaussianInsulin',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_random_gaussian_with_insulin:HovorkaRandomGaussianInsulin',
         timestep_limit = 96,
         max_episode_steps= 96
         )
 register(
         id = 'HovorkaRandomAbsolute-v0',
-        entry_point = 'gym.envs.diabetes.hovorka_interval_absolute:HovorkaIntervalAbsolute',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_random_absolute:HovorkaRandomAbsolute',
         timestep_limit = 96,
         max_episode_steps= 96
         )
 register(
         id = 'HovorkaRandomBinary-v0',
-        entry_point = 'gym.envs.diabetes.hovorka_interval_binary:HovorkaIntervalBinary',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_random_binary:HovorkaRandomBinary',
         timestep_limit = 96,
         max_episode_steps= 96
         )
