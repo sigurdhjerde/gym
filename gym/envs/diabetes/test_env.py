@@ -12,7 +12,8 @@ from pylab import plot, figure, title, show, ion
 # env = gym.make('MinimalDiabetesYasini-v0')
 # env = gym.make('YasiniMeals-v0')
 # env = gym.make('HovorkaMeals-v0')
-env = gym.make('HovorkaHovorka-v0')
+# env = gym.make('HovorkaHovorka-v0')
+env = gym.make('HovorkaRandomBinary-v0')
 
 
 

@@ -85,6 +85,32 @@ register(
         timestep_limit = 96,
         max_episode_steps= 96
         )
+
+# Hovorka random interval with different rewards
+register(
+        id = 'HovorkaRandomGaussian-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_gaussian:HovorkaIntervalGaussian',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'HovorkaRandomGaussianInsulin-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_gaussian_with_insulin:HovorkaIntervalGaussianInsulin',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'HovorkaRandomAbsolute-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_absolute:HovorkaIntervalAbsolute',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'HovorkaRandomBinary-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_binary:HovorkaIntervalBinary',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
 # Padova model
 # register(
         # id = 'Padova-v0',

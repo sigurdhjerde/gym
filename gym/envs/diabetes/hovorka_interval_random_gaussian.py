@@ -26,7 +26,7 @@ from scipy.optimize import fsolve
 
 logger = logging.getLogger(__name__)
 
-class HovorkaIntervalRandom(gym.Env):
+class HovorkaRandomGaussian(gym.Env):
     # TODO: fix metadata??
     metadata = {
         'render.modes': ['human', 'rgb_array'],
@@ -177,11 +177,7 @@ class HovorkaIntervalRandom(gym.Env):
         # ====================================================================================
 
         if not done:
-
-            if self.reward_flag != 'gaussian_with_insulin':
-                reward = calculate_reward(np.array(bg), self.reward_flag, 108)
-            else:
-                reward = calculate_reward(np.array(bg), 'gaussian_with_insulin', 108, action)
+            reward = calculate_reward(np.array(bg), self.reward_flag, 108)
 
         elif self.steps_beyond_done is None:
             # Blood glucose below zero -- simulation out of bounds
@@ -269,3 +265,6 @@ class HovorkaIntervalRandom(gym.Env):
 
             # plt.ion()
             # plt.plot(self.bg_history)
+
+
+
