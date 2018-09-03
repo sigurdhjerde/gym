@@ -10,6 +10,9 @@ from gym.envs.diabetes.hovorka_interval_gaussian import HovorkaIntervalGaussian
 from gym.envs.diabetes.hovorka_interval_gaussian_with_insulin import HovorkaIntervalGaussianInsulin
 from gym.envs.diabetes.hovorka_interval_hovorka import HovorkaIntervalHovorka
 
+# 30 minute interval with meals
+from gym.envs.diabetes.hovorka_interval_meals import HovorkaIntervalMeals
+
 # Random hovorka
 from gym.envs.diabetes.hovorka_interval_random import HovorkaIntervalRandom
 from gym.envs.diabetes.hovorka_interval_random_absolute import HovorkaRandomAbsolute

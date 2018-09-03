@@ -13,7 +13,9 @@ from pylab import plot, figure, title, show, ion
 # env = gym.make('YasiniMeals-v0')
 # env = gym.make('HovorkaMeals-v0')
 # env = gym.make('HovorkaHovorka-v0')
-env = gym.make('HovorkaRandomBinary-v0')
+# env = gym.make('HovorkaRandomGaussianInsulin-v0')
+# env = gym.make('HovorkaGaussianInsulin-v0')
+env = gym.make('HovorkaIntervalMeals-v0')
 
 
 
@@ -26,9 +28,9 @@ reward = []
 for i in range(96):
 
     # Step for the minimal/hovorka model
-    s, r, d, i = env.step(np.array([6.5]))
-    reward.append(r)
-    print(r)
+    s, r, d, i = env.step(np.array([6.6]))
+    # reward.append(r)
+    # print(r)
 
     # Step for the discrete Hovorka incremental
     # env.step(2)
@@ -41,7 +43,7 @@ plot(env.env.bg_history)
 ion()
 show()
 
-figure()
-plot(reward)
-show()
+# figure()
+# plot(reward)
+# show()
 
