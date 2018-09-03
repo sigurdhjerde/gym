@@ -78,6 +78,30 @@ register(
         timestep_limit = 96,
         max_episode_steps= 96
         )
+register(
+        id = 'HovorkaMealsAbsolute-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_absolute:HovorkaMealsAbsolute',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'HovorkaMealsBinary-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_binary:HovorkaMealsBinary',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'HovorkaMealsGaussian-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_absolute:HovorkaMealsGaussian',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'HovorkaMealsGaussianInsulin-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_gaussian_with_insulin:HovorkaMealsGaussianInsulin',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
 # ================================================
 # Hovorka random interval with different rewards
 # ================================================

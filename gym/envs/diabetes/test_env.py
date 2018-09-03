@@ -15,7 +15,9 @@ from pylab import plot, figure, title, show, ion
 # env = gym.make('HovorkaHovorka-v0')
 # env = gym.make('HovorkaRandomGaussianInsulin-v0')
 # env = gym.make('HovorkaGaussianInsulin-v0')
-env = gym.make('HovorkaIntervalMeals-v0')
+# env = gym.make('HovorkaIntervalMeals-v0')
+# env = gym.make('HovorkaMealsAbsolute-v0')
+env = gym.make('HovorkaMealsGaussianInsulin-v0')
 
 
 
