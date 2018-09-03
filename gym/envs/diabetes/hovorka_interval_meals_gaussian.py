@@ -52,10 +52,10 @@ class HovorkaMealsGaussian(gym.Env):
         # self.observation_space = spaces.Box(0, 500, 1)
 
         # Initial glucose regulation parameters
-        self.bolus = 8.3
+        self.bolus = 0
 
         # Initial basal -- this rate dictates the initial BG value
-        self.init_basal = 6.66
+        self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
         # self.init_basal = np.random.choice(np.concatenate((np.linspace(.5, 4, 15), np.arange(4, 7, .5), np.arange(7,15, 1))), 1)
         # self.init_basal = 6
 
@@ -226,7 +226,7 @@ class HovorkaMealsGaussian(gym.Env):
         if self.reset_basal_manually is None:
             # self.init_basal = np.random.choice(np.concatenate((np.linspace(.5, 4, 15), np.arange(4, 7, .5), np.arange(7,15, 1))), 1)
             # slf.init_basal = np.random.normal(5, .6)
-            self.init_basal = self.init_basal
+            self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
         else:
             self.init_basal = self.reset_basal_manually
 

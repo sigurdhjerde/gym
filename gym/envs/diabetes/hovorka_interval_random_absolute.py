@@ -52,7 +52,6 @@ class HovorkaRandomAbsolute(gym.Env):
         # self.observation_space = spaces.Box(0, 500, 1)
 
         # Initial glucose regulation parameters
-        self.basal = 8.3
         self.bolus = 8.8
         self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
 
