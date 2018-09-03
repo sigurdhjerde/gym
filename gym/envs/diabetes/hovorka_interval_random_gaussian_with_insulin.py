@@ -177,7 +177,7 @@ class HovorkaRandomGaussianInsulin(gym.Env):
         # ====================================================================================
 
         if not done:
-            reward = calculate_reward(np.array(bg), self.reward_flag, 108)
+            reward = calculate_reward(np.array(bg), self.reward_flag, 108, action)
 
         elif self.steps_beyond_done is None:
             # Blood glucose below zero -- simulation out of bounds
