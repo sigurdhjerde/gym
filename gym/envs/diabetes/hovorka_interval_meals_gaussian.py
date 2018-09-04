@@ -42,7 +42,7 @@ class HovorkaMealsGaussian(gym.Env):
         # self.action_space = spaces.Discrete(3)
 
         # Continuous action space
-        self.action_space = spaces.Box(0, 15, 1)
+        self.action_space = spaces.Box(0, 50, 1)
         self.previous_action = 0
 
         # Observation space -- bg between 0 and 500, measured every five minutes (1440 mins per day / 5 = 288)
