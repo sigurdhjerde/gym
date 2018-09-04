@@ -92,7 +92,7 @@ register(
         )
 register(
         id = 'HovorkaMealsGaussian-v0',
-        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_absolute:HovorkaMealsGaussian',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_gaussian:HovorkaMealsGaussian',
         timestep_limit = 96,
         max_episode_steps= 96
         )
