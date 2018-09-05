@@ -48,7 +48,7 @@ class HovorkaMealsBinary(gym.Env):
         # Observation space -- bg between 0 and 500, measured every five minutes (1440 mins per day / 5 = 288)
         # self.observation_space = spaces.Box(0, 500, 288)
 
-        self.observation_space = spaces.Box(0, 500, 30)
+        self.observation_space = spaces.Box(0, 500, 60)
         # self.observation_space = spaces.Box(0, 500, 1)
 
         # Initial glucose regulation parameters
@@ -92,9 +92,8 @@ class HovorkaMealsBinary(gym.Env):
         # self.state = [X0[4] * 18 / P[12], X0[6]]
         # self.state = [X0[4] * 18 / P[12]]
         initial_bg = X0[4] * 18 / P[12]
-        # initial_insulin = X0[6]
-        # self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), np.repeat(initial_insulin, self.simulation_time)])
-        self.state = np.repeat(initial_bg, self.simulation_time)
+        initial_insulin = X0[6]
+        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), np.repeat(initial_insulin, self.simulation_time)])
 
         self.simulation_state = X0
 
@@ -221,6 +220,8 @@ class HovorkaMealsBinary(gym.Env):
 
 
     def _reset(self):
+        #TODO: Insert init code here!
+
         # re init -- in case the init basal has been changed
         if self.reset_basal_manually is None:
             # self.init_basal = np.random.choice(np.concatenate((np.linspace(.5, 4, 15), np.arange(4, 7, .5), np.arange(7,15, 1))), 1)
@@ -239,11 +240,9 @@ class HovorkaMealsBinary(gym.Env):
         # State is BG, simulation_state is parameters of hovorka model
         # self.state[0] = X0[4] * 18 / P[12]
         # self.state[1] = X0[6]
-        # initial_insulin = X0[6]
-        # self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), np.repeat(initial_insulin, self.simulation_time)])
-
         initial_bg = X0[4] * 18 / P[12]
-        self.state = np.repeat(initial_bg, self.simulation_time)
+        initial_insulin = X0[6]
+        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), np.repeat(initial_insulin, self.simulation_time)])
 
         self.simulation_state = X0
         # self.bg_history = [X0[4] * 18 / P[12] ]

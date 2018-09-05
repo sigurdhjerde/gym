@@ -46,7 +46,11 @@ class HovorkaIntervalGaussianInsulin(gym.Env):
         self.action_space = spaces.Box(0, 15, 1)
         self.previous_action = 0
 
-        self.observation_space = spaces.Box(0, 500, 30)
+        # Observation space -- bg between 0 and 500, measured every five minutes (1440 mins per day / 5 = 288)
+        # self.observation_space = spaces.Box(0, 500, 288)
+
+        self.observation_space = spaces.Box(0, 500, 60)
+        # self.observation_space = spaces.Box(0, 500, 1)
 
         # Initial glucose regulation parameters
         self.basal = 8.3
@@ -87,9 +91,8 @@ class HovorkaIntervalGaussianInsulin(gym.Env):
         # self.state = [X0[4] * 18 / P[12], X0[6]]
         # self.state = [X0[4] * 18 / P[12]]
         initial_bg = X0[4] * 18 / P[12]
-        # initial_insulin = X0[6]
-        # self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), np.repeat(initial_insulin, self.simulation_time)])
-        self.state = np.repeat(initial_bg, self.simulation_time)
+        initial_insulin = X0[6]
+        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), np.repeat(initial_insulin, self.simulation_time)])
 
         self.simulation_state = X0
 
@@ -139,14 +142,14 @@ class HovorkaIntervalGaussianInsulin(gym.Env):
         # ==========================
 
         bg = []
-        # insulin = []
+        insulin = []
         for i in range(self.simulation_time):
 
             self.integrator.integrate(self.integrator.t + 1)
 
             self.num_iters += 1
             bg.append(self.integrator.y[4] * 18 / self.P[12])
-            # insulin.append(self.integrator.y[6])
+            insulin.append(self.integrator.y[6])
 
         # Updating environment parameters
         self.simulation_state = self.integrator.y
@@ -159,7 +162,7 @@ class HovorkaIntervalGaussianInsulin(gym.Env):
         # self.state[0] = bg
         # self.state[1] = self.integrator.y[6]
 
-        self.state = np.array(bg)
+        self.state = np.concatenate([bg, insulin])
 
         #Set environment done = True if blood_glucose_level is negative
         done = 0
@@ -218,8 +221,8 @@ class HovorkaIntervalGaussianInsulin(gym.Env):
         # self.state[0] = X0[4] * 18 / P[12]
         # self.state[1] = X0[6]
         initial_bg = X0[4] * 18 / P[12]
-        # initial_insulin = X0[6]
-        self.state = np.repeat(initial_bg, self.simulation_time)
+        initial_insulin = X0[6]
+        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), np.repeat(initial_insulin, self.simulation_time)])
 
         self.simulation_state = X0
         # self.bg_history = [X0[4] * 18 / P[12] ]
