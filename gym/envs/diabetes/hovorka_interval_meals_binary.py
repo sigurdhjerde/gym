@@ -48,7 +48,7 @@ class HovorkaMealsBinary(gym.Env):
         # Observation space -- bg between 0 and 500, measured every five minutes (1440 mins per day / 5 = 288)
         # self.observation_space = spaces.Box(0, 500, 288)
 
-        self.observation_space = spaces.Box(0, 500, 60)
+        self.observation_space = spaces.Box(0, 500, 34)
         # self.observation_space = spaces.Box(0, 500, 1)
 
         # Initial glucose regulation parameters
@@ -92,8 +92,8 @@ class HovorkaMealsBinary(gym.Env):
         # self.state = [X0[4] * 18 / P[12], X0[6]]
         # self.state = [X0[4] * 18 / P[12]]
         initial_bg = X0[4] * 18 / P[12]
-        initial_insulin = X0[6]
-        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), np.repeat(initial_insulin, self.simulation_time)])
+        initial_insulin = np.zeros(4)
+        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
 
         self.simulation_state = X0
 
@@ -101,7 +101,7 @@ class HovorkaMealsBinary(gym.Env):
         # self.bg_history = [X0[4] * 18 / P[12]]
         # self.insulin_history = [X0[6]]
         self.bg_history = []
-        self.insulin_history = []
+        self.insulin_history = initial_insulin
 
         # ====================
         # Meal setup
@@ -153,7 +153,7 @@ class HovorkaMealsBinary(gym.Env):
         self.integrator.set_initial_value(self.simulation_state, self.num_iters)
 
         bg = []
-        insulin = []
+        # insulin = []
         # ==========================
         # Integration loop
         # ==========================
@@ -170,20 +170,20 @@ class HovorkaMealsBinary(gym.Env):
 
             self.num_iters += 1
             bg.append(self.integrator.y[4] * 18 / self.P[12])
-            insulin.append(self.integrator.y[6])
+            # insulin.append(self.integrator.y[6])
 
         # Updating environment parameters
         self.simulation_state = self.integrator.y
 
         # Recording bg history for plotting
         self.bg_history = np.concatenate([self.bg_history, bg])
-        self.insulin_history.append(self.integrator.y[6])
+        self.insulin_history = np.concatenate([self.insulin_history, action])
 
         # Updating state
         # self.state[0] = bg
         # self.state[1] = self.integrator.y[6]
 
-        self.state = np.concatenate([bg, insulin])
+        self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:]))])
 
         #Set environment done = True if blood_glucose_level is negative
         done = 0
@@ -241,14 +241,14 @@ class HovorkaMealsBinary(gym.Env):
         # self.state[0] = X0[4] * 18 / P[12]
         # self.state[1] = X0[6]
         initial_bg = X0[4] * 18 / P[12]
-        initial_insulin = X0[6]
-        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), np.repeat(initial_insulin, self.simulation_time)])
+        initial_insulin = np.zeros(4)
+        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
 
         self.simulation_state = X0
         # self.bg_history = [X0[4] * 18 / P[12] ]
         # self.insulin_history = [X0[6]]
         self.bg_history = []
-        self.insulin_history = []
+        self.insulin_history = initial_insulin
 
         self.num_iters = 0
         # self.init_basal = np.random.choice(range(1, 10), 1)
