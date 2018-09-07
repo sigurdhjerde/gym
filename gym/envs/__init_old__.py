@@ -1,32 +1,180 @@
 from gym.envs.registration import registry, register, make, spec
 
+# Diabetes!
+# ----------------------------------------
+# ================================================
+# Hovorka model
+# ================================================
 register(
-        id = 'HovorkaGaussian-v0',
-        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_gaussian:HovorkaGaussian',
-        timestep_limit = 336,
-        max_episode_steps= 336
+        id = 'HovorkaDiabetes-v0',
+        entry_point = 'gym.envs.diabetes.hovorka:HovorkaDiabetes',
+        timestep_limit = 1440,
+        max_episode_steps=1440
         )
 register(
-        id = 'HovorkaBinary-v0',
-        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_binary:HovorkaBinary',
-        timestep_limit = 336,
-        max_episode_steps= 336
+        id = 'HovorkaMeals-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_meals:HovorkaMeals',
+        timestep_limit = 1440,
+        max_episode_steps=1440
+        )
+register(
+        id = 'HovorkaDiscrete-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_discrete:HovorkaDiscrete',
+        timestep_limit = 1440,
+        max_episode_steps=1440
+        )
+# ================================================
+# Hovorka interval with different rewards
+# ================================================
+register(
+        id = 'HovorkaInterval-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval:HovorkaInterval',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'HovorkaGaussian-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_gaussian:HovorkaIntervalGaussian',
+        timestep_limit = 96,
+        max_episode_steps= 96
         )
 register(
         id = 'HovorkaGaussianInsulin-v0',
-        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_gaussian_with_insulin:HovorkaGaussianInsulin',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_gaussian_with_insulin:HovorkaIntervalGaussianInsulin',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'HovorkaAbsolute-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_absolute:HovorkaIntervalAbsolute',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'HovorkaBinary-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_binary:HovorkaIntervalBinary',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'HovorkaHovorka-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_hovorka:HovorkaIntervalHovorka',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'HovorkaIntervalRandom-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_random:HovorkaIntervalRandom',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+
+register(
+        id = 'HovorkaBase-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_base:HovorkaBase',
         timestep_limit = 336,
         max_episode_steps= 336
         )
 register(
-        id = 'HovorkaAbsolute-v0',
-        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_absolute:HovorkaAbsolute',
+        id = 'HovorkaBase2-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_base2:HovorkaBase2',
+        timestep_limit = 336,
+        max_episode_steps= 336
+        )
+
+# ================================================
+# Hovorka interval with different rewards and meals
+# ================================================
+register(
+        id = 'HovorkaIntervalMeals-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_meals:HovorkaIntervalMeals',
+        timestep_limit = 336,
+        max_episode_steps= 336
+        )
+
+register(
+        id = 'HovorkaMealsAbsolute-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_absolute:HovorkaMealsAbsolute',
+        timestep_limit = 336,
+        max_episode_steps= 336
+        )
+register(
+        id = 'HovorkaMealsBinary-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_binary:HovorkaMealsBinary',
+        timestep_limit = 336,
+        max_episode_steps= 336
+        )
+register(
+        id = 'HovorkaMealsGaussian-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_gaussian:HovorkaMealsGaussian',
+        timestep_limit = 336,
+        max_episode_steps= 336
+        )
+register(
+        id = 'HovorkaMealsGaussianInsulin-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_gaussian_with_insulin:HovorkaMealsGaussianInsulin',
         timestep_limit = 336,
         max_episode_steps= 336
         )
 # ================================================
-# Hovorka interval with different rewards and meals
+# Hovorka random interval with different rewards
 # ================================================
+register(
+        id = 'HovorkaRandomGaussian-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_random_gaussian:HovorkaRandomGaussian',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'HovorkaRandomGaussianInsulin-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_random_gaussian_with_insulin:HovorkaRandomGaussianInsulin',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'HovorkaRandomAbsolute-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_random_absolute:HovorkaRandomAbsolute',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'HovorkaRandomBinary-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_random_binary:HovorkaRandomBinary',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+# ================================================
+# Minimal model
+# ================================================
+register(
+        id = 'MinimalDiabetes-v0',
+        entry_point = 'gym.envs.diabetes.minimal_env:MinimalDiabetes',
+        timestep_limit = 1440,
+        max_episode_steps=1440
+        )
+
+register(
+        id = 'MinimalDiabetesYasini-v0',
+        entry_point = 'gym.envs.diabetes.minimal_env_yasini:MinimalDiabetesYasini',
+        timestep_limit = 1440,
+        max_episode_steps=1440
+        )
+
+register(
+        id = 'YasiniMeals-v0',
+        entry_point = 'gym.envs.diabetes.minimal_env_yasini_meals:YasiniMeals',
+        timestep_limit = 1440,
+        max_episode_steps=1440
+        )
+# ==============
+# Padova model
+# ==============
+# register(
+        # id = 'Padova-v0',
+        # entry_point = 'gym.envs.diabetes.padova:PadovaDiabetes ',
+        # timestep_limit = 1440,
+        # max_episode_steps=1440
+        # )
 
 # Algorithmic
 # ----------------------------------------
