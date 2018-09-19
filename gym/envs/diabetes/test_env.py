@@ -12,15 +12,15 @@ env = gym.make('HovorkaGaussian-v0')
 
 
 # basal = 0
-# env.env.init_bg = 110
+env.env.reset_basal_manually = 6.43
 
 env.reset()
 reward = []
 
-for i in range(336):
+for i in range(96):
 
     # Step for the minimal/hovorka model
-    s, r, d, i = env.step(np.array([6.6]))
+    s, r, d, i = env.step(np.array([6.43]))
     reward.append(r)
     # print(r)
 
@@ -33,7 +33,7 @@ for i in range(336):
 figure()
 plot(env.env.bg_history)
 title('bg')
-ion()
+# ion()
 show()
 
 figure()

@@ -50,7 +50,7 @@ class HovorkaBase(gym.Env):
         self.observation_space = spaces.Box(0, 500, 34)
         # self.observation_space = spaces.Box(0, 500, 1)
 
-        self.bolus = 0
+        self.bolus = 8.3
 
         ## Loading variable parameters
         meal_times, meal_amounts, reward_flag, bg_init_flag, max_insulin_action = self._update_parameters()
@@ -111,7 +111,7 @@ class HovorkaBase(gym.Env):
         # meal_amounts = [0]
 
         eating_time = 30
-        premeal_bolus_time = 30
+        premeal_bolus_time = 15
 
         # Meals indicates the number of carbs taken at time t
         meals = np.zeros(14400)
@@ -127,6 +127,7 @@ class HovorkaBase(gym.Env):
         self.meals = meals
         self.meal_indicator = meal_indicator
         self.eating_time = eating_time
+        self.premeal_bolus_time = premeal_bolus_time
 
         # Counter for number of iterations
         self.num_iters = 0
@@ -174,7 +175,7 @@ class HovorkaBase(gym.Env):
             # Solving one step of the Hovorka model
             # ===============================================
 
-            insulin_rate = action + (self.meal_indicator[self.num_iters] * self.bolus)/self.eating_time
+            insulin_rate = action + (self.meal_indicator[self.num_iters] * self.bolus)/self.premeal_bolus_time
             self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
 
             self.integrator.integrate(self.integrator.t + 1)

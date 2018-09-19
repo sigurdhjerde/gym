@@ -1,32 +1,43 @@
 from gym.envs.registration import registry, register, make, spec
 
+# ================================================
+# Hovorka interval with different rewards and meals
+# ================================================
 register(
         id = 'HovorkaGaussian-v0',
         entry_point = 'gym.envs.diabetes.hovorka_interval_meals_gaussian:HovorkaGaussian',
-        timestep_limit = 336,
-        max_episode_steps= 336
+        timestep_limit = 96,
+        max_episode_steps= 96
         )
 register(
         id = 'HovorkaBinary-v0',
         entry_point = 'gym.envs.diabetes.hovorka_interval_meals_binary:HovorkaBinary',
-        timestep_limit = 336,
-        max_episode_steps= 336
+        timestep_limit = 96,
+        max_episode_steps= 96
         )
 register(
         id = 'HovorkaGaussianInsulin-v0',
         entry_point = 'gym.envs.diabetes.hovorka_interval_meals_gaussian_with_insulin:HovorkaGaussianInsulin',
-        timestep_limit = 336,
-        max_episode_steps= 336
+        timestep_limit = 96,
+        max_episode_steps= 96
         )
 register(
         id = 'HovorkaAbsolute-v0',
         entry_point = 'gym.envs.diabetes.hovorka_interval_meals_absolute:HovorkaAbsolute',
-        timestep_limit = 336,
-        max_episode_steps= 336
+        timestep_limit = 96,
+        max_episode_steps= 96
         )
+
 # ================================================
-# Hovorka interval with different rewards and meals
+# Cambridge model
 # ================================================
+
+register(
+        id = 'Cambridge-v0',
+        entry_point = 'gym.envs.cambridge_model:CambridgeBase',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
 
 # Algorithmic
 # ----------------------------------------
