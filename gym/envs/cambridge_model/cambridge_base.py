@@ -56,12 +56,12 @@ class CambridgeBase(gym.Env):
         ## Loading variable parameters
         meal_times, meal_amounts, reward_flag, bg_init_flag, = self._update_parameters()
 
-        self.action_space = spaces.Box(0, 100, 1)
+        self.action_space = spaces.Box(0, 50, 1)
 
         # Initial basal -- this rate dictates the initial BG value
 
         if bg_init_flag == 'random':
-            self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
+            self.init_basal = np.random.choice(np.linspace(0, 15, 50))
         elif bg_init_flag == 'fixed':
             self.init_basal = 6
 
