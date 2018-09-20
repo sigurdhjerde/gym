@@ -74,7 +74,7 @@ class CambridgeBase(gym.Env):
         # Setting up the cambridge simulator
         # ==========================================
 
-        # Patient parameters
+        # Patient parameters -- sub_1() means virtual patient #1
         P = sub_1()
         self.P = P
 
@@ -104,7 +104,6 @@ class CambridgeBase(gym.Env):
         self.bg_history = []
         self.insulin_history = initial_insulin
 
-        # ====================
         # Meal setup
         # ====================
         meal_times = [0]
@@ -238,7 +237,7 @@ class CambridgeBase(gym.Env):
 
         # re init -- in case the init basal has been changed
         if self.reset_basal_manually is None:
-            self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
+            self.init_basal = np.random.choice(np.linspace(0, 15, 50))
             # self.init_basal = 6
         else:
             self.init_basal = self.reset_basal_manually
