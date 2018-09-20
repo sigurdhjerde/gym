@@ -1,1 +1,5 @@
-from gym.envs.cambridge_model.cambridge_base import CambridgeBase
+# from gym.envs.cambridge_model.cambridge_base import CambridgeBase
+from gym.envs.cambridge_model.cambridge_binary import CambridgeBinary
+from gym.envs.cambridge_model.cambridge_absolute import CambridgeAbsolute
+from gym.envs.cambridge_model.cambridge_gaussian import CambridgeGaussian
+from gym.envs.cambridge_model.cambridge_gaussian_insulin import CambridgeGaussianInsulin

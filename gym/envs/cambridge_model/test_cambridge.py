@@ -5,8 +5,11 @@ import gym
 
 from pylab import plot, figure, title, show, ion, legend
 
-env = gym.make('Cambridge-v0')
-
+# env = gym.make('Cambridge-v0')
+# env = gym.make('CambridgeGaussian-v0')
+# env = gym.make('CambridgeGaussianInsulin-v0')
+# env = gym.make('CambridgeBinary-v0')
+env = gym.make('CambridgeAbsolute-v0')
 
 # basal = 0
 # env.env.reset_basal_manually = 6.43

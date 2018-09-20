@@ -32,9 +32,33 @@ register(
 # Cambridge model
 # ================================================
 
+# register(
+#         id = 'Cambridge-v0',
+#         entry_point = 'gym.envs.cambridge_model:CambridgeBase',
+#         timestep_limit = 96,
+#         max_episode_steps= 96
+#         )
 register(
-        id = 'Cambridge-v0',
-        entry_point = 'gym.envs.cambridge_model:CambridgeBase',
+        id = 'CambridgeGaussian-v0',
+        entry_point = 'gym.envs.cambridge_model.cambridge_gaussian:CambridgeGaussian',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'CambridgeBinary-v0',
+        entry_point = 'gym.envs.cambridge_model.cambridge_binary:CambridgeBinary',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'CambridgeGaussianInsulin-v0',
+        entry_point = 'gym.envs.cambridge_model.cambridge_gaussian_insulin:CambridgeGaussianInsulin',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'CambridgeAbsolute-v0',
+        entry_point = 'gym.envs.cambridge_model.cambridge_absolute:CambridgeAbsolute',
         timestep_limit = 96,
         max_episode_steps= 96
         )

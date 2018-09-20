@@ -1,6 +1,5 @@
 """
 OPENAI gym environment for the Cambridge/Hovorka model
-
 This is the base class for the Hovorka models.
     - Actions runs for a longer interval (default 30 mins)
     to get closer to a markov decision process.
@@ -8,7 +7,6 @@ This is the base class for the Hovorka models.
     - Default 34 dim observation space (30 min BG and last four actions)
     - Default action space 0 to 50 mU/min of insulin
     - Rendering disabled by default
-
     - Initialization and reset: Random initialization and no meals!
 """
 
@@ -51,10 +49,11 @@ class CambridgeBase(gym.Env):
         self.observation_space = spaces.Box(0, 500, 34)
         # self.observation_space = spaces.Box(0, 500, 1)
 
-        self.bolus = 8.3
+        self.bolus = 0
 
         ## Loading variable parameters
-        meal_times, meal_amounts, reward_flag, bg_init_flag, = self._update_parameters()
+        # meal_times, meal_amounts, reward_flag, bg_init_flag = self._update_parameters()
+        reward_flag, bg_init_flag = self._update_parameters()
 
         self.action_space = spaces.Box(0, 50, 1)
 
@@ -108,8 +107,8 @@ class CambridgeBase(gym.Env):
         # ====================
         # Meal setup
         # ====================
-        # meal_times = [0]
-        # meal_amounts = [0]
+        meal_times = [0]
+        meal_amounts = [0]
 
         eating_time = 30
         premeal_bolus_time = 15
@@ -149,13 +148,14 @@ class CambridgeBase(gym.Env):
         ''' Update parameters of model,
         this is only used for inherited classes'''
 
-        meal_times = [0]
-        meal_amounts = [0]
+        # meal_times = [0]
+        # meal_amounts = [0]
         reward_flag = 'gaussian'
         bg_init_flag = 'random'
         # action_space = spaces.box(0, 30, 1)
 
-        return meal_times, meal_amounts, reward_flag, bg_init_flag
+        # return meal_times, meal_amounts, reward_flag, bg_init_flag
+        return reward_flag, bg_init_flag
 
     def _step(self, action):
         """
@@ -300,5 +300,3 @@ class CambridgeBase(gym.Env):
 
             # plt.ion()
             # plt.plot(self.bg_history)
-
-
