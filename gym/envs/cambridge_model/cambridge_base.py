@@ -21,7 +21,7 @@ import numpy as np
 
 # Cambridge simulator
 from gym.envs.cambridge_model.cambridge_model import cambridge_model, cambridge_model_tuple
-from gym.envs.cambridge_model.sub_1 import sub_1
+from gym.envs.cambridge_model.subject import subject
 from gym.envs.cambridge_model.reward_function import calculate_reward
 
 # ODE solver stuff
@@ -75,7 +75,7 @@ class CambridgeBase(gym.Env):
         # ==========================================
 
         # Patient parameters -- sub_1() means virtual patient #1
-        P = sub_1()
+        P = subject(1)
         self.P = P
 
         # Initial values for parameters
