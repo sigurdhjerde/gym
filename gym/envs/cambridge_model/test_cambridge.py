@@ -21,7 +21,7 @@ reward = []
 bg = []
 cgm = []
 
-for i in range(96):
+for i in range(48):
 
     # Step for the minimal/hovorka model
     s, r, d, i = env.step(np.array([0]))

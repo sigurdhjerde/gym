@@ -107,17 +107,17 @@ class CambridgeBase(gym.Env):
         # ====================
         # Meal setup
         # ====================
-        meal_times = [0]
-        meal_amounts = [0]
+        meal_times = [round(np.random.uniform(690,750))]
+        meal_amounts = [round(np.random.uniform(50,60))]
 
         eating_time = 30
         premeal_bolus_time = 15
 
         # Meals indicates the number of carbs taken at time t
-        meals = np.zeros(14400)
+        meals = np.zeros(1440)
 
         # 'meal_indicator' indicates time of bolus - default 30 minutes before meal
-        meal_indicator = np.zeros(14400)
+        meal_indicator = np.zeros(1440)
 
         for i in range(len(meal_times)):
             meals[meal_times[i] : meal_times[i] + eating_time] = meal_amounts[i]/eating_time * 1000 /180
@@ -137,7 +137,7 @@ class CambridgeBase(gym.Env):
         self.bg_threshold_high = 500
 
         # TODO: This number is arbitrary
-        self.max_iter = 14400
+        self.max_iter = 1440
 
         # Reward flag
         self.reward_flag = reward_flag
