@@ -60,7 +60,7 @@ class CambridgeBase(gym.Env):
         # Initial basal -- this rate dictates the initial BG value
 
         if bg_init_flag == 'random':
-            self.init_basal = np.random.choice(np.linspace(0, 15, 50))
+            self.init_basal = np.random.choice(np.linspace(0, 9.5, 50))
         elif bg_init_flag == 'fixed':
             self.init_basal = 6
 
@@ -237,7 +237,7 @@ class CambridgeBase(gym.Env):
 
         # re init -- in case the init basal has been changed
         if self.reset_basal_manually is None:
-            self.init_basal = np.random.choice(np.linspace(0, 15, 50))
+            self.init_basal = np.random.choice(np.linspace(0, 9.5, 50))
             # self.init_basal = 6
         else:
             self.init_basal = self.reset_basal_manually
