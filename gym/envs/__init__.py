@@ -155,12 +155,12 @@ register(
 # ==============
 # Padova model
 # ==============
-# register(
-        # id = 'Padova-v0',
-        # entry_point = 'gym.envs.diabetes.padova:PadovaDiabetes ',
-        # timestep_limit = 1440,
-        # max_episode_steps=1440
-        # )
+register(
+        id = 'Padova-v0',
+        entry_point = 'gym.envs.diabetes.padova:PadovaDiabetes ',
+        timestep_limit = 1440,
+        max_episode_steps=1440
+        )
 
 # Algorithmic
 # ----------------------------------------

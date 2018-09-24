@@ -28,4 +28,4 @@ from gym.envs.diabetes.minimal_env import MinimalDiabetes
 from gym.envs.diabetes.minimal_env_yasini_meals import YasiniMeals
 
 # Padova model
-# from gym.envs.diabetes.padova import PadovaDiabetes
+from gym.envs.diabetes.padova import PadovaDiabetes
