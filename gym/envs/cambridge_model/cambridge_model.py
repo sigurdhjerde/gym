@@ -86,8 +86,8 @@ def cambridge_model(t, x, u, D, P): ## This zais the ode version
     # This is different
     # =======================
     ka_int = P[15]
-    R_cl = P[16]
-    R_thr = P[17]
+    # R_cl = P[16]
+   # R_thr = P[17]
 
     # Certain parameters are defined
     U_G = D2/tau_G             # Glucose absorption rate [mmol/min]
@@ -102,14 +102,28 @@ def cambridge_model(t, x, u, D, P): ## This zais the ode version
     # ========================
     # THIS IS DIFFERENT
     # ========================
-    F_01s = F_01/0.85
-    F_01c = F_01s*G / (G + 1)
+    # F_01s = F_01/0.85
+    # F_01c = F_01s*G / (G + 1)
 
     # ========================
     # THIS IS DIFFERENT  the numbers are changed from numbers to variables
     # ========================
-    if (G >= R_thr):
-        F_R = R_cl*(G - R_thr)*V_G  # Renal excretion of glucose in the kidneys [mmol/min]
+    # if (G >= R_thr):
+        # F_R = R_cl*(G - R_thr)*V_G  # Renal excretion of glucose in the kidneys [mmol/min]
+    # else:
+        # F_R = 0                # Renal excretion of glucose in the kidneys [mmol/min]
+
+
+    # ========================================
+    # Copied from old hovorka model code
+    # ========================================
+    if (G>=4.5):
+        F_01c = F_01           # Consumption of glucose by the central nervous system [mmol/min
+    else:
+        F_01c = F_01*G/4.5     # Consumption of glucose by the central nervous system [mmol/min]
+
+    if (G>=9):
+        F_R = 0.003*(G-9)*V_G  # Renal excretion of glucose in the kidneys [mmol/min]
     else:
         F_R = 0                # Renal excretion of glucose in the kidneys [mmol/min]
 
@@ -133,9 +147,13 @@ def cambridge_model(t, x, u, D, P): ## This zais the ode version
     # ========================
     # THIS IS DIFFERENT
     # ========================
-    xdot[ 7 ] = k_a1*I - k_b1*x1                                # dx1
-    xdot[ 8 ] = k_a2*I - k_b2*x2                                # dx2
-    xdot[ 9 ] = k_a3*I - k_b3*x3                               # dx3
+    # xdot[ 7 ] = k_a1*I - k_b1*x1                                # dx1
+    # xdot[ 8 ] = k_a2*I - k_b2*x2                                # dx2
+    # xdot[ 9 ] = k_a3*I - k_b3*x3                               # dx3
+
+    xdot[ 7 ] = k_b1*I - k_a1*x1                                # dx1
+    xdot[ 8 ] = k_b2*I - k_a2*x2                                # dx2
+    xdot[ 9 ] = k_b3*I - k_a3*x3                               # dx3
 
     # Interstitial glucose kinetics
     # ========================

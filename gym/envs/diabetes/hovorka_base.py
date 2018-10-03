@@ -82,7 +82,7 @@ class HovorkaBase(gym.Env):
         initial_pars = (self.init_basal, 0, P)
 
         # Initial value
-        X0 = fsolve(hovorka_model_tuple, np.zeros(10), args=initial_pars)
+        X0 = fsolve(hovorka_model_tuple, np.zeros(11), args=initial_pars)
         self.X0 = X0
 
         # Simulation setup
@@ -94,7 +94,7 @@ class HovorkaBase(gym.Env):
         self.simulation_time = 30
 
         # State is BG, simulation_state is parameters of hovorka model
-        initial_bg = X0[4] * 18 / P[12]
+        initial_bg = X0[-1] * 18
         initial_insulin = np.zeros(4)
         self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
 
@@ -181,7 +181,7 @@ class HovorkaBase(gym.Env):
             self.integrator.integrate(self.integrator.t + 1)
 
             self.num_iters += 1
-            bg.append(self.integrator.y[4] * 18 / self.P[12])
+            bg.append(self.integrator.y[-1] * 18)
             # insulin.append(self.integrator.y[6])
 
         # Updating environment parameters
@@ -245,12 +245,12 @@ class HovorkaBase(gym.Env):
         P = self.P
         initial_pars = (self.init_basal, 0, P)
 
-        X0 = fsolve(hovorka_model_tuple, np.zeros(10), args=initial_pars)
+        X0 = fsolve(hovorka_model_tuple, np.zeros(11), args=initial_pars)
         self.X0 = X0
         self.integrator.set_initial_value(self.X0, 0)
 
         # State is BG, simulation_state is parameters of hovorka model
-        initial_bg = X0[4] * 18 / P[12]
+        initial_bg = X0[-1] * 18
         initial_insulin = np.zeros(4)
         self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
 

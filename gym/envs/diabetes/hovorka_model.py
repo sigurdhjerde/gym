@@ -58,6 +58,7 @@ def hovorka_model(t, x, u, D, P): ## This is the ode version
     x1 = x[ 7 ]               # Insluin in muscle tissues [1], x1*Q1 = Insulin dependent uptake of glucose in muscles
     x2 = x[ 8 ]               # [1], x2*Q2 = Insulin dependent disposal of glucose in the muscle cells
     x3 = x[ 9 ]              # Insulin in the liver [1], EGP_0*(1-x3) = Endogenous release of glucose by the liver
+    C = x[10]
 
     # Unpack data
     tau_G = P[ 0 ]               # Time-to-glucose absorption [min]
@@ -94,7 +95,7 @@ def hovorka_model(t, x, u, D, P): ## This is the ode version
         F_R = 0                # Renal excretion of glucose in the kidneys [mmol/min]
 
     # Mass balances/differential equations
-    xdot = np.zeros (10);
+    xdot = np.zeros (11);
 
     xdot[ 0 ] = A_G*D-D1/tau_G                                # dD1
     xdot[ 1 ] = D1/tau_G-U_G                                  # dD2
@@ -106,6 +107,12 @@ def hovorka_model(t, x, u, D, P): ## This is the ode version
     xdot[ 7 ] = k_b1*I-k_a1*x1                                # dx1
     xdot[ 8 ] = k_b2*I-k_a2*x2                                # dx2
     xdot[ 9 ] = k_b3*I-k_a3*x3                               # dx3
+    # ===============
+    # CGM delay
+    # ===============
+    ka_int = 0.073
+    xdot[10] = ka_int*(G - C)
+
 
     return xdot
 
@@ -136,6 +143,7 @@ def hovorka_model_tuple(x, *pars):
     x1 = x[ 7 ]               # Insluin in muscle tissues [1], x1*Q1 = Insulin dependent uptake of glucose in muscles
     x2 = x[ 8 ]               # [1], x2*Q2 = Insulin dependent disposal of glucose in the muscle cells
     x3 = x[ 9 ]              # Insulin in the liver [1], EGP_0*(1-x3) = Endogenous release of glucose by the liver
+    C = x[10]
 
     # Unpack data
     tau_G = P[ 0 ]               # Time-to-glucose absorption [min]
@@ -171,8 +179,9 @@ def hovorka_model_tuple(x, *pars):
     else:
         F_R = 0                # Renal excretion of glucose in the kidneys [mmol/min]
 
+
     # Mass balances/differential equations
-    xdot = np.zeros (10);
+    xdot = np.zeros (11);
 
     xdot[ 0 ] = A_G*D-D1/tau_G                                # dD1
     xdot[ 1 ] = D1/tau_G-U_G                                  # dD2
@@ -184,5 +193,10 @@ def hovorka_model_tuple(x, *pars):
     xdot[ 7 ] = k_b1*I-k_a1*x1                                # dx1
     xdot[ 8 ] = k_b2*I-k_a2*x2                                # dx2
     xdot[ 9 ] = k_b3*I-k_a3*x3                               # dx3
+    # ===============
+    # CGM delay
+    # ===============
+    ka_int = 0.073
+    xdot[10] = ka_int*(G - C)
 
     return xdot
