@@ -20,7 +20,7 @@ import numpy as np
 # import matplotlib.pyplot as plt
 
 # Cambridge simulator
-from gym.envs.cambridge_model.cambridge_model import cambridge_model, cambridge_model_tuple
+from gym.envs.cambridge_model.cambridge_model import cambridge_model, cambridge_model_tuple, cambridge_parameters
 from gym.envs.cambridge_model.subject import subject
 from gym.envs.cambridge_model.reward_function import calculate_reward
 
@@ -75,7 +75,8 @@ class CambridgeBase(gym.Env):
         # ==========================================
 
         # Patient parameters -- sub_1() means virtual patient #1
-        P = subject(1)
+        # P = subject(1)
+        P = cambridge_parameters(70)
         self.P = P
 
         # Initial values for parameters
@@ -106,8 +107,11 @@ class CambridgeBase(gym.Env):
 
         # Meal setup
         # ====================
-        meal_times = [round(np.random.uniform(690,750))]
-        meal_amounts = [round(np.random.uniform(50,60))]
+        # meal_times = [round(np.random.uniform(690,750))]
+        # meal_amounts = [round(np.random.uniform(50,60))]
+
+        meal_times = [0]
+        meal_amounts = [0]
 
         eating_time = 30
         premeal_bolus_time = 15
