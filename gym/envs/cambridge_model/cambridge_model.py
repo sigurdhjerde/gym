@@ -26,7 +26,7 @@ def cambridge_parameters(BW):
     k_b3 = S_IE*k_a3           # Activation rate of insulin on EGP
     k_e = 0.138                # Insulin elimination from Plasma [1/min]
 
-    ka_int = .001                   # Transfer rate from plasma to interstitial BG [1/min]
+    ka_int = 0.1510                   # Transfer rate from plasma to interstitial BG [1/min]
     R_cl = 0.003
     R_thr = 9
 
@@ -37,7 +37,7 @@ def cambridge_parameters(BW):
 
 
 def cambridge_model(t, x, u, D, P): ## This zais the ode version
-    """HOVORKA DIFFERENTIAL EQUATIONS
+    """CAMBRIDGE model (wilinska 2010) DIFFERENTIAL EQUATIONS
     # t:    Time window for the simulation. Format: [t0 t1], or [t1 t2 t3 ... tn]. [min]
     # x:    Initial conditions
     # u:    Amount of insulin insulin injected [mU/min]
@@ -81,6 +81,10 @@ def cambridge_model(t, x, u, D, P): ## This zais the ode version
     V_G = P[ 12 ]                # Glucose distribution volume [L]
     F_01s = P[ 13 ]               # Glucose consumption by the central nervous system [mmol/min]
     EGP_0 = P[ 14 ]              # Liver glucose production rate [mmol/min]
+
+    # =======================
+    # This is different
+    # =======================
     ka_int = P[15]
     R_cl = P[16]
     R_thr = P[17]
@@ -94,9 +98,16 @@ def cambridge_model(t, x, u, D, P): ## This zais the ode version
 
 
     # Non insulin dependent glucose flux
+
+    # ========================
+    # THIS IS DIFFERENT
+    # ========================
     # F_01s = F_01/0.85
     F_01c = F_01s*G / (G + 1)
 
+    # ========================
+    # THIS IS DIFFERENT  the numbers are changed from numbers to variables
+    # ========================
     if (G >= R_thr):
         F_R = R_cl*(G - R_thr)*V_G  # Renal excretion of glucose in the kidneys [mmol/min]
     else:
@@ -119,11 +130,17 @@ def cambridge_model(t, x, u, D, P): ## This zais the ode version
     xdot[ 5 ] = x1*Q1 - (k_12 + x2)*Q2                            # dQ2
 
     # Insulin action
+    # ========================
+    # THIS IS DIFFERENT
+    # ========================
     xdot[ 7 ] = k_a1*I - k_b1*x1                                # dx1
     xdot[ 8 ] = k_a2*I - k_b2*x2                                # dx2
     xdot[ 9 ] = k_a3*I - k_b3*x3                               # dx3
 
     # Interstitial glucose kinetics
+    # ========================
+    # THIS IS NEW!
+    # ========================
     xdot[10] = ka_int*(G - C)
 
     return xdot
