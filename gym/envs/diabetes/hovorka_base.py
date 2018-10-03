@@ -50,12 +50,13 @@ class HovorkaBase(gym.Env):
         self.observation_space = spaces.Box(0, 500, 34)
         # self.observation_space = spaces.Box(0, 500, 1)
 
-        self.bolus = 8.3
+        self.bolus = 0
 
         ## Loading variable parameters
-        meal_times, meal_amounts, reward_flag, bg_init_flag, max_insulin_action = self._update_parameters()
+        # meal_times, meal_amounts, reward_flag, bg_init_flag, max_insulin_action = self._update_parameters()
+        reward_flag, bg_init_flag = self._update_parameters()
 
-        self.action_space = spaces.Box(0, max_insulin_action, 1)
+        self.action_space = spaces.Box(0, 50, 1)
 
         # Initial basal -- this rate dictates the initial BG value
 
@@ -110,6 +111,9 @@ class HovorkaBase(gym.Env):
         # meal_times = [0]
         # meal_amounts = [0]
 
+        meal_times = [round(np.random.uniform(330, 390)), round(np.random.uniform(690, 750)), round(np.random.uniform(1050, 1110))]
+        meal_amounts = [round(np.random.uniform(70, 80)), round(np.random.uniform(50, 60)), round(np.random.uniform(50, 60))]
+
         eating_time = 30
         premeal_bolus_time = 15
 
@@ -148,13 +152,14 @@ class HovorkaBase(gym.Env):
         ''' Update parameters of model,
         this is only used for inherited classes'''
 
-        meal_times = [0]
-        meal_amounts = [0]
+        # meal_times = [0]
+        # meal_amounts = [0]
         reward_flag = 'gaussian'
         bg_init_flag = 'random'
-        action_space = spaces.box(0, 30, 1)
+        # action_space = spaces.box(0, 30, 1)
 
-        return meal_times, meal_amounts, reward_flag, bg_init_flag, action_space
+        # return meal_times, meal_amounts, reward_flag, bg_init_flag
+        return reward_flag, bg_init_flag
 
     def _step(self, action):
         """
