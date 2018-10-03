@@ -77,6 +77,8 @@ class CambridgeBase(gym.Env):
         # Patient parameters -- sub_1() means virtual patient #1
         # P = subject(1)
         P = cambridge_parameters(70)
+
+        P = subject(6)
         self.P = P
 
         # Initial values for parameters
@@ -107,11 +109,15 @@ class CambridgeBase(gym.Env):
 
         # Meal setup
         # ====================
+
         # meal_times = [round(np.random.uniform(690,750))]
         # meal_amounts = [round(np.random.uniform(50,60))]
 
-        meal_times = [0]
-        meal_amounts = [0]
+        # meal_times = [0]
+        # meal_amounts = [0]
+
+        meal_times = [round(np.random.uniform(330,390)), round(np.random.uniform(690,750)), round(np.random.uniform(1050,1110))]
+        meal_amounts = [round(np.random.uniform(70,80)), round(np.random.uniform(50,60)), round(np.random.uniform(50,60))]
 
         eating_time = 30
         premeal_bolus_time = 15
