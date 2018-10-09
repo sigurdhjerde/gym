@@ -50,13 +50,17 @@ class HovorkaBase(gym.Env):
         self.observation_space = spaces.Box(0, 500, 34)
         # self.observation_space = spaces.Box(0, 500, 1)
 
-        self.bolus = 0
+        # self.bolus = 0
+        self.bolus = 8.3
 
         ## Loading variable parameters
         # meal_times, meal_amounts, reward_flag, bg_init_flag, max_insulin_action = self._update_parameters()
         reward_flag, bg_init_flag = self._update_parameters()
 
         self.action_space = spaces.Box(0, 50, 1)
+
+        # Increasing the max bolus rate
+        # self.action_space = spaces.Box(0, 150, 1)
 
         # Initial basal -- this rate dictates the initial BG value
 
@@ -104,6 +108,7 @@ class HovorkaBase(gym.Env):
         # Keeping track of entire blood glucose level for each episode
         self.bg_history = []
         self.insulin_history = initial_insulin
+        # self.insulin_history = []
 
         # ====================
         # Meal setup
@@ -112,7 +117,11 @@ class HovorkaBase(gym.Env):
         # meal_amounts = [0]
 
         meal_times = [round(np.random.uniform(330, 390)), round(np.random.uniform(690, 750)), round(np.random.uniform(1050, 1110))]
-        meal_amounts = [round(np.random.uniform(70, 80)), round(np.random.uniform(50, 60)), round(np.random.uniform(50, 60))]
+        meal_amounts = [round(np.random.uniform(70, 90)), round(np.random.uniform(50, 70)), round(np.random.uniform(50, 70))]
+
+        # Adding guessed meal amount
+        guessed_meal_amount = [round(np.random.uniform(meal_amounts[0]-20, meal_amounts[0]+20)), \
+                               round(np.random.uniform(meal_amounts[1]-20, meal_amounts[1]+20)), round(np.random.uniform(meal_amounts[2]-20, meal_amounts[2]+20))]
 
         eating_time = 30
         premeal_bolus_time = 15
@@ -125,13 +134,17 @@ class HovorkaBase(gym.Env):
 
         for i in range(len(meal_times)):
             meals[meal_times[i] : meal_times[i] + eating_time] = meal_amounts[i]/eating_time * 1000 /180
-            meal_indicator[meal_times[i]-premeal_bolus_time:meal_times[i]] = meal_amounts[i] * 1000 / 180
+            meal_indicator[meal_times[i]-premeal_bolus_time:meal_times[i]-premeal_bolus_time + eating_time] = guessed_meal_amount[i] * 1000 / 180
+
+            # Changing to guessed meal amount
+            # meal_indicator[meal_times[i]-premeal_bolus_time] = guessed_meal_amount[i] * 1000 / 180
 
         # TODO: Clean up these
         self.meals = meals
         self.meal_indicator = meal_indicator
         self.eating_time = eating_time
         self.premeal_bolus_time = premeal_bolus_time
+        self.guessed_meal_amount = guessed_meal_amount
 
         # Counter for number of iterations
         self.num_iters = 0
@@ -171,6 +184,7 @@ class HovorkaBase(gym.Env):
         self.integrator.set_initial_value(self.simulation_state, self.num_iters)
 
         bg = []
+        insulin = []
         # ==========================
         # Integration loop
         # ==========================
@@ -180,21 +194,23 @@ class HovorkaBase(gym.Env):
             # Solving one step of the Hovorka model
             # ===============================================
 
-            insulin_rate = action + (self.meal_indicator[self.num_iters] * self.bolus)/self.premeal_bolus_time
+            insulin_rate = action + (self.meal_indicator[self.num_iters] * self.bolus)/self.eating_time
+
             self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
+            # self.integrator.set_f_params(insulin_rate, 0, self.P)
 
             self.integrator.integrate(self.integrator.t + 1)
 
             self.num_iters += 1
             bg.append(self.integrator.y[-1] * 18)
-            # insulin.append(self.integrator.y[6])
+            # insulin.append(np.array([insulin_rate]))
 
         # Updating environment parameters
         self.simulation_state = self.integrator.y
 
         # Recording bg history for plotting
         self.bg_history = np.concatenate([self.bg_history, bg])
-        self.insulin_history = np.concatenate([self.insulin_history, action])
+        self.insulin_history = np.concatenate([self.insulin_history, insulin_rate])
 
         # Updating state
 
@@ -262,6 +278,7 @@ class HovorkaBase(gym.Env):
         self.simulation_state = X0
         self.bg_history = []
         self.insulin_history = initial_insulin
+        # self.insulin_history = []
 
         self.num_iters = 0
 
