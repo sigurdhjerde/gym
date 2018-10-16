@@ -1,18 +1,66 @@
 from gym.envs.registration import registry, register, make, spec
 
-# Diabetes!
-# ----------------------------------------
-# register(
-    # id='hovorka-v0',
-    # entry_point='gym.envs.diabetes.hovorka:HovorkaDiabetes',
-    # timestep_limit=200,
-    # reward_threshold=25.0,
-# )
+# ================================================
+# Hovorka interval with different rewards and meals
+# ================================================
 register(
-        id = 'HovorkaDiabetes-v0',
-        entry_point = 'gym.envs.diabetes.hovorka:HovorkaDiabetes',
-        timestep_limit = 1440,
-        max_episode_steps=1440
+        id = 'HovorkaGaussian-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_gaussian:HovorkaGaussian',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'HovorkaBinary-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_binary:HovorkaBinary',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'HovorkaGaussianInsulin-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_gaussian_with_insulin:HovorkaGaussianInsulin',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+register(
+        id = 'HovorkaAbsolute-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_absolute:HovorkaAbsolute',
+        timestep_limit = 96,
+        max_episode_steps= 96
+        )
+
+# ================================================
+# Cambridge model
+# ================================================
+
+# register(
+#         id = 'Cambridge-v0',
+#         entry_point = 'gym.envs.cambridge_model:CambridgeBase',
+#         timestep_limit = 96,
+#         max_episode_steps= 96
+#         )
+register(
+        id = 'CambridgeGaussian-v0',
+        entry_point = 'gym.envs.cambridge_model.cambridge_gaussian:CambridgeGaussian',
+        timestep_limit = 48,
+        max_episode_steps= 48
+        )
+register(
+        id = 'CambridgeBinary-v0',
+        entry_point = 'gym.envs.cambridge_model.cambridge_binary:CambridgeBinary',
+        timestep_limit = 48,
+        max_episode_steps= 48
+        )
+register(
+        id = 'CambridgeGaussianInsulin-v0',
+        entry_point = 'gym.envs.cambridge_model.cambridge_gaussian_insulin:CambridgeGaussianInsulin',
+        timestep_limit = 48,
+        max_episode_steps= 48
+        )
+register(
+        id = 'CambridgeAbsolute-v0',
+        entry_point = 'gym.envs.cambridge_model.cambridge_absolute:CambridgeAbsolute',
+        timestep_limit = 48,
+        max_episode_steps= 48
         )
 
 # Algorithmic
