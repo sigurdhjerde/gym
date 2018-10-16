@@ -13,9 +13,9 @@ class CliffWalkingEnv(discrete.DiscreteEnv):
     This is a simple implementation of the Gridworld Cliff
     reinforcement learning task.
 
-    Adapted from Example 6.6 (page 145) from Reinforcement Learning: An Introduction
+    Adapted from Example 6.6 (page 132) from Reinforcement Learning: An Introduction
     by Sutton and Barto:
-    http://people.inf.elte.hu/lorincz/Files/RL_2006/SuttonBook.pdf
+    http://incompleteideas.net/book/the-book-2nd.html
     
     With inspiration from:
     https://github.com/dennybritz/reinforcement-learning/blob/master/lib/envs/cliff_walking.py
@@ -87,10 +87,7 @@ class CliffWalkingEnv(discrete.DiscreteEnv):
         is_done = tuple(new_position) == terminal_state
         return [(1.0, new_state, -1, is_done)]
 
-    def _render(self, mode='human', close=False):
-        if close:
-            return
-
+    def render(self, mode='human'):
         outfile = sys.stdout
 
         for s in range(self.nS):
