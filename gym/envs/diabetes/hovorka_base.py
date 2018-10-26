@@ -15,11 +15,12 @@ This is the base class for the Hovorka models.
 import logging
 import gym
 from gym import spaces
+from gym.utils import seeding
 
 import numpy as np
 
 # Plotting for the rendering
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 # Hovorka simulator
 from gym.envs.diabetes.hovorka_model import hovorka_parameters, hovorka_model, hovorka_model_tuple
@@ -47,7 +48,7 @@ class HovorkaBase(gym.Env):
         self.previous_action = 0
 
         # State space
-        self.observation_space = spaces.Box(0, 500, 34)
+        self.observation_space = spaces.Box(0, 500, (34,))
         # self.observation_space = spaces.Box(0, 500, 1)
 
         # self.bolus = 0
@@ -57,7 +58,7 @@ class HovorkaBase(gym.Env):
         # meal_times, meal_amounts, reward_flag, bg_init_flag, max_insulin_action = self._update_parameters()
         reward_flag, bg_init_flag = self._update_parameters()
 
-        self.action_space = spaces.Box(0, 50, 1)
+        self.action_space = spaces.Box(0, 50, (1,))
 
         # Increasing the max bolus rate
         # self.action_space = spaces.Box(0, 150, 1)
@@ -161,6 +162,11 @@ class HovorkaBase(gym.Env):
 
         self.steps_beyond_done = None
 
+
+    def _seed(self, seed=None):
+        self.np_random, seed = seeding.np_random(seed)
+        return [seed]
+
     def _update_parameters(self):
         ''' Update parameters of model,
         this is only used for inherited classes'''
@@ -179,6 +185,11 @@ class HovorkaBase(gym.Env):
         Take action. In the diabetes simulation this means increase, decrease or do nothing
         to the insulin to carb ratio (bolus).
         """
+        # if action > self.action_space.high:
+            # action = self.action_space.high
+        # elif action < self.action_space.low:
+            # action = self.action_space.low
+
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
         self.integrator.set_initial_value(self.simulation_state, self.num_iters)
@@ -296,29 +307,29 @@ class HovorkaBase(gym.Env):
         #TODO: Clean up plotting routine
 
         return None
-        # if mode == 'rgb_array':
+        if mode == 'rgb_array':
+            return None
+        elif mode is 'human':
+            if not bool(plt.get_fignums()):
+                plt.ion()
+                self.fig = plt.figure()
+                self.ax = self.fig.add_subplot(111)
+                # self.line1, = ax.plot(self.bg_history)
+                self.ax.plot(self.bg_history)
+                plt.show()
+            else:
+                # self.line1.set_ydata(self.bg_history)
+                # self.fig.canvas.draw()
+                self.ax.clear()
+                self.ax.plot(self.bg_history)
+
+            plt.pause(0.0000001)
+            plt.show()
+
             # return None
-        # elif mode is 'human':
-            # if not bool(plt.get_fignums()):
-                # plt.ion()
-                # self.fig = plt.figure()
-                # self.ax = self.fig.add_subplot(111)
-                # # self.line1, = ax.plot(self.bg_history)
-                # self.ax.plot(self.bg_history)
-                # plt.show()
-            # else:
-                # # self.line1.set_ydata(self.bg_history)
-                # # self.fig.canvas.draw()
-                # self.ax.clear()
-                # self.ax.plot(self.bg_history)
+        else:
+            super(HovorkaInterval, self).render(mode=mode) # just raise an exception
 
-            # plt.pause(0.0000001)
-            # plt.show()
-
-            # # return None
-        # else:
-            # super(HovorkaInterval, self).render(mode=mode) # just raise an exception
-
-            # plt.ion()
-            # plt.plot(self.bg_history)
+            plt.ion()
+            plt.plot(self.bg_history)
 
