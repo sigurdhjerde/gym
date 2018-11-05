@@ -6,26 +6,26 @@ from gym.envs.registration import registry, register, make, spec
 register(
         id = 'HovorkaGaussian-v0',
         entry_point = 'gym.envs.diabetes.hovorka_interval_meals_gaussian:HovorkaGaussian',
-        timestep_limit = 96,
-        max_episode_steps= 96
+        timestep_limit = 48,
+        max_episode_steps= 48
         )
 register(
         id = 'HovorkaBinary-v0',
         entry_point = 'gym.envs.diabetes.hovorka_interval_meals_binary:HovorkaBinary',
-        timestep_limit = 96,
-        max_episode_steps= 96
+        timestep_limit = 48,
+        max_episode_steps= 48
         )
 register(
         id = 'HovorkaGaussianInsulin-v0',
         entry_point = 'gym.envs.diabetes.hovorka_interval_meals_gaussian_with_insulin:HovorkaGaussianInsulin',
-        timestep_limit = 96,
-        max_episode_steps= 96
+        timestep_limit = 48,
+        max_episode_steps= 48
         )
 register(
         id = 'HovorkaAbsolute-v0',
         entry_point = 'gym.envs.diabetes.hovorka_interval_meals_absolute:HovorkaAbsolute',
-        timestep_limit = 96,
-        max_episode_steps= 96
+        timestep_limit = 48,
+        max_episode_steps= 48
         )
 
 # ================================================

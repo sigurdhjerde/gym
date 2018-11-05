@@ -18,7 +18,7 @@ reward = []
 bg = []
 cgm = []
 
-env.env.reset_basal_manually = 6.43
+# env.env.reset_basal_manually = 6.43
 env.env.bolus = 8.3
 env.reset()
 
