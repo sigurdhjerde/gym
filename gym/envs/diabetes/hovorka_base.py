@@ -304,10 +304,10 @@ class HovorkaBase(gym.Env):
         return np.array(self.state)
 
 
-    def _render(self, mode='human', close=False):
+    def render(self, mode='human', close=False):
         #TODO: Clean up plotting routine
 
-        return None
+        # return None
         if mode == 'rgb_array':
             return None
         elif mode is 'human':
@@ -327,9 +327,9 @@ class HovorkaBase(gym.Env):
             plt.pause(0.0000001)
             plt.show()
 
-            # return None
+            return None
         else:
-            super(HovorkaInterval, self).render(mode=mode) # just raise an exception
+            super(HovorkaBase, self).render(mode=mode) # just raise an exception
 
             plt.ion()
             plt.plot(self.bg_history)
