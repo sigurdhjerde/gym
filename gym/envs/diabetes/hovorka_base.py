@@ -44,7 +44,6 @@ class HovorkaBase(gym.Env):
         Initializing the simulation environment.
         """
 
-        # Action space
         self.previous_action = 0
 
         # State space
@@ -58,7 +57,13 @@ class HovorkaBase(gym.Env):
         # meal_times, meal_amounts, reward_flag, bg_init_flag, max_insulin_action = self._update_parameters()
         reward_flag, bg_init_flag = self._update_parameters()
 
-        self.action_space = spaces.Box(0, 50, (1,))
+
+        # Action space
+        # ====================================
+        # Normalized action space!! 
+        # ====================================
+        # self.action_space = spaces.Box(0, 50, (1,))
+        self.action_space = spaces.Box(-1, 1, (1,))
 
         # Increasing the max bolus rate
         # self.action_space = spaces.Box(0, 150, 1)
@@ -192,6 +197,11 @@ class HovorkaBase(gym.Env):
             # action = self.action_space.low
 
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
+
+        # Converting scaled action
+        ub = 50
+        lb = 0
+        action = lb + (action + 1) * .5 * (ub - lb)
 
         self.integrator.set_initial_value(self.simulation_state, self.num_iters)
 

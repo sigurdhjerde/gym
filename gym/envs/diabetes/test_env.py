@@ -25,7 +25,7 @@ env.reset()
 for i in range(48):
 
     # Step for the minimal/hovorka model
-    s, r, d, i = env.step(np.array([6.43]))
+    s, r, d, i = env.step(np.array([-1]))
     # s, r, d, i = env.step(np.array([0]))
     bg.append(env.env.simulation_state[4])
     cgm.append(env.env.simulation_state[-1] * env.env.P[12])
