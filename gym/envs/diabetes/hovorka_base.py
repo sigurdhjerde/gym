@@ -191,12 +191,12 @@ class HovorkaBase(gym.Env):
         Take action. In the diabetes simulation this means increase, decrease or do nothing
         to the insulin to carb ratio (bolus).
         """
-        # if action > self.action_space.high:
-            # action = self.action_space.high
-        # elif action < self.action_space.low:
-            # action = self.action_space.low
+        if action > self.action_space.high:
+            action = self.action_space.high
+        elif action < self.action_space.low:
+            action = self.action_space.low
 
-        assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
+        # assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
         # Converting scaled action
         ub = 50
