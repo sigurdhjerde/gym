@@ -46,7 +46,7 @@ class CambridgeBase(gym.Env):
         self.previous_action = 0
 
         # State space
-        self.observation_space = spaces.Box(0, 500, 34)
+        self.observation_space = spaces.Box(0, 500, (34,))
         # self.observation_space = spaces.Box(0, 500, 1)
 
         self.bolus = 0
@@ -55,7 +55,7 @@ class CambridgeBase(gym.Env):
         # meal_times, meal_amounts, reward_flag, bg_init_flag = self._update_parameters()
         reward_flag, bg_init_flag = self._update_parameters()
 
-        self.action_space = spaces.Box(0, 50, 1)
+        self.action_space = spaces.Box(0, 50, (1,))
 
         # Initial basal -- this rate dictates the initial BG value
 
@@ -67,7 +67,7 @@ class CambridgeBase(gym.Env):
         # Flag for manually resetting the init
         self.reset_basal_manually = None
 
-        self._seed()
+        # self.seed()
         self.viewer = None
 
         # ==========================================
@@ -75,10 +75,13 @@ class CambridgeBase(gym.Env):
         # ==========================================
 
         # Patient parameters -- sub_1() means virtual patient #1
-        # P = subject(1)
-        P = cambridge_parameters(70)
+        P = subject(1)
+        # P = subject(2)
+        # P = subject(3)
+        # P = subject(4)
+        # P = subject(5)
+        # P = subject(6)
 
-        P = subject(6)
         self.P = P
 
         # Initial values for parameters
@@ -152,6 +155,9 @@ class CambridgeBase(gym.Env):
         self.reward_flag = reward_flag
 
         self.steps_beyond_done = None
+
+    def _seed():
+        return None
 
     def _update_parameters(self):
         ''' Update parameters of model,

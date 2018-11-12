@@ -9,7 +9,7 @@ class HovorkaBinary(hovorka_base.HovorkaBase):
         # meal_times = [0]
         # meal_amounts = [0]
 
-        reward_flag = 'binary'
+        reward_flag = 'binary_tight'
 
         # Initialization flag: 'random' or 'fixed'
         bg_init_flag = 'random'

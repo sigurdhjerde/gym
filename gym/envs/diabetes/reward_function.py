@@ -11,7 +11,7 @@ def calculate_reward(blood_glucose_level, reward_flag='absolute', bg_ref=108, ac
         high_bg = 120
 
         if np.max(blood_glucose_level) < high_bg and np.min(blood_glucose_level) > low_bg:
-            reward = 200
+            reward = 1
         else:
             reward = 0
 
