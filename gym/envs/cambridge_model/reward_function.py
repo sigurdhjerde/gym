@@ -19,8 +19,10 @@ def calculate_reward(blood_glucose_level, reward_flag='absolute', bg_ref=108, ac
         ''' Tighter version of the binary reward function,
         the bounds are [-5, 5] around the optimal rate.
         '''
-        low_bg = bg_ref - 5
-        high_bg = bg_ref + 5
+        # low_bg = bg_ref - 5
+        # high_bg = bg_ref + 5
+        low_bg = bg_ref - 10
+        high_bg = bg_ref + 10
 
         if np.max(blood_glucose_level) < high_bg and np.min(blood_glucose_level) > low_bg:
             reward = 1
@@ -55,7 +57,7 @@ def calculate_reward(blood_glucose_level, reward_flag='absolute', bg_ref=108, ac
         h = 30
         # h = 15
 
-        reward =  np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2)
+        reward = np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2)
 
     elif reward_flag == 'gaussian_with_insulin':
         ''' Gaussian reward function '''
@@ -63,7 +65,7 @@ def calculate_reward(blood_glucose_level, reward_flag='absolute', bg_ref=108, ac
         # h = 15
         alpha = .5
 
-        bg_reward =  np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2)
+        bg_reward = np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2)
         insulin_reward =  -1/15 * action + 1
 
         reward = alpha * bg_reward + (1 - alpha) * insulin_reward
