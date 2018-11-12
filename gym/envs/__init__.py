@@ -57,6 +57,12 @@ register(
         max_episode_steps= 48
         )
 register(
+        id = 'CambridgeBinaryTight-v0',
+        entry_point = 'gym.envs.cambridge_model.cambridge_binary_tight:CambridgeBinaryTight',
+        timestep_limit = 48,
+        max_episode_steps= 48
+        )
+register(
         id = 'CambridgeGaussianInsulin-v0',
         entry_point = 'gym.envs.cambridge_model.cambridge_gaussian_insulin:CambridgeGaussianInsulin',
         timestep_limit = 48,

@@ -26,7 +26,8 @@ def calculate_reward(blood_glucose_level, reward_flag='absolute', bg_ref=108, ac
         high_bg = bg_ref + 10
 
         if np.max(blood_glucose_level) < high_bg and np.min(blood_glucose_level) > low_bg:
-            reward = 200
+            # reward = 200
+            reward = 1
         else:
             reward = 0
 
@@ -55,23 +56,25 @@ def calculate_reward(blood_glucose_level, reward_flag='absolute', bg_ref=108, ac
 
     elif reward_flag == 'gaussian':
         ''' Gaussian reward function '''
-        # h = 30
+        h = 30
         # h = 15
-        h = 10
+        # h = 10
 
-        reward = 200 * np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2)
+        # reward = 200 * np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2)
+        reward = np.exp(-0.5 * (blood_glucose_level - bg_ref) ** 2 / h ** 2)
 
     elif reward_flag == 'gaussian_with_insulin':
         ''' Gaussian reward function '''
-        # h = 30
+        h = 30
         # h = 15
-        h = 10
+        # h = 10
         alpha = .5
 
-        bg_reward =  np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2)
+        bg_reward = np.exp(-0.5 * (blood_glucose_level - bg_ref)**2 /h**2)
         insulin_reward =  -1/15 * action + 1
 
-        reward = 200 * alpha * bg_reward + (1 - alpha) * insulin_reward
+        # reward = 200 * alpha * bg_reward + (1 - alpha) * insulin_reward
+        reward = alpha * bg_reward + (1 - alpha) * insulin_reward
 
     elif reward_flag == 'hovorka':
         ''' Sum of squared distances from target trajectory in Hovorka 2014 '''
