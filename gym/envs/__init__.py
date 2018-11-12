@@ -16,6 +16,12 @@ register(
         max_episode_steps= 48
         )
 register(
+        id = 'HovorkaBinaryTight-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_interval_meals_binary_tight:HovorkaBinaryTight',
+        timestep_limit = 48,
+        max_episode_steps= 48
+        )
+register(
         id = 'HovorkaGaussianInsulin-v0',
         entry_point = 'gym.envs.diabetes.hovorka_interval_meals_gaussian_with_insulin:HovorkaGaussianInsulin',
         timestep_limit = 48,
