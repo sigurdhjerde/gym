@@ -70,12 +70,12 @@ def cambridge_model(t, x, u, D, P): ## This zais the ode version
     k_a = P[ 1 ]               # Time-to-insulin absorption [min]
     A_G = P[ 2 ]                 # Factor describing utilization of CHO to glucose [1]
     k_12 = P[ 3 ]                # [1/min] k_12*Q2 = Transfer of glucose from peripheral tissues (ex. muscle to the blood)
-    k_a1 = P[ 4 ]                # Deactivation rate [1/min]
-    k_b1 = P[ 5 ]                # [L/(mU*min)]
-    k_a2 = P[ 6 ]                # Deactivation rate [1/min]
-    k_b2 = P[ 7 ]                # [L/(mU*min)]
-    k_a3 = P[ 8 ]                # Deactivation rate [1/min]
-    k_b3 = P[ 9 ]               # [L/(mU*min)]
+    k_b1 = P[ 4 ]                # Deactivation rate [1/min]
+    k_a1 = P[ 5 ]                # [L/(mU*min)]
+    k_b2 = P[ 6 ]                # Deactivation rate [1/min]
+    k_a2 = P[ 7 ]                # [L/(mU*min)]
+    k_b3 = P[ 8 ]                # Deactivation rate [1/min]
+    k_a3 = P[ 9 ]               # [L/(mU*min)]
     k_e = P[ 10 ]                # Insulin elimination rate [1/min]
     V_I = P[ 11 ]                # Insulin distribution volume [L]
     V_G = P[ 12 ]                # Glucose distribution volume [L]
@@ -86,8 +86,8 @@ def cambridge_model(t, x, u, D, P): ## This zais the ode version
     # This is different
     # =======================
     ka_int = P[15]
-    # R_cl = P[16]
-   # R_thr = P[17]
+    R_cl = P[16]
+    R_thr = P[17]
 
     # Certain parameters are defined
     U_G = D2/tau_G             # Glucose absorption rate [mmol/min]
@@ -102,30 +102,30 @@ def cambridge_model(t, x, u, D, P): ## This zais the ode version
     # ========================
     # THIS IS DIFFERENT
     # ========================
-    # F_01s = F_01/0.85
-    # F_01c = F_01s*G / (G + 1)
+    F_01s = F_01/0.85
+    F_01c = F_01s*G / (G + 1)
 
     # ========================
     # THIS IS DIFFERENT  the numbers are changed from numbers to variables
     # ========================
-    # if (G >= R_thr):
-        # F_R = R_cl*(G - R_thr)*V_G  # Renal excretion of glucose in the kidneys [mmol/min]
-    # else:
-        # F_R = 0                # Renal excretion of glucose in the kidneys [mmol/min]
+    if (G >= R_thr):
+        F_R = R_cl*(G - R_thr)*V_G  # Renal excretion of glucose in the kidneys [mmol/min]
+    else:
+        F_R = 0                # Renal excretion of glucose in the kidneys [mmol/min]
 
 
     # ========================================
     # Copied from old hovorka model code
     # ========================================
-    if (G>=4.5):
-        F_01c = F_01           # Consumption of glucose by the central nervous system [mmol/min
-    else:
-        F_01c = F_01*G/4.5     # Consumption of glucose by the central nervous system [mmol/min]
+    # if (G>=4.5):
+        # F_01c = F_01           # Consumption of glucose by the central nervous system [mmol/min
+    # else:
+        # F_01c = F_01*G/4.5     # Consumption of glucose by the central nervous system [mmol/min]
 
-    if (G>=9):
-        F_R = 0.003*(G-9)*V_G  # Renal excretion of glucose in the kidneys [mmol/min]
-    else:
-        F_R = 0                # Renal excretion of glucose in the kidneys [mmol/min]
+    # if (G>=9):
+        # F_R = 0.003*(G-9)*V_G  # Renal excretion of glucose in the kidneys [mmol/min]
+    # else:
+        # F_R = 0                # Renal excretion of glucose in the kidneys [mmol/min]
 
     # Mass balances/differential equations
     xdot = np.zeros (11);
