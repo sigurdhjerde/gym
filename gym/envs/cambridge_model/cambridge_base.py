@@ -49,7 +49,7 @@ class CambridgeBase(gym.Env):
         self.observation_space = spaces.Box(0, 500, (34,))
         # self.observation_space = spaces.Box(0, 500, 1)
 
-        self.bolus = 0
+        self.bolus = 6
 
         ## Loading variable parameters
         # meal_times, meal_amounts, reward_flag, bg_init_flag = self._update_parameters()
@@ -182,6 +182,7 @@ class CambridgeBase(gym.Env):
         self.integrator.set_initial_value(self.simulation_state, self.num_iters)
 
         bg = []
+        insulin = []
         # ==========================
         # Integration loop
         # ==========================
@@ -199,13 +200,16 @@ class CambridgeBase(gym.Env):
             self.num_iters += 1
             bg.append(self.integrator.y[-1] * self.P[12])
             # insulin.append(self.integrator.y[6])
+            insulin.append(insulin_rate)
 
         # Updating environment parameters
         self.simulation_state = self.integrator.y
 
         # Recording bg history for plotting
         self.bg_history = np.concatenate([self.bg_history, bg])
-        self.insulin_history = np.concatenate([self.insulin_history, action])
+
+        # adding average insulin of last 30 minutes
+        self.insulin_history = np.concatenate([self.insulin_history, np.atleast_1d(np.mean(insulin))])
 
         # Updating state
 
