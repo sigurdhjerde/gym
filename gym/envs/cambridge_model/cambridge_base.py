@@ -49,18 +49,23 @@ class CambridgeBase(gym.Env):
         self.observation_space = spaces.Box(0, 500, (34,))
         # self.observation_space = spaces.Box(0, 500, 1)
 
-        self.bolus = 6
+        self.bolus = 0
 
         ## Loading variable parameters
         # meal_times, meal_amounts, reward_flag, bg_init_flag = self._update_parameters()
         reward_flag, bg_init_flag = self._update_parameters()
 
-        self.action_space = spaces.Box(0, 50, (1,))
+        # Action space
+        # ====================================
+        # Normalized action space!!
+        # ====================================
+        # self.action_space = spaces.Box(0, 50, (1,))
+        self.action_space = spaces.Box(-1, 1, (1,))
 
         # Initial basal -- this rate dictates the initial BG value
 
         if bg_init_flag == 'random':
-            self.init_basal = np.random.choice(np.linspace(0, 9.5, 50))
+            self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
         elif bg_init_flag == 'fixed':
             self.init_basal = 6
 
@@ -75,8 +80,8 @@ class CambridgeBase(gym.Env):
         # ==========================================
 
         # Patient parameters -- sub_1() means virtual patient #1
-        # P = subject(1)
-        P = subject(2)
+        P = subject(1)
+        # P = subject(2)
         # P = subject(3)
         # P = subject(4)
         # P = subject(5)
@@ -177,7 +182,17 @@ class CambridgeBase(gym.Env):
         Take action. In the diabetes simulation this means increase, decrease or do nothing
         to the insulin to carb ratio (bolus).
         """
-        assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
+        if action > self.action_space.high:
+            action = self.action_space.high
+        elif action < self.action_space.low:
+            action = self.action_space.low
+
+        # assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
+
+        # Converting scaled action
+        ub = 50
+        lb = 0
+        action = lb + (action + 1) * .5 * (ub - lb)
 
         self.integrator.set_initial_value(self.simulation_state, self.num_iters)
 
@@ -261,7 +276,7 @@ class CambridgeBase(gym.Env):
 
         # re init -- in case the init basal has been changed
         if self.reset_basal_manually is None:
-            self.init_basal = np.random.choice(np.linspace(0, 9.5, 50))
+            self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
             # self.init_basal = 6
         else:
             self.init_basal = self.reset_basal_manually
