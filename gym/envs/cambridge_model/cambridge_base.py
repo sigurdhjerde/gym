@@ -127,6 +127,10 @@ class CambridgeBase(gym.Env):
         # meal_times = [round(np.random.uniform(330,390)), round(np.random.uniform(690,750)), round(np.random.uniform(1050,1110))]
         # meal_amounts = [round(np.random.uniform(70,80)), round(np.random.uniform(50,60)), round(np.random.uniform(50,60))]
 
+        # Adding guessed meal amount
+        # guessed_meal_amount = [round(np.random.uniform(meal_amounts[0]-20, meal_amounts[0]+20)), \
+        #                       round(np.random.uniform(meal_amounts[1]-20, meal_amounts[1]+20)), round(np.random.uniform(meal_amounts[2]-20, meal_amounts[2]+20))]
+
         eating_time = 30
         premeal_bolus_time = 15
 
@@ -139,6 +143,9 @@ class CambridgeBase(gym.Env):
         for i in range(len(meal_times)):
             meals[meal_times[i] : meal_times[i] + eating_time] = meal_amounts[i]/eating_time * 1000 /180
             meal_indicator[meal_times[i]-premeal_bolus_time:meal_times[i]] = meal_amounts[i] * 1000 / 180
+
+            # Changing to guessed meal amount
+            # meal_indicator[meal_times[i]-premeal_bolus_time] = guessed_meal_amount[i] * 1000 / 180
 
         # TODO: Clean up these
         self.meals = meals
