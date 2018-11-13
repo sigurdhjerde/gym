@@ -75,8 +75,8 @@ class CambridgeBase(gym.Env):
         # ==========================================
 
         # Patient parameters -- sub_1() means virtual patient #1
-        P = subject(1)
-        # P = subject(2)
+        # P = subject(1)
+        P = subject(2)
         # P = subject(3)
         # P = subject(4)
         # P = subject(5)
@@ -172,7 +172,7 @@ class CambridgeBase(gym.Env):
         # return meal_times, meal_amounts, reward_flag, bg_init_flag
         return reward_flag, bg_init_flag
 
-    def _step(self, action):
+    def step(self, action):
         """
         Take action. In the diabetes simulation this means increase, decrease or do nothing
         to the insulin to carb ratio (bolus).
@@ -256,7 +256,7 @@ class CambridgeBase(gym.Env):
         return np.array(self.state), np.mean(reward), done, {}
 
 
-    def _reset(self):
+    def reset(self):
         #TODO: Insert init code here!
 
         # re init -- in case the init basal has been changed
