@@ -80,10 +80,10 @@ class CambridgeBase(gym.Env):
         # ==========================================
 
         # Patient parameters -- sub_1() means virtual patient #1
-        P = subject(1)
+        # P = subject(1)
         # P = subject(2)
         # P = subject(3)
-        # P = subject(4)
+        P = subject(4)
         # P = subject(5)
         # P = subject(6)
 
