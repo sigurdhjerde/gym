@@ -22,18 +22,28 @@ def subject(sub):
         S_IE = 0.0377
         tau_G = 43
         A_G = 0.710
-        k_12 = .1095
-        k_b1 = 0.0021104996
-        k_b2 = 0.3956
-        k_b3 = 0.0803
-        k_a1 = k_b1 * S_IT
-        k_a2 = k_b2 * S_ID
-        k_a3 = k_b3 * S_IE
+        k_12 = .0073
+        # k_b1 = 0.0021104996
+        # k_b2 = 0.3956
+        # k_b3 = 0.0803
+        # k_a1 = k_b1 * S_IT
+        # k_a2 = k_b2 * S_ID
+        # k_a3 = k_b3 * S_IE
 
         k_e = 0.1320736797
         k_a = 1.98e-2
 
         ka_int = 0.0736
+
+        # Adapted to fit old Hovorka model
+        k_a1 = 0.0021104996
+        k_a2 = 0.3956
+        k_a3 = 0.0803
+        k_b1 = k_a1 * S_IT
+        k_b2 = k_a2 * S_ID
+        k_b3 = k_a3 * S_IE
+
+        k_a = 1/k_a
 
         # Summary of the patient's values:
         P = [tau_G, k_a, A_G, k_12, k_a1, k_b1, k_a2, k_b2, k_a3, k_b3, k_e, V_I, V_G, F_01s, EGP_0, ka_int, R_cl, R_thr]
@@ -57,17 +67,28 @@ def subject(sub):
         tau_G = 55
         A_G = 0.90
         k_12 = .0509
-        k_b1 = 0.0006
-        k_b2 = 0.0136
-        k_b3 = 0.0202
-        k_a1 = k_b1 * S_IT
-        k_a2 = k_b2 * S_ID
-        k_a3 = k_b3 * S_IE
+
+        # k_b1 = 0.0006
+        # k_b2 = 0.0136
+        # k_b3 = 0.0202
+        # k_a1 = k_b1 * S_IT
+        # k_a2 = k_b2 * S_ID
+        # k_a3 = k_b3 * S_IE
 
         k_e = 10.1e-2
-        k_a = 1.60e-2
+        # k_a = 1.60e-2
 
         ka_int = 0.1510
+
+        k_a1 = 0.0006
+        k_a2 = 0.0136
+        k_a3 = 0.0202
+        k_b1 = k_a1 * S_IT
+        k_b2 = k_a2 * S_ID
+        k_b3 = k_a3 * S_IE
+
+        k_a = 1/1.60e-2
+
 
         # Summary of the patient's values:
         P = [tau_G, k_a, A_G, k_12, k_a1, k_b1, k_a2, k_b2, k_a3, k_b3, k_e, V_I, V_G, F_01s, EGP_0, ka_int, R_cl, R_thr]
@@ -91,15 +112,16 @@ def subject(sub):
         tau_G = 26
         A_G = 0.72
         k_12 = .0307
-        k_b1 = 0.0007
-        k_b2 = 0.0369
-        k_b3 = 0.0339
-        k_a1 = k_b1 * S_IT
-        k_a2 = k_b2 * S_ID
-        k_a3 = k_b3 * S_IE
+
+        k_a1 = 0.0007
+        k_a2 = 0.0369
+        k_a3 = 0.0339
+        k_b1 = k_a1 * S_IT
+        k_b2 = k_a2 * S_ID
+        k_b3 = k_a3 * S_IE
 
         k_e = 17.7e-2
-        k_a = 2.57e-2
+        k_a = 1/2.57e-2
 
         ka_int = 0.0974
 
@@ -125,15 +147,16 @@ def subject(sub):
         tau_G = 29
         A_G = 0.77
         k_12 = .0635
-        k_b1 = 0.0014
-        k_b2 = 0.1377
-        k_b3 = 0.0210
-        k_a1 = k_b1 * S_IT
-        k_a2 = k_b2 * S_ID
-        k_a3 = k_b3 * S_IE
+
+        k_a1 = 0.0014
+        k_a2 = 0.1377
+        k_a3 = 0.0210
+        k_b1 = k_a1 * S_IT
+        k_b2 = k_a2 * S_ID
+        k_b3 = k_a3 * S_IE
 
         k_e = 14e-2
-        k_a = 2.53e-2
+        k_a = 1/2.53e-2
 
         ka_int = 0.1103
 
@@ -159,15 +182,16 @@ def subject(sub):
         tau_G = 42
         A_G = 0.78
         k_12 = .0293
-        k_b1 = 0.0032
-        k_b2 = 0.2195
-        k_b3 = 0.0323
-        k_a1 = k_b1 * S_IT
-        k_a2 = k_b2 * S_ID
-        k_a3 = k_b3 * S_IE
+
+        k_a1 = 0.0032
+        k_a2 = 0.2195
+        k_a3 = 0.0323
+        k_b1 = k_a1 * S_IT
+        k_b2 = k_a2 * S_ID
+        k_b3 = k_a3 * S_IE
 
         k_e = 12e-2
-        k_a = 2.89e-2
+        k_a = 1/2.89e-2
 
         ka_int = 0.0689
 
@@ -194,12 +218,13 @@ def subject(sub):
         tau_G = 52
         A_G = 0.71
         k_12 = .0537
-        k_b1 = 0.0048
-        k_b2 = 0.0442
-        k_b3 = 0.0166
-        k_a1 = k_b1 * S_IT
-        k_a2 = k_b2 * S_ID
-        k_a3 = k_b3 * S_IE
+
+        k_a1 = 0.0048
+        k_a2 = 0.0442
+        k_a3 = 0.0166
+        k_b1 = k_a1 * S_IT
+        k_b2 = k_a2 * S_ID
+        k_b3 = k_a3 * S_IE
 
         k_e = 16.7e-2
         k_a = 2.44e-2

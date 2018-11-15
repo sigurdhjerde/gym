@@ -20,7 +20,7 @@ import numpy as np
 # import matplotlib.pyplot as plt
 
 # Cambridge simulator
-from gym.envs.cambridge_model.cambridge_model import cambridge_model, cambridge_model_tuple, cambridge_parameters
+from gym.envs.cambridge_model.cambridge_model import cambridge_model, cambridge_model_tuple
 from gym.envs.cambridge_model.subject import subject
 from gym.envs.cambridge_model.reward_function import calculate_reward
 
@@ -105,7 +105,7 @@ class CambridgeBase(gym.Env):
         self.simulation_time = 30
 
         # State is BG, simulation_state is parameters of hovorka model
-        initial_bg = X0[-1] * P[12]
+        initial_bg = X0[-1] * 18
         initial_insulin = np.zeros(4)
         self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
 
@@ -220,7 +220,7 @@ class CambridgeBase(gym.Env):
             self.integrator.integrate(self.integrator.t + 1)
 
             self.num_iters += 1
-            bg.append(self.integrator.y[-1] * self.P[12])
+            bg.append(self.integrator.y[-1] * 18)
             # insulin.append(self.integrator.y[6])
             insulin.append(insulin_rate)
 
@@ -284,7 +284,6 @@ class CambridgeBase(gym.Env):
         # re init -- in case the init basal has been changed
         if self.reset_basal_manually is None:
             self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
-            # self.init_basal = 6
         else:
             self.init_basal = self.reset_basal_manually
 
@@ -296,7 +295,7 @@ class CambridgeBase(gym.Env):
         self.integrator.set_initial_value(self.X0, 0)
 
         # State is BG, simulation_state is parameters of hovorka model
-        initial_bg = X0[-1] * P[12]
+        initial_bg = X0[-1] * 18
         initial_insulin = np.zeros(4)
         self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
 
@@ -316,7 +315,7 @@ class CambridgeBase(gym.Env):
         return np.array(self.state)
 
 
-    def _render(self, mode='human', close=False):
+    def render(self, mode='human', close=False):
         #TODO: Clean up plotting routine
 
         return None
