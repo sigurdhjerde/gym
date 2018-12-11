@@ -20,8 +20,8 @@ import numpy as np
 # import matplotlib.pyplot as plt
 
 # Cambridge simulator
-from gym.envs.cambridge_model.cambridge_model import cambridge_model, cambridge_model_tuple, cambridge_parameters
-from gym.envs.cambridge_model.subject import subject
+from gym.envs.cambridge_model.cambridge_model import cambridge_model, cambridge_model_tuple
+# from gym.envs.cambridge_model.subject import subject
 from gym.envs.cambridge_model.reward_function import calculate_reward
 
 # ODE solver stuff
@@ -30,8 +30,8 @@ from scipy.optimize import fsolve
 
 logger = logging.getLogger(__name__)
 
-pars = np.load('/home/jonas/gym/gym/envs/cambridge_model/parameters_hovorka.npy')
-init_basal_rates = np.load('/home/jonas/gym/gym/envs/cambridge_model/init_basal.npy')
+pars = np.load('./parameters_hovorka.npy')
+init_basal_rates = np.load('./init_basal.npy')
 
 class CambridgeBase(gym.Env):
     # TODO: fix metadata??
