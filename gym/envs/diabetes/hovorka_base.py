@@ -47,7 +47,7 @@ class HovorkaBase(gym.Env):
         self.previous_action = 0
 
         # State space
-        self.observation_space = spaces.Box(0, 500, (34,))
+        self.observation_space = spaces.Box(0, 500, (34,), dtype=np.float32)
         # self.observation_space = spaces.Box(0, 500, 1)
 
         self.bolus = 0
@@ -62,8 +62,8 @@ class HovorkaBase(gym.Env):
         # ====================================
         # Normalized action space!! 
         # ====================================
-        # self.action_space = spaces.Box(0, 50, (1,))
-        self.action_space = spaces.Box(-1, 1, (1,))
+        self.action_space = spaces.Box(0, 50, (1,))
+        # self.action_space = spaces.Box(-1, 1, (1,))
 
         # Increasing the max bolus rate
         # self.action_space = spaces.Box(0, 150, 1)
@@ -199,9 +199,9 @@ class HovorkaBase(gym.Env):
         # assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
         # Converting scaled action
-        ub = 50
-        lb = 0
-        action = lb + (action + 1) * .5 * (ub - lb)
+        # ub = 50
+        # lb = 0
+        # action = lb + (action + 1) * .5 * (ub - lb)
 
         self.integrator.set_initial_value(self.simulation_state, self.num_iters)
 
@@ -275,6 +275,7 @@ class HovorkaBase(gym.Env):
             reward = -1000
 
         self.previous_action = action
+
 
         return np.array(self.state), np.mean(reward), done, {}
 

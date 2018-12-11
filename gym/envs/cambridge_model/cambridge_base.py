@@ -20,7 +20,7 @@ import numpy as np
 # import matplotlib.pyplot as plt
 
 # Cambridge simulator
-from gym.envs.cambridge_model.cambridge_model import cambridge_model, cambridge_model_tuple
+from gym.envs.cambridge_model.cambridge_model import cambridge_model, cambridge_model_tuple, cambridge_parameters
 from gym.envs.cambridge_model.subject import subject
 from gym.envs.cambridge_model.reward_function import calculate_reward
 
@@ -30,6 +30,9 @@ from scipy.optimize import fsolve
 
 logger = logging.getLogger(__name__)
 
+pars = np.load('/home/jonas/gym/gym/envs/cambridge_model/parameters_hovorka.npy')
+init_basal_rates = np.load('/home/jonas/gym/gym/envs/cambridge_model/init_basal.npy')
+
 class CambridgeBase(gym.Env):
     # TODO: fix metadata??
     metadata = {
@@ -37,7 +40,7 @@ class CambridgeBase(gym.Env):
         'video.frames_per_second' : 50
     }
 
-    def __init__(self):
+    def __init__(self, patient_number=None):
         """
         Initializing the simulation environment.
         """
@@ -46,10 +49,10 @@ class CambridgeBase(gym.Env):
         self.previous_action = 0
 
         # State space
-        self.observation_space = spaces.Box(0, 500, (34,))
+        self.observation_space = spaces.Box(0, 500, (34,), dtype=np.float32)
         # self.observation_space = spaces.Box(0, 500, 1)
 
-        self.bolus = 0
+        self.bolus = 6
 
         ## Loading variable parameters
         # meal_times, meal_amounts, reward_flag, bg_init_flag = self._update_parameters()
@@ -59,18 +62,10 @@ class CambridgeBase(gym.Env):
         # ====================================
         # Normalized action space!!
         # ====================================
-        # self.action_space = spaces.Box(0, 50, (1,))
-        self.action_space = spaces.Box(-1, 1, (1,))
+        self.action_space = spaces.Box(0, 50, (1,))
+        # self.action_space = spaces.Box(-1, 1, (1,))
 
-        # Initial basal -- this rate dictates the initial BG value
 
-        if bg_init_flag == 'random':
-            self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
-        elif bg_init_flag == 'fixed':
-            self.init_basal = 6
-
-        # Flag for manually resetting the init
-        self.reset_basal_manually = None
 
         # self.seed()
         self.viewer = None
@@ -79,15 +74,24 @@ class CambridgeBase(gym.Env):
         # Setting up the cambridge simulator
         # ==========================================
 
-        # Patient parameters -- sub_1() means virtual patient #1
-        P = subject(1)
-        # P = subject(2)
-        # P = subject(3)
-        # P = subject(4)
-        # P = subject(5)
-        # P = subject(6)
+        # Selecting the virtual patient parameter
+        if patient_number==None:
+            patient_number = 0
+        self.patient_number = patient_number
+
+
+        P = pars[:, patient_number]
+        self.init_basal = init_basal_rates[patient_number]
 
         self.P = P
+
+        # Initial basal -- this rate dictates the initial BG value
+
+        if bg_init_flag == 'random':
+            self.init_basal = np.random.choice(np.linspace(init_basal_rates[self.patient_number]-2, init_basal_rates[self.patient_number], 10))
+
+        # Flag for manually resetting the init
+        self.reset_basal_manually = None
 
         # Initial values for parameters
         initial_pars = (self.init_basal, 0, P)
@@ -118,16 +122,19 @@ class CambridgeBase(gym.Env):
         # Meal setup
         # ====================
 
+        # One random meal
         # meal_times = [round(np.random.uniform(690,750))]
         # meal_amounts = [round(np.random.uniform(50,60))]
 
+        # No meals
         meal_times = [0]
         meal_amounts = [0]
 
+        # Three random meals
         # meal_times = [round(np.random.uniform(330,390)), round(np.random.uniform(690,750)), round(np.random.uniform(1050,1110))]
         # meal_amounts = [round(np.random.uniform(70,80)), round(np.random.uniform(50,60)), round(np.random.uniform(50,60))]
 
-        # Adding guessed meal amount
+        # CHO counting uncertainty
         # guessed_meal_amount = [round(np.random.uniform(meal_amounts[0]-20, meal_amounts[0]+20)), \
         #                       round(np.random.uniform(meal_amounts[1]-20, meal_amounts[1]+20)), round(np.random.uniform(meal_amounts[2]-20, meal_amounts[2]+20))]
 
@@ -169,7 +176,8 @@ class CambridgeBase(gym.Env):
         self.steps_beyond_done = None
 
     def _seed():
-        return None
+        self.np_random, seed = seeding.np_random(seed)
+        return [seed]
 
     def _update_parameters(self):
         ''' Update parameters of model,
@@ -197,9 +205,9 @@ class CambridgeBase(gym.Env):
         # assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
         # Converting scaled action
-        ub = 50
-        lb = 0
-        action = lb + (action + 1) * .5 * (ub - lb)
+        # ub = 50
+        # lb = 0
+        # action = lb + (action + 1) * .5 * (ub - lb)
 
         self.integrator.set_initial_value(self.simulation_state, self.num_iters)
 
@@ -283,7 +291,8 @@ class CambridgeBase(gym.Env):
 
         # re init -- in case the init basal has been changed
         if self.reset_basal_manually is None:
-            self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
+            # self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
+            self.init_basal = np.random.choice(np.linspace(init_basal_rates[self.patient_number]-2, init_basal_rates[self.patient_number], 10))
         else:
             self.init_basal = self.reset_basal_manually
 

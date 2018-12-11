@@ -15,7 +15,7 @@ def cambridge_parameters(BW):
     S_ID = 8.2e-4              # Insulin sensitivity of disposal [L/min*mU]
     S_IE = 520e-4              # Insluin sensitivity of EGP [L/mU]
     tau_G = 40                 # Time-to-maximum CHO absorption [min]
-    tau_I = 1/55                 # Time-to-maximum of absorption of s.c. injected short-acting insulin [min]
+    tau_I = 55                 # Time-to-maximum of absorption of s.c. injected short-acting insulin [min]
     A_G = 0.8                  # CHO bioavailability [1]
     k_12 = 0.066               # Transfer rate [min]
     k_a1 = 0.006               # Deactivation rate of insulin on distribution/transport [1/min]

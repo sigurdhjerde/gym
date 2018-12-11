@@ -16,7 +16,7 @@ env = gym.make('CambridgeAbsolute-v0')
 
 # Simulation states
 
-def run_episode(env, action, sub, init_basal):
+def run_episode(env, action, sub, init_basal=6.43):
 
     bg = []
     cgm = []
@@ -38,14 +38,14 @@ def run_episode(env, action, sub, init_basal):
     return bg, reward, cgm
 
 # running through all subjects with different insulin action
-insulin_rates = np.linspace(0, 15, 16)
+# insulin_rates = np.linspace(0, 15, 16)
 
-
+figure()
 for i in range(6):
     env.env.P = subject(i+1)
     print('Reset values for patient '  + str(i))
-    for j in range(len(insulin_rates)):
-        env.env.reset_basal_manually = insulin_rates[j]
-        s = env.reset()
-        print(s[0])
+    bg, reward, cgm = run_episode(env, -1, i+1)
+    plot(cgm)
+
+title('Cambridge virtual patients -- no insulin')
 
