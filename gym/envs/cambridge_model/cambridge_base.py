@@ -74,7 +74,7 @@ class CambridgeBase(gym.Env):
         # Setting up the cambridge simulator
         # ==========================================
 
-<<<<<<< HEAD
+
         # Selecting the virtual patient parameter
         if patient_number==None:
             patient_number = 0
@@ -83,15 +83,14 @@ class CambridgeBase(gym.Env):
 
         P = pars[:, patient_number]
         self.init_basal = init_basal_rates[patient_number]
-=======
+
         # Patient parameters -- sub_1() means virtual patient #1
         # P = subject(1)
         # P = subject(2)
         # P = subject(3)
-        P = subject(4)
+        # P = subject(4)
         # P = subject(5)
         # P = subject(6)
->>>>>>> 50c943765a33c3ba82d5618f3bd777521bfe90a7
 
         self.P = P
 
