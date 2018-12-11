@@ -30,8 +30,11 @@ from scipy.optimize import fsolve
 
 logger = logging.getLogger(__name__)
 
-pars = np.load('./parameters_hovorka.npy')
-init_basal_rates = np.load('./init_basal.npy')
+
+pars =  np.load(gym.__path__[0] + '/envs/cambridge_model/parameters_hovorka.npy')
+init_basal_rates = np.load(gym.__path__[0] + '/envs/cambridge_model/init_basal.npy')
+# pars = np.load('parameters_hovorka.npy')
+# init_basal_rates = np.load('init_basal.npy')
 
 class CambridgeBase(gym.Env):
     # TODO: fix metadata??
