@@ -106,7 +106,7 @@ def cambridge_model(t, x, u, D, P): ## This zais the ode version
     F_01c = F_01s*G / (G + 1)
 
     # ========================
-    # THIS IS DIFFERENT  the numbers are changed from numbers to variables
+    # THIS IS DIFFERENT  the numbers are changed from constants to variables
     # ========================
     if (G >= R_thr):
         F_R = R_cl*(G - R_thr)*V_G  # Renal excretion of glucose in the kidneys [mmol/min]
@@ -140,7 +140,9 @@ def cambridge_model(t, x, u, D, P): ## This zais the ode version
     xdot[ 6 ] = U_I/V_I - k_e*I                                 # dI
 
     # Glucose kinetics
-    xdot[ 4 ] = -(F_01c + F_R) - x1*Q1 + k_12*Q2 + U_G + np.clip(EGP_0*(1-x3), 0, np.inf)   # dQ1
+    # xdot[ 4 ] = -(F_01c + F_R) - x1*Q1 + k_12*Q2 + U_G + np.clip(EGP_0*(1-x3), 0, np.inf)   # dQ1
+    # Checking if the clip makes the code slow
+    xdot[ 4 ] = -(F_01c + F_R) - x1*Q1 + k_12*Q2 + U_G + EGP_0*(1-x3)   # dQ1
     xdot[ 5 ] = x1*Q1 - (k_12 + x2)*Q2                            # dQ2
 
     # Insulin action

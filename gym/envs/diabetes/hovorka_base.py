@@ -16,6 +16,7 @@ import logging
 import gym
 from gym import spaces
 from gym.utils import seeding
+from gym.envs.diabetes.meal_generator.meal_generator import meal_generator
 
 import numpy as np
 
@@ -50,8 +51,8 @@ class HovorkaBase(gym.Env):
         self.observation_space = spaces.Box(0, 500, (34,), dtype=np.float32)
         # self.observation_space = spaces.Box(0, 500, 1)
 
-        self.bolus = 0
-        # self.bolus = 8.3
+        # self.bolus = 0
+        self.bolus = 8.3
 
         ## Loading variable parameters
         # meal_times, meal_amounts, reward_flag, bg_init_flag, max_insulin_action = self._update_parameters()
@@ -62,7 +63,7 @@ class HovorkaBase(gym.Env):
         # ====================================
         # Normalized action space!! 
         # ====================================
-        self.action_space = spaces.Box(0, 50, (1,))
+        self.action_space = spaces.Box(0, 50, (1,), dtype=np.float32)
         # self.action_space = spaces.Box(-1, 1, (1,))
 
         # Increasing the max bolus rate
@@ -119,39 +120,16 @@ class HovorkaBase(gym.Env):
         # ====================
         # Meal setup
         # ====================
-        meal_times = [0]
-        meal_amounts = [0]
-
-        # meal_times = [round(np.random.uniform(330, 390)), round(np.random.uniform(690, 750)), round(np.random.uniform(1050, 1110))]
-        # meal_amounts = [round(np.random.uniform(70, 90)), round(np.random.uniform(50, 70)), round(np.random.uniform(50, 70))]
-
-        # Adding guessed meal amount
-        # guessed_meal_amount = [round(np.random.uniform(meal_amounts[0]-20, meal_amounts[0]+20)), \
-        #                       round(np.random.uniform(meal_amounts[1]-20, meal_amounts[1]+20)), round(np.random.uniform(meal_amounts[2]-20, meal_amounts[2]+20))]
 
         eating_time = 30
-        premeal_bolus_time = 15
-
-        # Meals indicates the number of carbs taken at time t
-        meals = np.zeros(1440)
-
-        # 'meal_indicator' indicates time of bolus - default 30 minutes before meal
-        meal_indicator = np.zeros(1440)
-
-        for i in range(len(meal_times)):
-            meals[meal_times[i] : meal_times[i] + eating_time] = meal_amounts[i]/eating_time * 1000 /180
-            # meal_indicator[meal_times[i]-premeal_bolus_time:meal_times[i]-premeal_bolus_time + eating_time] = guessed_meal_amount[i] * 1000 / 180
-            meal_indicator[meal_times[i] - premeal_bolus_time:meal_times[i]] = meal_amounts[i] * 1000 / 180
-
-            # Changing to guessed meal amount
-            # meal_indicator[meal_times[i]-premeal_bolus_time] = guessed_meal_amount[i] * 1000 / 180
+        meals, meal_indicator = meal_generator(eating_time=eating_time)
+        # meals = np.zeros(1440)
+        # meal_indicator = np.zeros(1440)
 
         # TODO: Clean up these
         self.meals = meals
         self.meal_indicator = meal_indicator
         self.eating_time = eating_time
-        self.premeal_bolus_time = premeal_bolus_time
-        # self.guessed_meal_amount = guessed_meal_amount
 
         # Counter for number of iterations
         self.num_iters = 0

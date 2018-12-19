@@ -13,6 +13,8 @@ This is the base class for the Hovorka models.
 import logging
 import gym
 from gym import spaces
+from gym.utils import seeding
+from gym.envs.diabetes.meal_generator.meal_generator import meal_generator
 
 import numpy as np
 
@@ -65,7 +67,7 @@ class CambridgeBase(gym.Env):
         # ====================================
         # Normalized action space!!
         # ====================================
-        self.action_space = spaces.Box(0, 50, (1,))
+        self.action_space = spaces.Box(0, 50, (1,), dtype=np.float32)
         # self.action_space = spaces.Box(-1, 1, (1,))
 
 
@@ -131,46 +133,17 @@ class CambridgeBase(gym.Env):
         self.bg_history = []
         self.insulin_history = initial_insulin
 
+        # ====================
         # Meal setup
         # ====================
 
-        # One random meal
-        # meal_times = [round(np.random.uniform(690,750))]
-        # meal_amounts = [round(np.random.uniform(50,60))]
-
-        # No meals
-        meal_times = [0]
-        meal_amounts = [0]
-
-        # Three random meals
-        # meal_times = [round(np.random.uniform(330,390)), round(np.random.uniform(690,750)), round(np.random.uniform(1050,1110))]
-        # meal_amounts = [round(np.random.uniform(70,80)), round(np.random.uniform(50,60)), round(np.random.uniform(50,60))]
-
-        # CHO counting uncertainty
-        # guessed_meal_amount = [round(np.random.uniform(meal_amounts[0]-20, meal_amounts[0]+20)), \
-        #                       round(np.random.uniform(meal_amounts[1]-20, meal_amounts[1]+20)), round(np.random.uniform(meal_amounts[2]-20, meal_amounts[2]+20))]
-
         eating_time = 30
-        premeal_bolus_time = 15
-
-        # Meals indicates the number of carbs taken at time t
-        meals = np.zeros(1440)
-
-        # 'meal_indicator' indicates time of bolus - default 30 minutes before meal
-        meal_indicator = np.zeros(1440)
-
-        for i in range(len(meal_times)):
-            meals[meal_times[i] : meal_times[i] + eating_time] = meal_amounts[i]/eating_time * 1000 /180
-            meal_indicator[meal_times[i]-premeal_bolus_time:meal_times[i]] = meal_amounts[i] * 1000 / 180
-
-            # Changing to guessed meal amount
-            # meal_indicator[meal_times[i]-premeal_bolus_time] = guessed_meal_amount[i] * 1000 / 180
+        meals, meal_indicator = meal_generator(eating_time=eating_time)
 
         # TODO: Clean up these
         self.meals = meals
         self.meal_indicator = meal_indicator
         self.eating_time = eating_time
-        self.premeal_bolus_time = premeal_bolus_time
 
         # Counter for number of iterations
         self.num_iters = 0
@@ -187,7 +160,7 @@ class CambridgeBase(gym.Env):
 
         self.steps_beyond_done = None
 
-    def _seed():
+    def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
@@ -234,7 +207,7 @@ class CambridgeBase(gym.Env):
             # Solving one step of the Hovorka model
             # ===============================================
 
-            insulin_rate = action + (self.meal_indicator[self.num_iters] * self.bolus)/self.premeal_bolus_time
+            insulin_rate = action + (self.meal_indicator[self.num_iters] * self.bolus)/self.eating_time
             self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
 
             self.integrator.integrate(self.integrator.t + 1)

@@ -4,7 +4,7 @@ import gym
 # sns.set()
 
 from pylab import plot, figure, title, show, ion, legend, ylim
-from gym.envs.cambridge_model.subject_stochastic import sample_patient
+# from gym.envs.cambridge_model.subject_stochastic import sample_patient
 from gym.envs.registration import register
 
 
