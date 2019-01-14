@@ -33,7 +33,13 @@ register(
         timestep_limit = 48,
         max_episode_steps= 48
         )
-
+# Hovorka model with cambridge params
+register(
+        id = 'HovorkaCambridge-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_cambridge:HovorkaCambridgeBase',
+        timestep_limit = 48,
+        max_episode_steps= 48
+        )
 # ================================================
 # Cambridge model
 # ================================================

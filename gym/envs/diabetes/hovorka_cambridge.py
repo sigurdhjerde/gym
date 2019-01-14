@@ -1,5 +1,7 @@
 """
-OPENAI gym environment for the Hovorka model
+OPENAI gym environment for the Hovorka model using the cambridge parameter set
+
+The reason we are doing this is that the cambridge model is very slow!
 
 This is the base class for the Hovorka models.
     - Actions runs for a longer interval (default 30 mins)
@@ -10,6 +12,13 @@ This is the base class for the Hovorka models.
     - Rendering disabled by default
 
     - Initialization and reset: Random initialization and no meals!
+
+
+    - TODO:
+        - Double check parameters - renal threshold et al
+        - Check difference in previous insulin compared to cambridge model
+        - check initial basal rates
+
 """
 
 import logging
@@ -24,8 +33,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Hovorka simulator
-from gym.envs.diabetes.hovorka_model import hovorka_parameters, hovorka_model, hovorka_model_tuple
+from gym.envs.diabetes.hovorka_model import hovorka_model, hovorka_model_tuple
 from gym.envs.diabetes.reward_function import calculate_reward
+from gym.envs.diabetes.hovorka_cambride_pars import hovorka_cambridge_pars
 
 # ODE solver stuff
 from scipy.integrate import ode
@@ -33,7 +43,7 @@ from scipy.optimize import fsolve
 
 logger = logging.getLogger(__name__)
 
-class HovorkaBase(gym.Env):
+class HovorkaCambridgeBase(gym.Env):
     # TODO: fix metadata??
     metadata = {
         'render.modes': ['human', 'rgb_array'],
@@ -60,21 +70,28 @@ class HovorkaBase(gym.Env):
 
 
         # Action space
-        # ====================================
-        # Normalized action space!! 
-        # ====================================
         self.action_space = spaces.Box(0, 50, (1,), dtype=np.float32)
+
+        # ====================================
+        # Normalized action space!!
+        # ====================================
         # self.action_space = spaces.Box(-1, 1, (1,))
 
         # Increasing the max bolus rate
         # self.action_space = spaces.Box(0, 150, 1)
 
+        # Cambridge parameters
+        P, init_basal_optimal = hovorka_cambridge_pars(0)
+        self.P = P
+        self.init_basal_optimal = init_basal_optimal
+
         # Initial basal -- this rate dictates the initial BG value
 
         if bg_init_flag == 'random':
-            self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
+            # self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
+            self.init_basal = np.random.choice(np.linspace(init_basal_optimal-2, init_basal_optimal, 10))
         elif bg_init_flag == 'fixed':
-            self.init_basal = 6
+            self.init_basal = init_basal_optimal
 
         # Flag for manually resetting the init
         self.reset_basal_manually = None
@@ -85,10 +102,6 @@ class HovorkaBase(gym.Env):
         # ==========================================
         # Setting up the Hovorka simulator
         # ==========================================
-
-        # Patient parameters
-        P = hovorka_parameters(70)
-        self.P = P
 
         # Initial values for parameters
         initial_pars = (self.init_basal, 0, P)
@@ -194,7 +207,7 @@ class HovorkaBase(gym.Env):
             # Solving one step of the Hovorka model
             # ===============================================
 
-            insulin_rate = action + (self.meal_indicator[self.num_iters] * 5.55 *self.bolus)/self.eating_time
+            insulin_rate = action + (self.meal_indicator[self.num_iters] * self.bolus)/self.eating_time
 
             self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
             # self.integrator.set_f_params(insulin_rate, 0, self.P)
@@ -263,7 +276,8 @@ class HovorkaBase(gym.Env):
 
         # re init -- in case the init basal has been changed
         if self.reset_basal_manually is None:
-            self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
+            # self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
+            self.init_basal = np.random.choice(np.linspace(self.init_basal_optimal-2, self.init_basal_optimal, 10))
             # self.init_basal = 6
         else:
             self.init_basal = self.reset_basal_manually
@@ -322,7 +336,7 @@ class HovorkaBase(gym.Env):
 
             return None
         else:
-            super(HovorkaBase, self).render(mode=mode) # just raise an exception
+            super(HovorkaCambridgeBase, self).render(mode=mode) # just raise an exception
 
             plt.ion()
             plt.plot(self.bg_history)

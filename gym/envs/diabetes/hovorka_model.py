@@ -81,6 +81,18 @@ def hovorka_model(t, x, u, D, P): ## This is the ode version
     F_01 = P[ 13 ]               # Glucose consumption by the central nervous system [mmol/min]
     EGP_0 = P[ 14 ]              # Liver glucose production rate [mmol/min]
 
+    # If some parameters are not defined
+    if len(P) == 15:
+        ka_int = 0.073
+        R_cl = 0.003
+        R_thr = 9
+    elif len(P) == 18:
+        R_cl = P[16]
+        ka_int = P[15]
+        R_thr = P[17]
+
+
+
     # Certain parameters are defined
     U_G = D2/tau_G             # Glucose absorption rate [mmol/min]
     U_I = S2/tau_I             # Insulin absorption rate [mU/min]
@@ -93,8 +105,13 @@ def hovorka_model(t, x, u, D, P): ## This is the ode version
     else:
         F_01c = F_01*G/4.5     # Consumption of glucose by the central nervous system [mmol/min]
 
-    if (G>=9):
-        F_R = 0.003*(G-9)*V_G  # Renal excretion of glucose in the kidneys [mmol/min]
+    # if (G>=9):
+        # F_R = 0.003*(G-9)*V_G  # Renal excretion of glucose in the kidneys [mmol/min]
+    # else:
+        # F_R = 0                # Renal excretion of glucose in the kidneys [mmol/min]
+
+    if (G >= R_thr):
+        F_R = R_cl*(G - R_thr)*V_G  # Renal excretion of glucose in the kidneys [mmol/min]
     else:
         F_R = 0                # Renal excretion of glucose in the kidneys [mmol/min]
 
@@ -114,7 +131,6 @@ def hovorka_model(t, x, u, D, P): ## This is the ode version
     # ===============
     # CGM delay
     # ===============
-    ka_int = 0.073
     xdot[10] = ka_int*(G - C)
 
 

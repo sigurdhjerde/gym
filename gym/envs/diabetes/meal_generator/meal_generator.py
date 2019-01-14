@@ -10,11 +10,11 @@ def meal_generator(eating_time=30, premeal_bolus_time=15, meal_uncertainty_grams
     if seed is not None:
         np.random.seed(seed)
 
-    meals = np.zeros(1440)
-    meal_indicator = np.zeros(1440)
+    # HACK
+    np.random.seed(0)
 
     meal_times = [round(np.random.uniform(330, 390)), round(np.random.uniform(690, 750)), round(np.random.uniform(1050, 1110))]
-    meal_amounts = [round(np.random.uniform(70, 90)), round(np.random.uniform(50, 70)), round(np.random.uniform(50, 70))]
+    meal_amounts = [round(np.random.uniform(70, 90)), round(np.random.uniform(50, 70)), round(np.random.uniform(70, 90))]
 
     # Adding guessed meal amount
     guessed_meal_amount = [round(np.random.uniform(meal_amounts[0]-20, meal_amounts[0]+20)), \
@@ -40,6 +40,11 @@ def meal_generator(eating_time=30, premeal_bolus_time=15, meal_uncertainty_grams
     if no_meals:
         meals = np.zeros(1440)
         meal_indicator = np.zeros(1440)
+
+    # Hack
+    # meals = np.zeros(1440)
+    # meal_indicator = np.zeros(1440)
+
 
     meal_bolus_indicator = meal_indicator
 

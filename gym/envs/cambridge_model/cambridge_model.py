@@ -36,7 +36,7 @@ def cambridge_parameters(BW):
     return P
 
 
-def cambridge_model(t, x, u, D, P): ## This zais the ode version
+def cambridge_model(t, x, u, D, P): ## This is the ode version
     """CAMBRIDGE model (wilinska 2010) DIFFERENTIAL EQUATIONS
     # t:    Time window for the simulation. Format: [t0 t1], or [t1 t2 t3 ... tn]. [min]
     # x:    Initial conditions
