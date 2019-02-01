@@ -61,6 +61,7 @@ class HovorkaCambridgeBase(gym.Env):
         self.observation_space = spaces.Box(0, 500, (34,), dtype=np.float32)
         # self.observation_space = spaces.Box(0, 500, 1)
 
+        # Bolus rate -- [mU/mmol]
         # self.bolus = 0
         self.bolus = 8.3
 
