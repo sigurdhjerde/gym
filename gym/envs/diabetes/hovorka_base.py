@@ -194,7 +194,7 @@ class HovorkaBase(gym.Env):
             # Solving one step of the Hovorka model
             # ===============================================
 
-            insulin_rate = action + (self.meal_indicator[self.num_iters] * 5.55 *self.bolus)/self.eating_time
+            insulin_rate = action + (self.meal_indicator[self.num_iters] * self.bolus)/self.eating_time
 
             self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
             # self.integrator.set_f_params(insulin_rate, 0, self.P)
