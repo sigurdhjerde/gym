@@ -135,7 +135,7 @@ class HovorkaCambridgeBase(gym.Env):
         # Meal setup
         # ====================
 
-        eating_time = 30
+        eating_time = 1
         meals, meal_indicator = meal_generator(eating_time=eating_time)
         # meals = np.zeros(1440)
         # meal_indicator = np.zeros(1440)
@@ -208,7 +208,12 @@ class HovorkaCambridgeBase(gym.Env):
             # Solving one step of the Hovorka model
             # ===============================================
 
-            insulin_rate = action + (self.meal_indicator[self.num_iters] * self.bolus)/self.eating_time
+            # insulin_rate = action + (self.meal_indicator[self.num_iters] * self.bolus)/self.eating_time
+
+            # TODO: remove!
+            # Manual bolus given directly!
+            insulin_rate = action + self.meal_indicator[self.num_iters]
+
 
             self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
             # self.integrator.set_f_params(insulin_rate, 0, self.P)
