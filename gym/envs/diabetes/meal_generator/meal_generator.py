@@ -22,8 +22,8 @@ def meal_generator(eating_time=30, premeal_bolus_time=15, meal_uncertainty_grams
     guessed_meal_amount = [round(np.random.uniform(meal_amounts[0]-20, meal_amounts[0]+20)), \
                               round(np.random.uniform(meal_amounts[1]-20, meal_amounts[1]+20)), round(np.random.uniform(meal_amounts[2]-20, meal_amounts[2]+20))]
 
-    eating_time = 30
-    premeal_bolus_time = 15
+    # eating_time = 30
+    # premeal_bolus_time = 15
 
     # Meals indicates the number of carbs taken at time t
     meals = np.zeros(1440)

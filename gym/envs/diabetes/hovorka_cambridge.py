@@ -58,12 +58,13 @@ class HovorkaCambridgeBase(gym.Env):
         self.previous_action = 0
 
         # State space
+        # TODO: remove manual size specification of state space
         self.observation_space = spaces.Box(0, 500, (34,), dtype=np.float32)
         # self.observation_space = spaces.Box(0, 500, 1)
 
         # Bolus rate -- [mU/mmol]
-        # self.bolus = 0
-        self.bolus = 8.3
+        self.bolus = 0
+        # self.bolus = 8.3
 
         ## Loading variable parameters
         # meal_times, meal_amounts, reward_flag, bg_init_flag, max_insulin_action = self._update_parameters()
@@ -130,14 +131,17 @@ class HovorkaCambridgeBase(gym.Env):
         self.bg_history = []
         self.insulin_history = initial_insulin
         # self.insulin_history = []
+        self.carb_history = []
 
         # ====================
         # Meal setup
         # ====================
 
+        # NOTE: This has changed in the spike_meal_bolus fork!
         eating_time = 30
         meals, meal_indicator = meal_generator(eating_time=eating_time)
         # meals = np.zeros(1440)
+
         # meal_indicator = np.zeros(1440)
 
         # TODO: Clean up these
@@ -180,8 +184,7 @@ class HovorkaCambridgeBase(gym.Env):
 
     def step(self, action):
         """
-        Take action. In the diabetes simulation this means increase, decrease or do nothing
-        to the insulin to carb ratio (bolus).
+        Take action. Action is mU/ml of insulin
         """
         if action > self.action_space.high:
             action = self.action_space.high
@@ -199,6 +202,7 @@ class HovorkaCambridgeBase(gym.Env):
 
         bg = []
         insulin = []
+        carbs = []
         # ==========================
         # Integration loop
         # ==========================
@@ -210,7 +214,12 @@ class HovorkaCambridgeBase(gym.Env):
 
             insulin_rate = action + (self.meal_indicator[self.num_iters] * self.bolus)/self.eating_time
 
+            # TODO: remove!
+            # Manual bolus given directly!
+            # insulin_rate = action + self.meal_indicator[self.num_iters]
+
             self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
+            # print(self.integrator.f_params[1])
             # self.integrator.set_f_params(insulin_rate, 0, self.P)
 
             self.integrator.integrate(self.integrator.t + 1)
@@ -219,12 +228,17 @@ class HovorkaCambridgeBase(gym.Env):
             bg.append(self.integrator.y[-1] * 18)
             # insulin.append(np.array([insulin_rate]))
 
+            carbs.append(self.integrator.y[0])
+            # print(carbs)
+
         # Updating environment parameters
         self.simulation_state = self.integrator.y
 
         # Recording bg history for plotting
         self.bg_history = np.concatenate([self.bg_history, bg])
+        self.carb_history = np.concatenate([self.carb_history, carbs])
         self.insulin_history = np.concatenate([self.insulin_history, insulin_rate])
+        # self.insulin_history.append(insulin)
 
         # Updating state
 
@@ -297,6 +311,7 @@ class HovorkaCambridgeBase(gym.Env):
 
         self.simulation_state = X0
         self.bg_history = []
+        self.carb_history = []
         self.insulin_history = initial_insulin
         # self.insulin_history = []
 
@@ -341,4 +356,3 @@ class HovorkaCambridgeBase(gym.Env):
 
             plt.ion()
             plt.plot(self.bg_history)
-
