@@ -63,7 +63,10 @@ class HovorkaCambridgeBase(gym.Env):
 
         # Bolus rate -- [mU/mmol]
         # self.bolus = 0
-        self.bolus = 8.3
+        # self.bolus = 8.3
+
+        # Bolus carb factor -- [g/U]
+        self.bolus = 25
 
         ## Loading variable parameters
         # meal_times, meal_amounts, reward_flag, bg_init_flag, max_insulin_action = self._update_parameters()
@@ -114,6 +117,9 @@ class HovorkaCambridgeBase(gym.Env):
         # Simulation setup
         self.integrator = ode(hovorka_model)
         self.integrator.set_integrator('vode', method='bdf', order=5)
+        # self.integrator.set_integrator('lsoda', method='bdf')
+        # self.integrator.set_integrator('dopri853')
+
         self.integrator.set_initial_value(X0, 0)
 
         # Simulation time in minutes
@@ -136,7 +142,7 @@ class HovorkaCambridgeBase(gym.Env):
         # ====================
 
         eating_time = 1
-        meals, meal_indicator = meal_generator(eating_time=eating_time)
+        meals, meal_indicator = meal_generator(eating_time=eating_time, premeal_bolus_time=0)
         # meals = np.zeros(1440)
         # meal_indicator = np.zeros(1440)
 
@@ -212,11 +218,26 @@ class HovorkaCambridgeBase(gym.Env):
 
             # TODO: remove!
             # Manual bolus given directly!
-            insulin_rate = action + self.meal_indicator[self.num_iters]
+            # insulin_rate = action + self.meal_indicator[self.num_iters]
+
+            # Bolus rate for spike meal
+            insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )/self.eating_time
 
 
             self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
+            # self.integrator.set_f_params(insulin_rate, np.round(self.meals[self.num_iters]), self.P)
+
+            if self.meals[self.num_iters] > 0:
+                print(self.meals[self.num_iters])
+                print(insulin_rate)
             # self.integrator.set_f_params(insulin_rate, 0, self.P)
+
+            # Using a finer resolution for the integration!
+            # n_solver_steps = 100
+            # stepsize = 1/n_solver_steps
+
+            # for j in range(n_solver_steps):
+                # self.integrator.integrate(self.integrator.t + stepsize)
 
             self.integrator.integrate(self.integrator.t + 1)
 
