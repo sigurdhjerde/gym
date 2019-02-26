@@ -15,7 +15,11 @@ def meal_generator(eating_time=30, premeal_bolus_time=15, meal_uncertainty_grams
     # ==========================================
     # np.random.seed(0)
 
-    meal_times = [round(np.random.uniform(330, 390)), round(np.random.uniform(690, 750)), round(np.random.uniform(1050, 1110))]
+    # meal_times = [round(np.random.uniform(330, 390)), round(np.random.uniform(690, 750)), round(np.random.uniform(1050, 1110))]
+    # meal_amounts = [round(np.random.uniform(70, 90)), round(np.random.uniform(50, 70)), round(np.random.uniform(70, 90))]
+
+    # Rounding off to nearest 5 minutes for simplicity
+    meal_times = [int(np.random.choice(np.linspace(330, 390, 5))), int(np.random.choice(np.linspace(690, 750, 5))), int(np.random.choice(np.linspace(1050, 1110, 5)))]
     meal_amounts = [round(np.random.uniform(70, 90)), round(np.random.uniform(50, 70)), round(np.random.uniform(70, 90))]
 
     # Adding guessed meal amount

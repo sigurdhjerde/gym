@@ -30,7 +30,7 @@ bg = []
 cgm = []
 
 # env.env.reset_basal_manually = 6.43
-env.env.bolus = 25
+env.env.bolus = 10
 # env.env.meals = np.zeros(1440)
 # env.env.meal_indicator = np.zeros(1440)
 env.reset()
