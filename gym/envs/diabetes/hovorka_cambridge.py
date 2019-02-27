@@ -144,7 +144,8 @@ class HovorkaCambridgeBase(gym.Env):
         # Meal setup
         # ====================
 
-        eating_time = self.n_solver_steps
+        # eating_time = self.n_solver_steps
+        eating_time = 1
         meals, meal_indicator = meal_generator(eating_time=eating_time, premeal_bolus_time=0)
         # meals = np.zeros(1440)
         # meal_indicator = np.zeros(1440)
@@ -213,29 +214,44 @@ class HovorkaCambridgeBase(gym.Env):
         # ==========================
         # Integration loop
         # ==========================
-        for i in range(self.simulation_time):
+        # for i in range(self.simulation_time):
+        for i in range(6):
 
             # ===============================================
             # Solving one step of the Hovorka model
             # ===============================================
 
             # Bolus rate for spike meal
+            # if self.meal_indicator[self.num_iters] > 0:
+                # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )/self.eating_time
+                # self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
+                # print(self.integrator.f_params[1])
+            # else:
+                # insulin_rate = action
+
             insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )/self.eating_time
 
-            self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
+            self.integrator.set_f_params(insulin_rate, round(self.meals[self.num_iters]), self.P)
+            if self.meal_indicator[self.num_iters] > 0:
+                # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )/self.eating_time
+                # self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
+                print(self.integrator.f_params[1])
 
             # Debugging TODO remove!
             # if self.meals[self.num_iters] > 0:
                 # print(self.meals[self.num_iters])
                 # print(insulin_rate)
 
-            self.integrator.integrate(self.integrator.t + 1)
+            self.integrator.integrate(self.integrator.t + 5)
+            # print(self.integrator.t)
 
             # Only updating the cgm every 'n_solver_steps' minute
-            if np.mod(i, self.n_solver_steps)==0:
-                bg.append(self.integrator.y[-1] * 18)
+            # if np.mod(i, self.n_solver_steps)==0:
+                # bg.append(self.integrator.y[-1] * 18)
 
-            self.num_iters += 1
+            bg.append(self.integrator.y[-1] * 18)
+
+            self.num_iters += 5
 
         # Updating environment parameters
         self.simulation_state = self.integrator.y

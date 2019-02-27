@@ -20,6 +20,15 @@ env.env.reset_basal_manually = init_basal_optimal
 # env = gym.make('HovorkaGaussianInsulin-v0')
 # env = gym.make('HovorkaBinary-v0')
 # env = gym.make('HovorkaAbsolute-v0')
+meal_amount = np.array([40, 80, 60, 30])
+env.env.meals = np.zeros(1440)
+env.env.meals[[8*60, 12*60, 18*60, 22*60]] = np.array([40, 80, 60, 30])
+env.env.meals = env.env.meals * 1000/180
+
+env.env.meal_indicator = np.zeros(1440)
+env.env.meal_indicator[[8*60, 12*60, 18*60, 22*60]] = np.array([40, 80, 60, 30]) + np.random.randint(-20, 20)
+env.env.meal_indicator = env.env.meal_indicator * 1000/180
+
 
 
 # basal = 0
@@ -30,7 +39,7 @@ bg = []
 cgm = []
 
 # env.env.reset_basal_manually = 6.43
-env.env.bolus = 10
+env.env.bolus = 40
 # env.env.meals = np.zeros(1440)
 # env.env.meal_indicator = np.zeros(1440)
 env.reset()
