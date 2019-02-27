@@ -76,6 +76,11 @@ class HovorkaCambridgeBase(gym.Env):
         # Action space
         self.action_space = spaces.Box(0, 50, (1,), dtype=np.float32)
 
+        # Initialize bolus history
+        self.bolusHistoryIndex = 0
+        self.bolusHistoryValue = []
+        self.bolusHistoryTime = []
+
         # ====================================
         # Normalized action space!!
         # ====================================
@@ -126,12 +131,14 @@ class HovorkaCambridgeBase(gym.Env):
         self.simulation_time = 30
         self.n_solver_steps = 5
         self.stepsize = int(self.simulation_time/self.n_solver_steps)
-        self.observation_space = spaces.Box(0, 500, (int(self.stepsize + 4),), dtype=np.float32)
+        self.observation_space = spaces.Box(0, 500, (int(self.stepsize + 4 + 1),), dtype=np.float32)
 
         # State is BG, simulation_state is parameters of hovorka model
         initial_bg = X0[-1] * 18
         initial_insulin = np.zeros(4)
-        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
+        initial_iob = np.zeros(1)
+        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin, initial_iob])
+        #self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
 
         self.simulation_state = X0
 
@@ -189,6 +196,31 @@ class HovorkaCambridgeBase(gym.Env):
         # return meal_times, meal_amounts, reward_flag, bg_init_flag
         return reward_flag, bg_init_flag
 
+    def scalableExpIOB(self, t, tp, td):
+            #SCALABLEEXPIOB
+            # Calculates the insulin bolus on board using a decay
+            # expenontiel. Function taken from
+            # https://github.com/ps2/LoopIOB/blob/master/ScalableExp.ipynb
+            # Original contributor Dragan Maksimovic (@dm61)
+            #
+            # Inputs:
+            #    - t: Time duration after bolus delivery.
+            #    - tp: Time of peak action of insulin.
+            #    - td: Time duration of insulin action.
+            #
+            # For more info on tp and td:
+            # http://guidelines.diabetes.ca/cdacpg_resources/Ch12_Table1_Types_of_Insulin_updated_Aug_5.pdf
+            #
+
+            if t > td:
+                iob = 0
+                return iob
+            else:
+                tau = tp * (1 - tp / td) / (1 - 2 * tp / td)
+                a = 2 * tau / td
+                S = 1 / (1 - a + (1 + a) * np.exp(-td/tau))
+                iob = 1 - S * (1 - a) * ((t**2 / (tau * td * (1 - a)) - t / tau - 1) * np.exp(-t/tau) + 1)
+                return iob
 
     def step(self, action):
         """
@@ -220,6 +252,13 @@ class HovorkaCambridgeBase(gym.Env):
             # ===============================================
             # Solving one step of the Hovorka model
             # ===============================================
+
+            # Add bolus to history
+            if self.meal_indicator[self.num_iters] > 0:
+                self.bolusHistoryIndex = self.bolusHistoryIndex + 1
+                self.bolusHistoryValue.append(self.meal_indicator[self.num_iters] * (180/self.bolus))
+                self.bolusHistoryTime.append(self.num_iters)
+                # self.lastBolusTime = self.num_iters
 
             # Bolus rate for spike meal
             # if self.meal_indicator[self.num_iters] > 0:
@@ -262,7 +301,12 @@ class HovorkaCambridgeBase(gym.Env):
 
         # Updating state
 
-        self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:]))])
+        insulinOnBoard = np.zeros(1)
+        if self.bolusHistoryIndex > 0:
+           for b in range(self.bolusHistoryIndex):
+               insulinOnBoard = insulinOnBoard + self.bolusHistoryValue[b] * self.scalableExpIOB(self.num_iters - self.bolusHistoryTime[b], 75, 210)
+
+        self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:])), insulinOnBoard])
 
         #Set environment done = True if blood_glucose_level is negative
         done = 0
@@ -327,7 +371,9 @@ class HovorkaCambridgeBase(gym.Env):
         # State is BG, simulation_state is parameters of hovorka model
         initial_bg = X0[-1] * 18
         initial_insulin = np.zeros(4)
-        self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin])
+        initial_iob = np.zeros(1)
+        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin, initial_iob])
+        # self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin])
 
         self.simulation_state = X0
         self.bg_history = []
@@ -340,7 +386,7 @@ class HovorkaCambridgeBase(gym.Env):
         # changing observation space if simulation time is changed
         # if self.simulation_time != 30:
         if self.stepsize != 1:
-            action_space_shape = int(self.stepsize + 4)
+            action_space_shape = int(self.stepsize + 4 + 1)
             self.observation_space = spaces.Box(0, 500, (action_space_shape,), dtype=np.float32)
 
 
