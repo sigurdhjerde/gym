@@ -291,10 +291,10 @@ class HovorkaCambridgeBase(gym.Env):
             # print(self.integrator.y[0])
 
             # Only updating the cgm every 'n_solver_steps' minute
-            # if np.mod(i, self.n_solver_steps)==0:
-                # bg.append(self.integrator.y[-1] * 18)
+            if np.mod(i, self.n_solver_steps)==0:
+                bg.append(self.integrator.y[-1] * 18)
 
-            bg.append(self.integrator.y[-1] * 18)
+            # bg.append(self.integrator.y[-1] * 18)
 
             self.num_iters += 1
             # self.num_iters += 5

@@ -112,22 +112,23 @@ class RewardFunction:
             high_bg = 180
 
             # if np.min(blood_glucose_level) < severe_low_bg:
-            if blood_glucose_level[-1] < severe_low_bg:
+            if any(blood_glucose_level) < severe_low_bg:
                 reward = -100
                 self.tir = 0
             # elif severe_low_bg <= blood_glucose_level < low_bg:
-            elif severe_low_bg <= blood_glucose_level[-1] < low_bg:
+            elif severe_low_bg <= any(blood_glucose_level) < low_bg:
                 reward = np.exp((np.log(140.9)/low_bg) * blood_glucose_level) - 140.9
                 self.tir = 0
             # elif low_bg <= blood_glucose_level < bg_ref:
-            elif low_bg <= blood_glucose_level[-1] < bg_ref:
+            elif low_bg <= any(blood_glucose_level) < bg_ref:
                 reward = ((1/36)*blood_glucose_level - 2) + self.tir
                 self.tir = self.tir + 1
             # elif bg_ref <= blood_glucose_level <= high_bg:
-            elif bg_ref <= blood_glucose_level[-1] <= high_bg:
+            elif bg_ref <= all(blood_glucose_level) <= high_bg:
                 reward = ((-1/72)*blood_glucose_level + (5/2)) + self.tir
                 self.tir = self.tir + 1
-            else:
+            # else:
+            elif high_bg < any(blood_glucose_level):
                 reward = 0
                 self.tir = 0
 
