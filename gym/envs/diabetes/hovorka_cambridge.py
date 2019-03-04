@@ -155,8 +155,7 @@ class HovorkaCambridgeBase(gym.Env):
         # ====================
 
         # eating_time = self.n_solver_steps
-        eating_time = 30
-        # eating_time = 1
+        eating_time = 1
         meals, meal_indicator = meal_generator(eating_time=eating_time, premeal_bolus_time=0)
         # meals = np.zeros(1440)
         # meal_indicator = np.zeros(1440)
@@ -270,7 +269,7 @@ class HovorkaCambridgeBase(gym.Env):
             insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )
 
             # Setting the carb and insulin parameter in the model
-            self.integrator.set_f_params(insulin_rate, round(self.meals[self.num_iters]), self.P)
+            self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
 
             # if self.meal_indicator[self.num_iters] > 0:
             #     # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )/self.eating_time
