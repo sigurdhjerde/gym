@@ -19,12 +19,18 @@ def meal_generator(eating_time=30, premeal_bolus_time=15, meal_uncertainty_grams
     # meal_amounts = [round(np.random.uniform(70, 90)), round(np.random.uniform(50, 70)), round(np.random.uniform(70, 90))]
 
     # Rounding off to nearest 5 minutes for simplicity
-    meal_times = [int(np.random.choice(np.linspace(330, 390, 5))), int(np.random.choice(np.linspace(690, 750, 5))), int(np.random.choice(np.linspace(1050, 1110, 5)))]
-    meal_amounts = [round(np.random.uniform(70, 90)), round(np.random.uniform(50, 70)), round(np.random.uniform(70, 90))]
+    # meal_times = [int(np.random.choice(np.linspace(330, 390, 5))), int(np.random.choice(np.linspace(690, 750, 5))), int(np.random.choice(np.linspace(1050, 1110, 5)))]
+    # meal_amounts = [round(np.random.uniform(70, 90)), round(np.random.uniform(50, 70)), round(np.random.uniform(70, 90))]
+
+    # Using the base-meals of Anas El Fathis work and adding +-30 mins to the times randomly
+    meal_amounts = np.array([40, 80, 60, 30])  + np.random.uniform(-20, 20, 4)
+    meal_times = np.array([8*60, 12*60, 18*60, 22*60]) + np.random.choice(np.linspace(-30, 30, 3, dtype=int), 4)
 
     # Adding guessed meal amount
-    guessed_meal_amount = [round(np.random.uniform(meal_amounts[0]-20, meal_amounts[0]+20)), \
-                              round(np.random.uniform(meal_amounts[1]-20, meal_amounts[1]+20)), round(np.random.uniform(meal_amounts[2]-20, meal_amounts[2]+20))]
+    # guessed_meal_amount = [round(np.random.uniform(meal_amounts[0]-20, meal_amounts[0]+20)), \
+                              # round(np.random.uniform(meal_amounts[1]-20, meal_amounts[1]+20)), round(np.random.uniform(meal_amounts[2]-20, meal_amounts[2]+20))]
+
+    guessed_meal_amount = meal_amounts + np.random.uniform(-20, 20, 4)
 
     # eating_time = 30
     # premeal_bolus_time = 15

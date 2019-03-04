@@ -246,8 +246,8 @@ class HovorkaCambridgeBase(gym.Env):
         # ==========================
         # Integration loop
         # ==========================
-        # for i in range(self.simulation_time):
-        for i in range(6):
+        for i in range(self.simulation_time):
+        # for i in range(6):
 
             # ===============================================
             # Solving one step of the Hovorka model
@@ -260,37 +260,23 @@ class HovorkaCambridgeBase(gym.Env):
                 self.bolusHistoryTime.append(self.num_iters)
                 # self.lastBolusTime = self.num_iters
 
-            # Bolus rate for spike meal
-            # if self.meal_indicator[self.num_iters] > 0:
-                # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )/self.eating_time
-                # self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
-                # print(self.integrator.f_params[1])
-            # else:
-                # insulin_rate = action
+            # Basal rate = action, bolus calculated from carb ratio
+            # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )/self.eating_time
+            insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )
 
-            insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )/self.eating_time
-
+            # Setting the carb and insulin parameter in the model
             self.integrator.set_f_params(insulin_rate, round(self.meals[self.num_iters]), self.P)
-            if self.meal_indicator[self.num_iters] > 0:
-                # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )/self.eating_time
-                # self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
-                print(self.integrator.f_params[1])
 
-            # Debugging TODO remove!
-            # if self.meals[self.num_iters] > 0:
-                # print(self.meals[self.num_iters])
-                # print(insulin_rate)
-
-            self.integrator.integrate(self.integrator.t + 5)
-            # print(self.integrator.t)
+            self.integrator.integrate(self.integrator.t + 1)
 
             # Only updating the cgm every 'n_solver_steps' minute
-            # if np.mod(i, self.n_solver_steps)==0:
-                # bg.append(self.integrator.y[-1] * 18)
+            if np.mod(i, self.n_solver_steps)==0:
+                bg.append(self.integrator.y[-1] * 18)
 
-            bg.append(self.integrator.y[-1] * 18)
+            # bg.append(self.integrator.y[-1] * 18)
 
-            self.num_iters += 5
+            # self.num_iters += 5
+            self.num_iters += 1
 
         # Updating environment parameters
         self.simulation_state = self.integrator.y
@@ -372,7 +358,7 @@ class HovorkaCambridgeBase(gym.Env):
         initial_bg = X0[-1] * 18
         initial_insulin = np.zeros(4)
         initial_iob = np.zeros(1)
-        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin, initial_iob])
+        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time/self.n_solver_steps), initial_insulin, initial_iob])
         # self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin])
 
         self.simulation_state = X0
@@ -386,8 +372,8 @@ class HovorkaCambridgeBase(gym.Env):
         # changing observation space if simulation time is changed
         # if self.simulation_time != 30:
         if self.stepsize != 1:
-            action_space_shape = int(self.stepsize + 4 + 1)
-            self.observation_space = spaces.Box(0, 500, (action_space_shape,), dtype=np.float32)
+            observation_space_shape = int(self.stepsize + 4 + 1)
+            self.observation_space = spaces.Box(0, 500, (observation_space_shape,), dtype=np.float32)
 
 
         self.steps_beyond_done = None
