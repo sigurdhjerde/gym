@@ -34,14 +34,17 @@ import matplotlib.pyplot as plt
 
 # Hovorka simulator
 from gym.envs.diabetes.hovorka_model import hovorka_model, hovorka_model_tuple
-from gym.envs.diabetes.reward_function import calculate_reward
+# from gym.envs.diabetes.reward_function import calculate_reward
 from gym.envs.diabetes.hovorka_cambride_pars import hovorka_cambridge_pars
+from gym.envs.diabetes.reward_function import RewardFunction
 
 # ODE solver stuff
 from scipy.integrate import ode
 from scipy.optimize import fsolve
 
 logger = logging.getLogger(__name__)
+
+rewardFunction = RewardFunction()
 
 class HovorkaCambridgeBase(gym.Env):
     # TODO: fix metadata??
@@ -152,7 +155,8 @@ class HovorkaCambridgeBase(gym.Env):
         # ====================
 
         # eating_time = self.n_solver_steps
-        eating_time = 1
+        eating_time = 30
+        # eating_time = 1
         meals, meal_indicator = meal_generator(eating_time=eating_time, premeal_bolus_time=0)
         # meals = np.zeros(1440)
         # meal_indicator = np.zeros(1440)
@@ -189,7 +193,8 @@ class HovorkaCambridgeBase(gym.Env):
 
         # meal_times = [0]
         # meal_amounts = [0]
-        reward_flag = 'gaussian'
+        # reward_flag = 'gaussian'
+        reward_flag = 'asymmetric'
         bg_init_flag = 'random'
         # action_space = spaces.box(0, 30, 1)
 
@@ -267,7 +272,20 @@ class HovorkaCambridgeBase(gym.Env):
             # Setting the carb and insulin parameter in the model
             self.integrator.set_f_params(insulin_rate, round(self.meals[self.num_iters]), self.P)
 
+            # if self.meal_indicator[self.num_iters] > 0:
+            #     # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )/self.eating_time
+            #     # self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
+            #     print(self.integrator.y[0])
+
+            # Debugging TODO remove!
+            # if self.meals[self.num_iters] > 0:
+                # print(self.meals[self.num_iters])
+                # print(insulin_rate)
+
             self.integrator.integrate(self.integrator.t + 1)
+            # self.integrator.integrate(self.integrator.t + 5)
+            # print(self.integrator.y[0])
+
 
             # Only updating the cgm every 'n_solver_steps' minute
             if np.mod(i, self.n_solver_steps)==0:
@@ -311,9 +329,9 @@ class HovorkaCambridgeBase(gym.Env):
 
         if not done:
             if self.reward_flag != 'gaussian_with_insulin':
-                reward = calculate_reward(np.array(bg), self.reward_flag, 108)
+                reward = rewardFunction.calculate_reward(np.array(bg), self.reward_flag, 108)
             else:
-                reward = calculate_reward(np.array(bg), 'gaussian_with_insulin', 108, action)
+                reward = rewardFunction.calculate_reward(np.array(bg), 'gaussian_with_insulin', 108, action)
 
         elif self.steps_beyond_done is None:
             # Blood glucose below zero -- simulation out of bounds
@@ -321,9 +339,9 @@ class HovorkaCambridgeBase(gym.Env):
             # reward = 0.0
             # reward = -1000
             if self.reward_flag != 'gaussian_with_insulin':
-                reward = calculate_reward(np.array(bg), self.reward_flag, 108)
+                reward = rewardFunction.calculate_reward(np.array(bg), self.reward_flag, 108)
             else:
-                reward = calculate_reward(np.array(bg), 'gaussian_with_insulin', 108, action)
+                reward = rewardFunction.calculate_reward(np.array(bg), 'gaussian_with_insulin', 108, action)
         else:
             if self.steps_beyond_done == 0:
                 logger.warning("You are calling 'step()' even though this environment has already returned done = True. You should always call 'reset()' once you receive 'done = True' -- any further steps are undefined behavior.")
@@ -409,4 +427,3 @@ class HovorkaCambridgeBase(gym.Env):
 
             plt.ion()
             plt.plot(self.bg_history)
-
