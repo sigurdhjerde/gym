@@ -13,7 +13,7 @@ def meal_generator(eating_time=30, premeal_bolus_time=15, meal_uncertainty_grams
     # ==========================================
     # HACK to manually fix the random seed
     # ==========================================
-    # np.random.seed(0)
+    np.random.seed(0)
 
     # meal_times = [round(np.random.uniform(330, 390)), round(np.random.uniform(690, 750)), round(np.random.uniform(1050, 1110))]
     # meal_amounts = [round(np.random.uniform(70, 90)), round(np.random.uniform(50, 70)), round(np.random.uniform(70, 90))]
@@ -23,14 +23,24 @@ def meal_generator(eating_time=30, premeal_bolus_time=15, meal_uncertainty_grams
     # meal_amounts = [round(np.random.uniform(70, 90)), round(np.random.uniform(50, 70)), round(np.random.uniform(70, 90))]
 
     # Using the base-meals of Anas El Fathis work and adding +-30 mins to the times randomly
-    meal_amounts = np.array([40, 80, 60, 30])  + np.random.uniform(-20, 20, 4)
-    meal_times = np.array([8*60, 12*60, 18*60, 22*60]) + np.random.choice(np.linspace(-30, 30, 3, dtype=int), 4)
+    # meal_amounts = np.array([40, 80, 60, 30])  + np.random.uniform(-20, 20, 4)
+    # meal_times = np.array([8*60, 12*60, 18*60, 22*60]) + np.random.choice(np.linspace(-30, 30, 3, dtype=int), 4)
+
+    meal_amounts = np.array([40])
+    meal_times = np.array([1*60])
 
     # Adding guessed meal amount
     # guessed_meal_amount = [round(np.random.uniform(meal_amounts[0]-20, meal_amounts[0]+20)), \
                               # round(np.random.uniform(meal_amounts[1]-20, meal_amounts[1]+20)), round(np.random.uniform(meal_amounts[2]-20, meal_amounts[2]+20))]
 
-    guessed_meal_amount = meal_amounts + np.random.uniform(-20, 20, 4)
+    # guessed_meal_amount = meal_amounts + np.random.uniform(-, 20, 4)
+    # guessed_meal_amount = np.zeros_like(meal_amounts)
+
+    # for i in range(len(meal_amounts)):
+        # guessed_meal_amount[i] = meal_amounts[i] + np.random.uniform(-meal_amounts[i]*.3, meal_amounts[i]*.3)
+
+    guessed_meal_amount = meal_amounts
+
 
     # eating_time = 30
     # premeal_bolus_time = 15
