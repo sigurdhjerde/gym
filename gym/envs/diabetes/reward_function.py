@@ -4,7 +4,8 @@ class RewardFunction:
 
     def __init__(self):
 
-        self.tir = 0
+        # self.tir = 0
+        self.reward = []
 
     def calculate_reward(self, blood_glucose_level, reward_flag='absolute', bg_ref=108, action=None, blood_glucose_level_start=None):
         """
@@ -112,24 +113,30 @@ class RewardFunction:
             high_bg = 180
 
             # if np.min(blood_glucose_level) < severe_low_bg:
-            if any(blood_glucose_level) < severe_low_bg:
-                reward = -100
-                self.tir = 0
-            # elif severe_low_bg <= blood_glucose_level < low_bg:
-            elif severe_low_bg <= any(blood_glucose_level) < low_bg:
-                reward = np.exp((np.log(140.9)/low_bg) * blood_glucose_level) - 140.9
-                self.tir = 0
-            # elif low_bg <= blood_glucose_level < bg_ref:
-            elif low_bg <= any(blood_glucose_level) < bg_ref:
-                reward = ((1/36)*blood_glucose_level - 2) + self.tir
-                self.tir = self.tir + 1
-            # elif bg_ref <= blood_glucose_level <= high_bg:
-            elif bg_ref <= all(blood_glucose_level) <= high_bg:
-                reward = ((-1/72)*blood_glucose_level + (5/2)) + self.tir
-                self.tir = self.tir + 1
-            # else:
-            elif high_bg < any(blood_glucose_level):
-                reward = 0
-                self.tir = 0
+            for i in range(len(blood_glucose_level)):
+                if blood_glucose_level[i] < severe_low_bg:
+                    self.reward.append(-100)
+                    # self.tir = 0
+                # elif severe_low_bg <= blood_glucose_level < low_bg:
+                elif severe_low_bg <= blood_glucose_level[i] < low_bg:
+                    self.reward.append(np.exp((np.log(140.9)/low_bg) * blood_glucose_level) - 140.9)
+                    # self.tir = 0
+                # elif low_bg <= blood_glucose_level < bg_ref:
+                elif low_bg <= blood_glucose_level[i] < bg_ref:
+                    self.reward.append(((1 / 36) * blood_glucose_level - 2))
+                    # reward = ((1/36)*blood_glucose_level - 2) + self.tir
+                    # self.tir = self.tir + 1
+                # elif bg_ref <= blood_glucose_level <= high_bg:
+                elif bg_ref <= blood_glucose_level[i] <= high_bg:
+                    self.reward.append(((-1 / 72) * blood_glucose_level + (5 / 2)))
+                    # reward = ((-1/72)*blood_glucose_level + (5/2)) + self.tir
+                    # self.tir = self.tir + 1
+                # else:
+                elif high_bg < blood_glucose_level[i]:
+                    self.reward.append(0)
+                    # self.tir = 0
+
+            reward = self.reward
 
         return reward
+

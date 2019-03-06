@@ -307,7 +307,7 @@ class HovorkaCambridgeBase(gym.Env):
         insulinOnBoard = np.zeros(1)
         if self.bolusHistoryIndex > 0:
            for b in range(self.bolusHistoryIndex):
-               insulinOnBoard = insulinOnBoard + self.bolusHistoryValue[b] * self.scalableExpIOB(self.num_iters - self.bolusHistoryTime[b], 75, 210)
+               insulinOnBoard = insulinOnBoard + self.bolusHistoryValue[b] * self.scalableExpIOB(self.num_iters - self.bolusHistoryTime[b], 75, 240)
 
         self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:])), insulinOnBoard])
 
