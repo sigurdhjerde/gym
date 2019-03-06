@@ -349,7 +349,6 @@ class HovorkaCambridgeBase(gym.Env):
 
         self.previous_action = action
 
-
         return np.array(self.state), np.mean(reward), done, {}
 
 
