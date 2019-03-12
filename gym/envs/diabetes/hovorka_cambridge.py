@@ -77,7 +77,7 @@ class HovorkaCambridgeBase(gym.Env):
 
 
         # Action space
-        self.action_space = spaces.Box(0, 50, (1,), dtype=np.float32)
+        self.action_space = spaces.Box(0, 20, (1,), dtype=np.float32)
 
         # Initialize bolus history
         self.bolusHistoryIndex = 0
@@ -132,16 +132,17 @@ class HovorkaCambridgeBase(gym.Env):
 
         # Simulation time in minutes
         self.simulation_time = 30
-        self.n_solver_steps = 5
+        self.n_solver_steps = 1
         self.stepsize = int(self.simulation_time/self.n_solver_steps)
-        self.observation_space = spaces.Box(0, 500, (int(self.stepsize + 4 + 1),), dtype=np.float32)
+        # self.observation_space = spaces.Box(0, 500, (int(self.stepsize + 4 + 1),), dtype=np.float32)
+        self.observation_space = spaces.Box(0, 500, (int(self.stepsize + 4 ),), dtype=np.float32)
 
         # State is BG, simulation_state is parameters of hovorka model
         initial_bg = X0[-1] * 18
         initial_insulin = np.zeros(4)
         initial_iob = np.zeros(1)
-        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin, initial_iob])
-        #self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
+        # self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin, initial_iob])
+        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
 
         self.simulation_state = X0
 
@@ -192,8 +193,8 @@ class HovorkaCambridgeBase(gym.Env):
 
         # meal_times = [0]
         # meal_amounts = [0]
-        # reward_flag = 'gaussian'
-        reward_flag = 'asymmetric'
+        reward_flag = 'gaussian'
+        # reward_flag = 'asymmetric'
         bg_init_flag = 'random'
         # action_space = spaces.box(0, 30, 1)
 
@@ -279,6 +280,8 @@ class HovorkaCambridgeBase(gym.Env):
             # Debugging TODO remove!
             # if self.meals[self.num_iters] > 0:
                 # print(self.meals[self.num_iters])
+
+            # if insulin_rate > 6.43:
                 # print(insulin_rate)
 
             self.integrator.integrate(self.integrator.t + 1)
@@ -287,10 +290,10 @@ class HovorkaCambridgeBase(gym.Env):
 
 
             # Only updating the cgm every 'n_solver_steps' minute
-            if np.mod(i, self.n_solver_steps)==0:
-                bg.append(self.integrator.y[-1] * 18)
+            # if np.mod(i, self.n_solver_steps)==0:
+                # bg.append(self.integrator.y[-1] * 18)
 
-            # bg.append(self.integrator.y[-1] * 18)
+            bg.append(self.integrator.y[-1] * 18)
 
             # self.num_iters += 5
             self.num_iters += 1
@@ -309,7 +312,8 @@ class HovorkaCambridgeBase(gym.Env):
            for b in range(self.bolusHistoryIndex):
                insulinOnBoard = insulinOnBoard + self.bolusHistoryValue[b] * self.scalableExpIOB(self.num_iters - self.bolusHistoryTime[b], 75, 240)
 
-        self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:])), insulinOnBoard])
+        # self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:])), insulinOnBoard])
+        self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:]))])
 
         #Set environment done = True if blood_glucose_level is negative
         done = 0
@@ -374,8 +378,8 @@ class HovorkaCambridgeBase(gym.Env):
         initial_bg = X0[-1] * 18
         initial_insulin = np.zeros(4)
         initial_iob = np.zeros(1)
-        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time/self.n_solver_steps), initial_insulin, initial_iob])
-        # self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin])
+        # self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time/self.n_solver_steps), initial_insulin, initial_iob])
+        self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin])
 
         self.simulation_state = X0
         self.bg_history = []
@@ -387,9 +391,9 @@ class HovorkaCambridgeBase(gym.Env):
 
         # changing observation space if simulation time is changed
         # if self.simulation_time != 30:
-        if self.stepsize != 1:
-            observation_space_shape = int(self.stepsize + 4 + 1)
-            self.observation_space = spaces.Box(0, 500, (observation_space_shape,), dtype=np.float32)
+        # if self.stepsize != 1:
+            # observation_space_shape = int(self.stepsize + 4 + 1)
+            # self.observation_space = spaces.Box(0, 500, (observation_space_shape,), dtype=np.float32)
 
 
         self.steps_beyond_done = None

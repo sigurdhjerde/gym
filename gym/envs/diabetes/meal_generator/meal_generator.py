@@ -24,11 +24,11 @@ def meal_generator(eating_time=30, premeal_bolus_time=15, meal_uncertainty_grams
 
     # Using the base-meals of Anas El Fathis work and adding +-30 mins to the times randomly
     meal_amounts = np.array([40, 80, 60, 30])  + np.random.uniform(-20, 20, 4)
-    meal_times = np.array([8*60, 12*60, 18*60, 22*60]) + np.random.choice(np.linspace(-30, 30, 3, dtype=int), 4)
+    meal_times = np.array([8*60, 12*60, 18*60, 22*60]) + np.random.choice(np.linspace(-30, 0, 3, dtype=int), 4)
 
-    # Meal for estimating carb ratio
-    # meal_amounts = np.array([40])
-    # meal_times = np.array([1*60])
+    # Meal for estimating carb ratio -- a single meal
+    # meal_amounts = np.array([40]) + np.random.uniform(-20, 20, 1)
+    # meal_times = np.array([1*60]) #+ np.random.choice(np.linspace(-30, 30, 3, dtype=int), 1)
     # guessed_meal_amount = meal_amounts
 
     # Adding guessed meal amount
@@ -39,7 +39,7 @@ def meal_generator(eating_time=30, premeal_bolus_time=15, meal_uncertainty_grams
 
     guessed_meal_amount = np.zeros_like(meal_amounts)
     for i in range(len(meal_amounts)):
-        guessed_meal_amount[i] = meal_amounts[i] + np.random.uniform(-meal_amounts[i]*.3, meal_amounts[i]*.3)
+        guessed_meal_amount[i] = meal_amounts[i] #+ np.random.uniform(-meal_amounts[i]*.3, meal_amounts[i]*.3)
 
 
     # eating_time = 30
