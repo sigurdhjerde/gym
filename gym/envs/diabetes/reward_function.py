@@ -125,12 +125,12 @@ class RewardFunction:
                 # elif low_bg <= blood_glucose_level < bg_ref:
                 elif low_bg <= blood_glucose_level[i] < bg_ref:
                     reward_aux.append(((1 / 36) * blood_glucose_level[i] - 2))
-                    # reward = ((1/36)*blood_glucose_level - 2) + self.tir
+                    # reward_aux.append(((1/36)*blood_glucose_level[i] - 2) + self.tir)
                     # self.tir = self.tir + 1
                 # elif bg_ref <= blood_glucose_level <= high_bg:
                 elif bg_ref <= blood_glucose_level[i] <= high_bg:
                     reward_aux.append(((-1 / 72) * blood_glucose_level[i] + (5 / 2)))
-                    # reward = ((-1/72)*blood_glucose_level + (5/2)) + self.tir
+                    # reward_aux.append(((-1/72)*blood_glucose_level[i] + (5/2)) + self.tir)
                     # self.tir = self.tir + 1
                 # else:
                 elif high_bg < blood_glucose_level[i]:
