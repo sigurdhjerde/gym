@@ -46,6 +46,7 @@ logger = logging.getLogger(__name__)
 
 rewardFunction = RewardFunction()
 
+
 class HovorkaCambridgeBase(gym.Env):
     # TODO: fix metadata??
     metadata = {
@@ -77,7 +78,7 @@ class HovorkaCambridgeBase(gym.Env):
 
 
         # Action space
-        self.action_space = spaces.Box(0, 20, (1,), dtype=np.float32)
+        self.action_space = spaces.Box(0, 50, (1,), dtype=np.float32)
 
         # Initialize bolus history
         self.bolusHistoryIndex = 0
@@ -193,8 +194,9 @@ class HovorkaCambridgeBase(gym.Env):
 
         # meal_times = [0]
         # meal_amounts = [0]
-        reward_flag = 'gaussian'
-        # reward_flag = 'asymmetric'
+        # reward_flag = 'gaussian'
+        reward_flag = 'asymmetric'
+        # reward_flag = 'binary_tight'
         bg_init_flag = 'random'
         # action_space = spaces.box(0, 30, 1)
 
