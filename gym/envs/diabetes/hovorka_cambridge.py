@@ -84,6 +84,14 @@ class HovorkaCambridgeBase(gym.Env):
         self.bolusHistoryValue = []
         self.bolusHistoryTime = []
 
+        # Initialize sensor model
+        self.CGMlambda = 15.96    # Johnson parameter of recalibrated and synchronized sensor error.
+        self.CGMepsilon = -5.471  # Johnson parameter of recalibrated and synchronized sensor error.
+        self.CGMdelta = 1.6898    # Johnson parameter of recalibrated and synchronized sensor error.
+        self.CGMgamma = -0.5444   # Johnson parameter of recalibrated and synchronized sensor error.
+        self.CGMerror = 0
+        # self.sensorNoiseValue = 0 # Set a value
+
         # ====================================
         # Normalized action space!!
         # ====================================
@@ -293,7 +301,31 @@ class HovorkaCambridgeBase(gym.Env):
             # if np.mod(i, self.n_solver_steps)==0:
                 # bg.append(self.integrator.y[-1] * 18)
 
-            bg.append(self.integrator.y[-1] * 18)
+            # ===============
+            # CGM noise
+            # ===============
+
+            # johnson
+            sensor_noise = 0.7 * (self.CGMerror + np.random.randn(1))
+            # paramMCHO = 180
+            self.CGMerror = (10 / 180) * (self.CGMepsilon + self.CGMlambda *
+                                          np.sinh((sensor_noise[0] - self.CGMgamma) / self.CGMdelta))
+
+            # # ar(1), colored}
+            # phi = 0.8
+            # self.CGMerror = phi * self.CGMerror + np.sqrt(1 - phi ^ 2) * self.sensorNoiseValue * np.randn(1)
+
+            # # mult
+            # self.CGMerror = self.sensorNoiseValue * self.state(self.integrator.y[-1]) * np.random.randn(1)
+
+            # # white, add
+            # self.CGMerror = self.sensorNoiseValue * np.random.randn(1)
+
+            # # No noise
+            # self.CGMerror = 0
+
+            # bg.append(self.integrator.y[-1] * 18)
+            bg.append(self.integrator.y[-1] * 18 + self.CGMerror)
 
             # self.num_iters += 5
             self.num_iters += 1
