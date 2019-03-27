@@ -39,7 +39,7 @@ def meal_generator(eating_time=30, premeal_bolus_time=15, meal_uncertainty_grams
 
     guessed_meal_amount = np.zeros_like(meal_amounts)
     for i in range(len(meal_amounts)):
-        guessed_meal_amount[i] = meal_amounts[i] #+ np.random.uniform(-meal_amounts[i]*.3, meal_amounts[i]*.3)
+        guessed_meal_amount[i] = meal_amounts[i] + np.random.uniform(-meal_amounts[i]*.3, meal_amounts[i]*.3)
 
 
     # eating_time = 30

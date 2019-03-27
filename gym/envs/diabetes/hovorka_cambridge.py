@@ -71,6 +71,7 @@ class HovorkaCambridgeBase(gym.Env):
 
         # Bolus carb factor -- [g/U]
         self.bolus = 25
+        self.meal_seed = None
 
         ## Loading variable parameters
         # meal_times, meal_amounts, reward_flag, bg_init_flag, max_insulin_action = self._update_parameters()
@@ -166,7 +167,7 @@ class HovorkaCambridgeBase(gym.Env):
 
         # eating_time = self.n_solver_steps
         eating_time = 1
-        meals, meal_indicator = meal_generator(eating_time=eating_time, premeal_bolus_time=0)
+        meals, meal_indicator = meal_generator(eating_time=eating_time, premeal_bolus_time=0,seed=self.meal_seed)
         # meals = np.zeros(1440)
         # meal_indicator = np.zeros(1440)
 
