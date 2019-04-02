@@ -61,30 +61,19 @@ class HovorkaCambridgeBase(gym.Env):
 
         self.previous_action = 0
 
-        # State space
-        # self.observation_space = spaces.Box(0, 500, (34,), dtype=np.float32)
-        # self.observation_space = spaces.Box(0, 500, 1)
-
-        # Bolus rate -- [mU/mmol]
-        # self.bolus = 0
-        # self.bolus = 8.3
-
-        # Bolus carb factor -- [g/U]
-        self.bolus = 25
-
         ## Loading variable parameters
-        # meal_times, meal_amounts, reward_flag, bg_init_flag, max_insulin_action = self._update_parameters()
         reward_flag, bg_init_flag = self._update_parameters()
 
         # Cambridge parameters
-        P, init_basal_optimal = hovorka_cambridge_pars(0)
+        P, init_basal_optimal, optimal_bolus = hovorka_cambridge_pars(0)
         self.P = P
         self.init_basal_optimal = init_basal_optimal
 
+        # Bolus carb factor -- [g/U]
+        self.bolus = optimal_bolus
+
         # Action space
-        # self.action_space = spaces.Box(-self.init_basal_optimal, 2*self.init_basal_optimal, (1,), dtype=np.float32)
-        # self.action_space = spaces.Box(0, 50, (1,), dtype=np.float32)
-        self.action_space = spaces.Box(0, 20, (1,), dtype=np.float32)
+        self.action_space = spaces.Box(0, 50, (1,), dtype=np.float32)
 
         # Initial basal -- this rate dictates the initial BG value
 
@@ -114,8 +103,6 @@ class HovorkaCambridgeBase(gym.Env):
         # Simulation setup
         self.integrator = ode(hovorka_model)
         self.integrator.set_integrator('vode', method='bdf', order=5)
-        # self.integrator.set_integrator('lsoda', method='bdf')
-        # self.integrator.set_integrator('dopri853')
 
         self.integrator.set_initial_value(X0, 0)
 
@@ -123,7 +110,7 @@ class HovorkaCambridgeBase(gym.Env):
         self.simulation_time = 30
         self.n_solver_steps = 1
         self.stepsize = int(self.simulation_time/self.n_solver_steps)
-        # self.observation_space = spaces.Box(0, 500, (int(self.stepsize + 4 + 1),), dtype=np.float32)
+
         self.observation_space = spaces.Box(0, 500, (int(self.stepsize + 4 ),), dtype=np.float32)
 
         # State is BG, simulation_state is parameters of hovorka model
@@ -136,19 +123,14 @@ class HovorkaCambridgeBase(gym.Env):
         # Keeping track of entire blood glucose level for each episode
         self.bg_history = []
         self.insulin_history = initial_insulin
-        # self.insulin_history = []
 
         # ====================
         # Meal setup
         # ====================
 
-        # eating_time = self.n_solver_steps
         eating_time = 1
         meals, meal_indicator = meal_generator(eating_time=eating_time, premeal_bolus_time=0)
-        # meals = np.zeros(1440)
-        # meal_indicator = np.zeros(1440)
 
-        # TODO: Clean up these
         self.meals = meals
         self.meal_indicator = meal_indicator
         self.eating_time = eating_time
@@ -178,17 +160,24 @@ class HovorkaCambridgeBase(gym.Env):
         ''' Update parameters of model,
         this is only used for inherited classes'''
 
-        # meal_times = [0]
-        # meal_amounts = [0]
-        # reward_flag = 'gaussian'
         reward_flag = 'asymmetric'
-        # reward_flag = 'asymmetric_insulin'
-        # reward_flag = 'binary_tight'
         bg_init_flag = 'random'
 
-        # return meal_times, meal_amounts, reward_flag, bg_init_flag
         return reward_flag, bg_init_flag
 
+
+    def change_patient(self, pat_num):
+        '''
+        Changing the patient parameters
+        '''
+
+        # Loading parameters
+        P, init_basal_optimal, optimal_bolus = hovorka_cambridge_pars(pat_num)
+
+        # Setting parameters
+        self.P = P
+        self.init_basal_optimal = init_basal_optimal
+        self.bolus = optimal_bolus
 
     def step(self, action):
         """
@@ -205,48 +194,26 @@ class HovorkaCambridgeBase(gym.Env):
         self.integrator.set_initial_value(self.simulation_state, self.num_iters)
 
         bg = []
-        # insulin = []
+
         # ==========================
         # Integration loop
         # ==========================
         for i in range(self.simulation_time):
-        # for i in range(6):
 
             # ===============================================
             # Solving one step of the Hovorka model
             # ===============================================
 
-            # Add bolus to history
-            # if self.meal_indicator[self.num_iters] > 0:
-                # self.bolusHistoryIndex = self.bolusHistoryIndex + 1
-                # self.bolusHistoryValue.append(self.meal_indicator[self.num_iters] * (180/self.bolus))
-                # self.bolusHistoryTime.append(self.num_iters)
-                # self.lastBolusTime = self.num_iters
-
             # Basal rate = action, bolus calculated from carb ratio
-            # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )/self.eating_time
             insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )
-            # insulin_rate = self.init_basal_optimal + action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )
 
             # Setting the carb and insulin parameter in the model
             self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
 
-            # if self.meal_indicator[self.num_iters] > 0:
-            #     # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )/self.eating_time
-            #     # self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
-            #     print(self.integrator.y[0])
-
             self.integrator.integrate(self.integrator.t + 1)
-            # self.integrator.integrate(self.integrator.t + 5)
 
             bg.append(self.integrator.y[-1] * 18)
 
-            # Only updating the cgm every 'n_solver_steps' minute
-            # if np.mod(i, self.n_solver_steps)==0:
-                # bg.append(self.integrator.y[-1] * 18)
-                # bg.append(self.integrator.y[-1] * 18 + self.CGMerror)
-
-            # self.num_iters += 5
             self.num_iters += 1
 
         # Updating environment parameters
@@ -304,9 +271,7 @@ class HovorkaCambridgeBase(gym.Env):
 
         # re init -- in case the init basal has been changed
         if self.reset_basal_manually is None:
-            # self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
             self.init_basal = np.random.choice(np.linspace(self.init_basal_optimal-2, self.init_basal_optimal, 10))
-            # self.init_basal = 6
         else:
             self.init_basal = self.reset_basal_manually
 
@@ -325,17 +290,8 @@ class HovorkaCambridgeBase(gym.Env):
         self.simulation_state = X0
         self.bg_history = []
         self.insulin_history = initial_insulin
-        # self.insulin_history = []
 
         self.num_iters = 0
-
-
-        # changing observation space if simulation time is changed
-        # if self.simulation_time != 30:
-        # if self.stepsize != 1:
-            # observation_space_shape = int(self.stepsize + 4 + 1)
-            # self.observation_space = spaces.Box(0, 500, (observation_space_shape,), dtype=np.float32)
-
 
         self.steps_beyond_done = None
         return np.array(self.state)
