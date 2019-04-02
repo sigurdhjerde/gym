@@ -12,6 +12,7 @@ from gym.envs.diabetes.hovorka_model import hovorka_parameters
 # env = gym.make('HovorkaGaussian-v0')
 # np.random.seed(0)
 env = gym.make('HovorkaCambridge-v0')
+# env = gym.make('HovorkaCambridgeNoise-v0')
 
 P = hovorka_parameters(70)
 env.env.P = P
@@ -118,7 +119,10 @@ for i in range(48):
 # ion()
 # show()
 # figure()
+subplot(2, 1, 1)
 plot(env.env.bg_history)
+subplot(2, 1, 2)
+plot(env.env.meals)
 # ylim(0, 300)
 show()
 title('Anas meals -- spike meal and bolus')

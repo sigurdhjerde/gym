@@ -40,6 +40,13 @@ register(
         timestep_limit = 48,
         max_episode_steps= 48
         )
+# Hovorka model with cambridge params and CGM noise
+register(
+        id = 'HovorkaCambridgeNoise-v0',
+        entry_point = 'gym.envs.diabetes.hovorka_cambridge_noise:HovorkaCambridgeBaseNoise',
+        timestep_limit = 48,
+        max_episode_steps= 48
+        )
 # ================================================
 # Cambridge model
 # ================================================

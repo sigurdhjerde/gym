@@ -3,27 +3,74 @@ insulin using a crude grid search.
 '''
 import numpy as np
 import gym
-from gym.envs.cambridge_model.subject_stochastic import sample_patient
+from gym.envs.cambridge_model.stochastic_subjects.subject_stochastic import sample_patient
 
-env = gym.make('CambridgeAbsolute-v0')
+env = gym.make('HovorkaCambridge-v0')
 
-def test_parameters(env, P):
+def test_parameters(env, P, basal_rate=6.43):
 
+    env.env.reset_basal_manually = basal_rate
     env.reset()
     env.env.P = P
+    env.env.bolus = 15e10
 
     for i in range(48):
 
         # Step for the minimal/hovorka model
-        s, r, d, i = env.step(np.array([6.43]))
+        s, r, d, i = env.step(np.array([basal_rate]))
 
     p_too_high = False
 
     if any(env.env.bg_history > 700):
         p_too_high = True
 
+    not_converging = False
 
-    return p_too_high
+    if env.env.bg_history[600] > 150:
+        not_converging = True
+
+    no_meal_spike = False
+
+    if env.env.bg_history[125] < 200:
+        no_meal_spike = True
+
+    return p_too_high, not_converging, no_meal_spike, env.env.bg_history
+
+
+def compare_to_hovorka():
+    '''
+    Comparing to the hovorka default patient
+    '''
+
+    env = gym.make('HovorkaCambridge-v0')
+
+    from gym.envs.diabetes.hovorka_model import hovorka_parameters
+
+    P = hovorka_parameters(70)
+
+    env.env.reset_basal_manually = 6.43
+
+    env.env.bolus = 1e10
+
+    env.env.P = P
+
+    env.reset()
+
+    for i in range(48):
+            s, r, d, i = env.step(np.array([6.43]))
+
+    hovorka_curve = env.env.bg_history
+
+    mse = np.zeros(500)
+
+    for i in range(500):
+        mse[i] = ((hovorka_curve - bg_hist[:, i])**2).mean()
+
+    mse_sorted = np.argsort(mse)
+
+    good_patients = mse_sorted[np.random.choice(200, 30)]
+
+    return hovorka_curve, good_patients
 
 
 def check_initial_insulin_bg(env, P):
@@ -48,29 +95,39 @@ def check_initial_insulin_bg(env, P):
 
 
 
-
-
-def generate_parameters():
+def generate_parameters(num_pars):
     t = int(0)
 
-    pars = np.zeros([18, 30])
-    bw = np.zeros([30])
+    pars = np.zeros([18, num_pars])
+    bg_hist = np.zeros([1440, num_pars])
+    bw = np.zeros([num_pars])
+    optimal_basal = np.zeros([num_pars])
 
-    while t < 30:
+    while t < num_pars:
 
         print('iteration ' + str(t))
         # Generating a random sample
         P, BW = sample_patient()
 
-        # p_too_high = test_parameters(env, P)
-        p_too_high = np.any(np.array(P)<0)
+        # Cheking the parameters
+        ob = check_initial_insulin_bg(env, P)
+        p_too_high, not_converging, no_meal_spike, bg = test_parameters(env, P, ob)
+        p_too_low = np.any(np.array(P)<0)
 
-        if not p_too_high:
+        # If insulin absorption is too slow, cut!
+        # ins_ab_too_slow = P[1]>90
+
+        # if not (p_too_high or p_too_low or ob<8 or ins_ab_too_slow):
+        # if not (p_too_high or p_too_low or ob<8 or no_meal_spike or not_converging):
+        # if not (p_too_high or p_too_low or ob<8 or ins_ab_too_slow or not_converging):
+        if not (p_too_low or ob<8):
             pars[:, t] = P
             bw[t] = BW
+            optimal_basal[t] = ob
+            bg_hist[:, t] = bg
             t += 1
 
-    return pars, bw
+    return pars, bw, optimal_basal, bg_hist
 
 
 # init_basal_range = np.linspace(6, 8, 20)
@@ -78,8 +135,9 @@ def generate_parameters():
 ## Doing the grid search to determine initial value
 if __name__ == '__main__':
 
-    print('main')
-    # pars, bw = generate_parameters()
-    # np.save('parameters_hovorka', pars)
-   # np.save('parameters_hovorka_bw', bw)
+    # print('main')
+    pars, bw, optimal_basal, bg_hist = generate_parameters(500)
+    np.save('parameters_hovorka_new_min_8', pars)
+    np.save('parameters_hovorka_new_min_8_bw', bw)
+    np.save('optimal_basal_min_8', optimal_basal)
 

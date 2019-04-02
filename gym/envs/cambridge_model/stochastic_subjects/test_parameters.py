@@ -4,44 +4,54 @@ import seaborn as sns
 sns.set()
 
 from pylab import plot, figure, title, show, ion, legend, ylim, stem, subplot, xlim, suptitle
-from gym.envs.cambridge_model.subject_stochastic import sample_patient
+# from gym.envs.cambridge_model.subject_stochastic import sample_patient
 ion()
 from gym.envs.registration import register
 
 
 def test_parameters(n, init_basal=6.43):
-    env = gym.make('CambridgeAbsolute-v0')
+    np.random.seed(0)
+    env = gym.make('HovorkaCambridge-v0')
 
     env.env.reset_basal_manually = init_basal
 
     # pars = np.load('parameters.npy')
     # pars = np.load('parameters_hovorka_fixed.npy')
-    pars = np.load('parameters_hovorka.npy')
+    # pars = np.load('parameters_hovorka.npy')
+    # pars = np.load('parameters_hovorka_new.npy')
+    pars = np.load('parameters_hovorka_new_min_8.npy')
     # pars = np.load('parameters_cambridge.npy')
 
+    # Loading optimal basal
+    # optimal_basal = np.load('optimal_basal.npy')
+    optimal_basal = np.load('optimal_basal_min_8.npy')
+    optimal_basal = optimal_basal[n]
 
     # Plotting episodes for all sampled patients
-    figure()
+    # figure()
     env.env.P = pars[:, n]
+    env.env.reset_basal_manually = optimal_basal
+    env.env.bolus = 15e6
     env.reset()
 
     for j in range(48):
-        s, r, d, i = env.step(np.array([0]))
+        s, r, d, i = env.step(np.array([optimal_basal]))
 
+    # figure()
     plot(env.env.bg_history)
+    ylim(0, 600)
 
-    env.reset()
+    # env.reset()
 
-    for j in range(48):
-        s, r, d, i = env.step(np.array([50]))
+    # for j in range(48):
+        # s, r, d, i = env.step(np.array([0]))
 
-    plot(env.env.bg_history)
-    legend(['zero insulin', 'max insulin'])
-    title('Testing a particular set of parameters')
+    # plot(env.env.bg_history)
+    # legend(['optimal basal insulin', 'zero insulin'])
+    title('Basal bolus control' + ' ' + str(optimal_basal))
     show()
 
 
 if __name__ == '__main__':
 
-    # test_parameters(0)
-    print('hello')
+    test_parameters(0)

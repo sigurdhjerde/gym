@@ -5,3 +5,4 @@
 # from gym.envs.diabetes.hovorka_interval_meals_gaussian import HovorkaGaussian
 # from gym.envs.diabetes.hovorka_interval_meals_gaussian_with_insulin import HovorkaGaussianInsulin
 from gym.envs.diabetes.hovorka_cambridge import HovorkaCambridgeBase
+from gym.envs.diabetes.hovorka_cambridge_noise import HovorkaCambridgeBaseNoise

@@ -11,7 +11,8 @@ def sample_patient():
 
 
     # Body weight
-    BW = normal_dist(74.9, 14.4)
+    # BW = normal_dist(74.9, 14.4)
+    BW = uniform_dist(45, 95)
 
     # ========================================
     # Clinically derived parameters -- FIXED
