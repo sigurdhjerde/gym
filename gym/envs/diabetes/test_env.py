@@ -7,6 +7,7 @@ from pylab import plot, figure, title, show, ion, legend, ylim, subplot
 
 # from gym.envs.diabetes.hovorka_cambride_pars import hovorka_cambridge_pars
 from gym.envs.diabetes.hovorka_model import hovorka_parameters
+from gym.envs.diabetes.bg_plot import bg_plot
 
 env = gym.make('HovorkaCambridge-v0')
 
@@ -22,19 +23,26 @@ bg = []
 cgm = []
 iob = []
 
-# env.env.bolus = 25
-env.reset()
+# env.env.bolus = 30
 
-for i in range(48):
+for pat in range(4):
+    env.env.change_patient(pat)
+    # env.env.reset_basal_manually = env.env.init_basal_optimal
+    env.env.reward_flag = 'asymmetric'
+    env.reset()
 
-    # Step for the minimal/hovorka model
-    s, r, d, i = env.step(np.array([env.env.init_basal_optimal]))
+    for i in range(48):
 
-    bg.append(env.env.simulation_state[4])
-    cgm.append(env.env.simulation_state[-1] * env.env.P[12])
-    reward.append(r)
-    iob.append(s[-1])
+        # Step for the minimal/hovorka model
+        s, r, d, i = env.step(np.array([env.env.init_basal_optimal]))
 
+        bg.append(env.env.simulation_state[4])
+        cgm.append(env.env.simulation_state[-1] * env.env.P[12])
+        reward.append(r)
+        iob.append(s[-1])
+
+    # bg_plot(env.env.bg_history, 'patient_nr_' + str(pat))
+    bg_plot(env.env.bg_history)
 
 
 # figure()
@@ -46,14 +54,15 @@ for i in range(48):
 # ion()
 # show()
 # figure()
-subplot(2, 1, 1)
-plot(env.env.bg_history)
-subplot(2, 1, 2)
-plot(env.env.meals)
-# ylim(0, 300)
-show()
-title('Anas meals -- spike meal and bolus')
+# subplot(2, 1, 1)
+# plot(env.env.bg_history/18)
+# subplot(2, 1, 2)
+# plot(env.env.meals)
+# # ylim(0, 300)
+# show()
+# title('Anas meals -- spike meal and bolus')
 
+print(np.sum(reward))
 
 ## Plotting iob and such
 # figure()

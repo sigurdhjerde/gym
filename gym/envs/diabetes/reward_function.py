@@ -49,6 +49,19 @@ class RewardFunction:
 
             reward = - abs(blood_glucose_level - bg_ref)
 
+        elif reward_flag == 'absolute_asymmetric':
+            ''' Asymmetric absolute cost function '''
+
+            reward = bg_ref - blood_glucose_level
+
+            reward[reward<0] = reward[reward<0]/50
+
+            reward[reward>0] = - reward[reward>0]/10
+
+            reward = np.exp(reward)
+
+
+
         elif reward_flag == 'absolute_with_insulin':
             ''' Absolute cost with insulin constraint '''
 

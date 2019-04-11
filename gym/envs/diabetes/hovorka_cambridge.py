@@ -73,7 +73,8 @@ class HovorkaCambridgeBase(gym.Env):
         self.bolus = optimal_bolus
 
         # Action space
-        self.action_space = spaces.Box(0, 50, (1,), dtype=np.float32)
+        # self.action_space = spaces.Box(0, 50, (1,), dtype=np.float32)
+        self.action_space = spaces.Box(0, 3*init_basal_optimal, (1,), dtype=np.float32)
 
         # Initial basal -- this rate dictates the initial BG value
 
@@ -173,6 +174,7 @@ class HovorkaCambridgeBase(gym.Env):
 
         # Loading parameters
         P, init_basal_optimal, optimal_bolus = hovorka_cambridge_pars(pat_num)
+        self.action_space = spaces.Box(0, 3*init_basal_optimal, (1,), dtype=np.float32)
 
         # Setting parameters
         self.P = P
