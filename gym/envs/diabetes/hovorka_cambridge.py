@@ -207,7 +207,7 @@ class HovorkaCambridgeBase(gym.Env):
             # ===============================================
 
             # Basal rate = action, bolus calculated from carb ratio
-            insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )
+            insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )/self.eating_time
 
             # Setting the carb and insulin parameter in the model
             self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)

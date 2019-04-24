@@ -128,7 +128,7 @@ def cambridge_model(t, x, u, D, P): ## This is the ode version
         # F_R = 0                # Renal excretion of glucose in the kidneys [mmol/min]
 
     # Mass balances/differential equations
-    xdot = np.zeros (11);
+    xdot = np.zeros (11)
 
     # Glucose absorption from the gut
     xdot[ 0 ] = A_G*D - D1/tau_G                                # dD1

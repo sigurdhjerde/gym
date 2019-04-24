@@ -52,8 +52,8 @@ def hovorka_model(t, x, u, D, P): ## This is the ode version
     # u, D, P = args
 
     # Defining the various equation names
-    D1 = x[ 0 ]               # Amount of glucose in compartment 1 [mmol]
-    D2 = x[ 1 ]               # Amount of glucose in compartment 2 [mmol]
+    G1 = x[ 0 ]               # Amount of glucose in compartment 1 [mmol]
+    G2 = x[ 1 ]               # Amount of glucose in compartment 2 [mmol]
     S1 = x[ 2 ]               # Amount of insulin in compartment 1 [mU]
     S2 = x[ 3 ]               # Amount of insulin in compartment 2 [mU]
     Q1 = x[ 4 ]               # Amount of glucose in the main blood stream [mmol]
@@ -94,21 +94,34 @@ def hovorka_model(t, x, u, D, P): ## This is the ode version
 
 
     # Certain parameters are defined
-    U_G = D2/tau_G             # Glucose absorption rate [mmol/min]
+    U_G = G2/tau_G             # Glucose absorption rate [mmol/min]
     U_I = S2/tau_I             # Insulin absorption rate [mU/min]
+
+    U_G_ceil = np.random.uniform(0.02, 0.035)
+    tau_G_ceil = G2/U_G_ceil
+    print('g2')
+    print(G2)
+    print('t_max')
+    print(tau_G_ceil)
+
+    if U_G > U_G_ceil:
+        tau_G = tau_G_ceil
+    else:
+        tau_G = P[0]
 
     # Constitutive equations
     G = Q1/V_G                 # Glucose concentration [mmol/L]
 
-    if (G>=4.5):
-        F_01c = F_01           # Consumption of glucose by the central nervous system [mmol/min
-    else:
-        F_01c = F_01*G/4.5     # Consumption of glucose by the central nervous system [mmol/min]
+    # ========================
+    # THIS IS DIFFERENT
+    # ========================
+    F_01s = F_01/0.85
+    F_01c = F_01s*G / (G + 1)
 
-    # if (G>=9):
-        # F_R = 0.003*(G-9)*V_G  # Renal excretion of glucose in the kidneys [mmol/min]
+    # if (G>=4.5):
+    #     F_01c = F_01           # Consumption of glucose by the central nervous system [mmol/min
     # else:
-        # F_R = 0                # Renal excretion of glucose in the kidneys [mmol/min]
+    #     F_01c = F_01*G/4.5     # Consumption of glucose by the central nervous system [mmol/min]
 
     if (G >= R_thr):
         F_R = R_cl*(G - R_thr)*V_G  # Renal excretion of glucose in the kidneys [mmol/min]
@@ -116,15 +129,19 @@ def hovorka_model(t, x, u, D, P): ## This is the ode version
         F_R = 0                # Renal excretion of glucose in the kidneys [mmol/min]
 
     # Mass balances/differential equations
-    xdot = np.zeros (11);
+    xdot = np.zeros (11)
 
-    xdot[ 0 ] = A_G*D-D1/tau_G                                # dD1
-    xdot[ 1 ] = D1/tau_G-U_G                                  # dD2
+    xdot[ 0 ] = A_G*D-G1/tau_G                                # dD1
+    xdot[ 1 ] = G1/tau_G-U_G                                  # dD2
+
     xdot[ 2 ] = u-S1/tau_I                                    # dS1
     xdot[ 3 ] = S1/tau_I-U_I                                  # dS2
+
     xdot[ 4 ] = -(F_01c+F_R)-x1*Q1+k_12*Q2+U_G+EGP_0*(1-x3)   # dQ1
     xdot[ 5 ] = x1*Q1-(k_12+x2)*Q2                            # dQ2
+
     xdot[ 6 ] = U_I/V_I-k_e*I                                 # dI
+
     xdot[ 7 ] = k_b1*I-k_a1*x1                                # dx1
     xdot[ 8 ] = k_b2*I-k_a2*x2                                # dx2
     xdot[ 9 ] = k_b3*I-k_a3*x3                               # dx3

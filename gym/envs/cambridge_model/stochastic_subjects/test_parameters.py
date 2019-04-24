@@ -9,7 +9,8 @@ ion()
 from gym.envs.registration import register
 
 
-def test_parameters(n, init_basal=6.43):
+# def test_parameters(n, init_basal=6.43):
+def test_parameters(pars, init_basal=6.43):
     np.random.seed(0)
     env = gym.make('HovorkaCambridge-v0')
 
@@ -19,19 +20,21 @@ def test_parameters(n, init_basal=6.43):
     # pars = np.load('parameters_hovorka_fixed.npy')
     # pars = np.load('parameters_hovorka.npy')
     # pars = np.load('parameters_hovorka_new.npy')
-    pars = np.load('parameters_hovorka_new_min_8.npy')
+    # pars = np.load('parameters_hovorka_new_min_8.npy')
     # pars = np.load('parameters_cambridge.npy')
 
     # Loading optimal basal
     # optimal_basal = np.load('optimal_basal.npy')
-    optimal_basal = np.load('optimal_basal_min_8.npy')
-    optimal_basal = optimal_basal[n]
+    # optimal_basal = np.load('optimal_basal_min_8.npy')
+    # optimal_basal = optimal_basal[n]
+    optimal_basal = init_basal
 
     # Plotting episodes for all sampled patients
     # figure()
-    env.env.P = pars[:, n]
-    env.env.reset_basal_manually = optimal_basal
-    env.env.bolus = 15e6
+    # env.env.P = pars[:, n]
+    env.env.P = pars
+    # env.env.reset_basal_manually = optimal_basal
+    env.env.bolus = 25
     env.reset()
 
     for j in range(48):
