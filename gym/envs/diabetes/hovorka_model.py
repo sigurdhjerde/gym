@@ -97,17 +97,19 @@ def hovorka_model(t, x, u, D, P): ## This is the ode version
     U_G = G2/tau_G             # Glucose absorption rate [mmol/min]
     U_I = S2/tau_I             # Insulin absorption rate [mU/min]
 
-    U_G_ceil = np.random.uniform(0.02, 0.035)
-    tau_G_ceil = G2/U_G_ceil
-    print('g2')
-    print(G2)
-    print('t_max')
-    print(tau_G_ceil)
 
-    if U_G > U_G_ceil:
-        tau_G = tau_G_ceil
-    else:
-        tau_G = P[0]
+    # Debugging the tau_max_ceil stuff
+    # U_G_ceil = np.random.uniform(0.02, 0.035)
+    # tau_G_ceil = G2/U_G_ceil
+    # print('g2')
+    # print(G2)
+    # print('t_max')
+    # print(tau_G_ceil)
+
+    # if U_G > U_G_ceil:
+        # tau_G = tau_G_ceil
+    # else:
+        # tau_G = P[0]
 
     # Constitutive equations
     G = Q1/V_G                 # Glucose concentration [mmol/L]

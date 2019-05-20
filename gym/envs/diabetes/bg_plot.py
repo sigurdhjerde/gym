@@ -23,7 +23,7 @@ def bg_plot(bg, save=None):
     plt.xlabel('Min')
     plt.ylim(0, 400)
 
-    plt.fill_between(range(1440), bg_low, bg_high, alpha=.20,
+    plt.fill_between(range(len(bg)), bg_low, bg_high, alpha=.20,
                                      facecolor=sns.xkcd_rgb["light orange"], label='Within range')
 
     # plt.title('Blood glucose levels for all patients')

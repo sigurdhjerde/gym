@@ -74,7 +74,7 @@ class HovorkaCambridgeBase(gym.Env):
 
         # Action space
         # self.action_space = spaces.Box(0, 50, (1,), dtype=np.float32)
-        self.action_space = spaces.Box(0, 3*init_basal_optimal, (1,), dtype=np.float32)
+        self.action_space = spaces.Box(0, 2*init_basal_optimal, (1,), dtype=np.float32)
 
         # Initial basal -- this rate dictates the initial BG value
 
@@ -162,6 +162,8 @@ class HovorkaCambridgeBase(gym.Env):
         this is only used for inherited classes'''
 
         reward_flag = 'asymmetric'
+        # reward_flag = 'gaussian'
+        # reward_flag = 'binary_tight'
         bg_init_flag = 'random'
 
         return reward_flag, bg_init_flag

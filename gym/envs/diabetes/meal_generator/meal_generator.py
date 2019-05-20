@@ -30,17 +30,29 @@ def meal_generator(eating_time=30, premeal_bolus_time=15, meal_uncertainty_grams
     # ===========================================================================================
     # Fixed meals!
     # ===========================================================================================
-    meal_amounts = np.array([40, 80, 60, 30])
-    meal_times = np.array([8*60, 12*60, 18*60, 22*60])
+    # meal_amounts = np.array([40, 80, 60, 30])
+    # meal_times = np.array([8*60, 12*60, 18*60, 22*60])
 
-    guessed_meal_amount = meal_amounts
+    # guessed_meal_amount = meal_amounts
+
+    # ===========================================================================================
+    # Fixed meals -- final meals!
+    # ===========================================================================================
+    # meal_amounts = np.array([53.7706299432407, 94.3178247049103, 73.8900695513650, 34.9425478714389])
+    # meal_times = np.array([510, 690, 1110, 1290])
+
+    # meal_amounts = np.array([40, 80, 60, 30])
+    # meal_times = np.array([8*60, 12*60, 18*60, 22*60])
+
+    # guessed_meal_amount = np.array([50, 65, 70, 15])
+
 
     # =====================================================
     # Meal for estimating carb ratio -- a single meal
     # =====================================================
-    # meal_amounts = np.array([40])
-    # meal_times = np.array([1*60])
-    # guessed_meal_amount = meal_amounts
+    meal_amounts = np.array([90]) + np.random.uniform(-20, 20, 1)
+    meal_times = np.array([2*60])
+    guessed_meal_amount = meal_amounts + np.random.uniform(-meal_amounts*.3, meal_amounts*.3)
 
     # Meals indicates the number of carbs taken at time t
     meals = np.zeros(1440)

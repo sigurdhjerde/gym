@@ -30,8 +30,8 @@ for i in range(48):
 
     # bg_plot(env.env.bg_history)
 
-ioff()
-env.render()
+# ioff()
+# env.render()
 
 # for pat in range(4):
 #     env.env.change_patient(pat)
@@ -54,13 +54,13 @@ env.render()
 
 
 # figure()
-# # plot(env.env.bg_history)
+plot(env.env.bg_history)
 # plot(bg)
 # plot(cgm)
 # legend(['bg', 'cgm'])
 # title('bg and cgm')
 # ion()
-# show()
+show()
 # figure()
 # subplot(2, 1, 1)
 # plot(env.env.bg_history/18)
