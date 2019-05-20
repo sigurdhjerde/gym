@@ -10,7 +10,7 @@ from gym.envs.registration import register
 
 
 # def test_parameters(n, init_basal=6.43):
-def test_parameters(pars, init_basal=6.43):
+def test_parameters(pars, init_basal=6.43, carb_ratio=25):
     np.random.seed(0)
     env = gym.make('HovorkaCambridge-v0')
 
@@ -34,7 +34,7 @@ def test_parameters(pars, init_basal=6.43):
     # env.env.P = pars[:, n]
     env.env.P = pars
     # env.env.reset_basal_manually = optimal_basal
-    env.env.bolus = 25
+    env.env.bolus = carb_ratio
     env.reset()
 
     for j in range(48):
