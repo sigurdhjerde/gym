@@ -1,4 +1,4 @@
-###### Estoy en Miguel_gym ogkrokrokog 
+###### Estoy en Miguel_gym
 
 """
 OPENAI gym environment for the Hovorka model using the cambridge parameter set
