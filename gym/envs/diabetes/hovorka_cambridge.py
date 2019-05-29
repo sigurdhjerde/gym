@@ -111,7 +111,7 @@ class HovorkaCambridgeBase(gym.Env):
         self.P = P
         self.init_basal_optimal = init_basal_optimal
 
-        self.action_space = spaces.Box(0, 3*self.init_basal_optimal, (1,), dtype=np.float32)
+        self.action_space = spaces.Box(0, 2*self.init_basal_optimal, (1,), dtype=np.float32)
         ### self.action_space = spaces.Box(-self.init_basal_optimal, 2 * self.init_basal_optimal, (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(0, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(-self.init_basal_optimal, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
@@ -154,8 +154,8 @@ class HovorkaCambridgeBase(gym.Env):
         self.simulation_time = 30
         self.n_solver_steps = 1
         self.stepsize = int(self.simulation_time/self.n_solver_steps)
-        ### self.observation_space = spaces.Box(0, 500, (int(self.stepsize + 4 + 1),), dtype=np.float32)
-        self.observation_space = spaces.Box(0, 500, (int(self.stepsize + 4),), dtype=np.float32)
+        self.observation_space = spaces.Box(0, 500, (int(self.stepsize + 4 + 1),), dtype=np.float32)
+        ### self.observation_space = spaces.Box(0, 500, (int(self.stepsize + 4),), dtype=np.float32)
 
         # State is BG, simulation_state is parameters of hovorka model
         initial_bg = X0[-1] * 18
@@ -163,8 +163,8 @@ class HovorkaCambridgeBase(gym.Env):
         # initial_insulin = np.zeros(4)
         initial_insulin = np.ones(4) * self.init_basal_optimal
         initial_iob = np.zeros(1)
-        ### self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin, initial_iob])
-        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
+        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin, initial_iob])
+        ### self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
 
         self.simulation_state = X0
 
@@ -215,8 +215,8 @@ class HovorkaCambridgeBase(gym.Env):
 
         # meal_times = [0]
         # meal_amounts = [0]
-        reward_flag = 'gaussian'
-        # reward_flag = 'asymmetric'
+        # reward_flag = 'gaussian'
+        reward_flag = 'asymmetric'
         bg_init_flag = 'random'
         # bg_init_flag = 'fixed'
         # action_space = spaces.box(0, 30, 1)
@@ -381,8 +381,8 @@ class HovorkaCambridgeBase(gym.Env):
         # print(self.insulinOnBoard)
         # print(self.num_iters)
 
-        ### self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:])), self.insulinOnBoard])
-        self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:]))])
+        self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:])), self.insulinOnBoard])
+        ### self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:]))])
 
         #Set environment done = True if blood_glucose_level is negative
         done = 0
@@ -451,8 +451,8 @@ class HovorkaCambridgeBase(gym.Env):
         initial_insulin = np.ones(4) * self.init_basal_optimal
         initial_iob = np.zeros(1)
         # self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time/self.n_solver_steps), initial_insulin, initial_iob])
-        ### self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin, initial_iob])
-        self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin])
+        self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin, initial_iob])
+        ### self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin])
 
         self.simulation_state = X0
         self.bg_history = []
