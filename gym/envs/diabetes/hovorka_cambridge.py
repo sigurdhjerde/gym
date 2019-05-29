@@ -215,8 +215,8 @@ class HovorkaCambridgeBase(gym.Env):
 
         # meal_times = [0]
         # meal_amounts = [0]
-        reward_flag = 'gaussian'
-        # reward_flag = 'asymmetric'
+        # reward_flag = 'gaussian'
+        reward_flag = 'asymmetric'
         bg_init_flag = 'random'
         # bg_init_flag = 'fixed'
         # action_space = spaces.box(0, 30, 1)
