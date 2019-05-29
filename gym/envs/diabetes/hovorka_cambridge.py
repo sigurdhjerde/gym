@@ -1,3 +1,5 @@
+###### Estoy en Miguel_gym
+
 """
 OPENAI gym environment for the Hovorka model using the cambridge parameter set
 
@@ -371,7 +373,7 @@ class HovorkaCambridgeBase(gym.Env):
         self.insulin_history = np.concatenate([self.insulin_history, insulin_rate])
 
         # Updating state
-# kaka prueba para ver si funciona git
+        
         # self.insulinOnBoard = np.zeros(1)
         # if self.bolusHistoryIndex > 0:
         #     for b in range(self.bolusHistoryIndex):
