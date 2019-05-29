@@ -1,6 +1,6 @@
 import numpy as np
 
-def meal_generator(eating_time=30, premeal_bolus_time=15, meal_uncertainty_grams=20, no_meals=False, seed=None):
+def meal_generator(eating_time=1, premeal_bolus_time=0, meal_uncertainty_grams=20, no_meals=False, seed=None):
     '''Generates random meals
 
     Three meals per day
@@ -26,6 +26,20 @@ def meal_generator(eating_time=30, premeal_bolus_time=15, meal_uncertainty_grams
     meal_amounts = np.array([40, 80, 60, 30])  + np.random.uniform(-20, 20, 4)
     meal_times = np.array([8*60, 12*60, 18*60, 22*60]) + np.random.choice(np.linspace(-30, 30, 3, dtype=int), 4)
 
+    ### meal_amounts = np.array([40, 80, 60, 30])
+    ### meal_times = np.array([8 * 60, 12 * 60, 18 * 60, 22 * 60])
+
+    # meal_amounts = np.array([np.random.uniform(10, 100)])
+    # meal_times = np.array([12 * 60]) + np.random.choice(np.linspace(-30, 30, 3, dtype=int))
+
+    # Matlab meals
+    # meal_amounts = np.array([53.7706299432407, 94.3178247049103, 73.8900695513650, 34.9425478714389])
+    ###meal_amounts = np.array([39.75461948, 83.27555771, 45.05470101, 45.07282482])
+    # meal_amounts = np.array([80, 0, 0, 0])
+    # meal_amounts = np.array([0, 0, 0, 0])1110
+    # meal_times = np.array([511, 691, 1111, 1291])
+    # meal_times = np.array([120,  750, 1110, 1290])
+
     # Meal for estimating carb ratio -- a single meal
     # meal_amounts = np.array([40]) + np.random.uniform(-20, 20, 1)
     # meal_times = np.array([1*60]) #+ np.random.choice(np.linspace(-30, 30, 3, dtype=int), 1)
@@ -39,12 +53,17 @@ def meal_generator(eating_time=30, premeal_bolus_time=15, meal_uncertainty_grams
 
     guessed_meal_amount = np.zeros_like(meal_amounts)
     for i in range(len(meal_amounts)):
-        guessed_meal_amount[i] = meal_amounts[i] #+ np.random.uniform(-meal_amounts[i]*.3, meal_amounts[i]*.3)
+        guessed_meal_amount[i] = meal_amounts[i] + np.random.uniform(-meal_amounts[i]*.3, meal_amounts[i]*.3)
 
+    ## guessed_meal_amount = np.array([42.00581209, 85.57842835, 41.38593027, 54.49588969])
+    # guessed_meal_amount = np.array([40, 80, 60, 30])
+    # guessed_meal_amount = np.array([100, 100, 100, 100])
 
-    # eating_time = 30
+    # eating_time = 1
     # premeal_bolus_time = 15
-
+###### time array([ 510,  690, 1050, 1290])
+    ####### meals array([23.57606377, 79.53611082, 47.24522753, 14.68298779])
+    ###### meal indicator array([20.61570784, 68.66430426, 46.07904586, 10.63029771])
     # Meals indicates the number of carbs taken at time t
     meals = np.zeros(1440)
 
@@ -57,7 +76,7 @@ def meal_generator(eating_time=30, premeal_bolus_time=15, meal_uncertainty_grams
         # meal_indicator[meal_times[i] - premeal_bolus_time:meal_times[i]] = meal_amounts[i] * 1000 / 180
 
         # Changing to guessed meal amount
-        meal_indicator[meal_times[i]-premeal_bolus_time:meal_times[i]-premeal_bolus_time + eating_time] = guessed_meal_amount[i] * 1000 / 180
+        meal_indicator[meal_times[i]-premeal_bolus_time:meal_times[i]-premeal_bolus_time + eating_time] = guessed_meal_amount[i]/eating_time * 1000 / 180
 
     if no_meals:
         meals = np.zeros(1440)

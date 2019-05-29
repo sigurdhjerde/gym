@@ -15,6 +15,7 @@ env = gym.make('HovorkaCambridge-v0')
 
 P = hovorka_parameters(70)
 env.env.P = P
+env.env.bolus = 30
 init_basal_optimal = 6.43
 env.env.init_basal_optimal = init_basal_optimal
 env.env.reset_basal_manually = init_basal_optimal
@@ -86,7 +87,7 @@ cgm = []
 iob = []
 
 # env.env.reset_basal_manually = 6.43
-env.env.bolus = 25
+#####env.env.bolus = 25
 # env.env.meals = np.zeros(1440)
 # env.env.meal_indicator = np.zeros(1440)
 env.reset()
@@ -109,8 +110,8 @@ for i in range(48):
 
 
 # env.render()
-# figure()
-# # plot(env.env.bg_history)
+figure()
+plot(env.env.bg_history)
 # plot(bg)
 # plot(cgm)
 # legend(['bg', 'cgm'])
@@ -118,10 +119,12 @@ for i in range(48):
 # ion()
 # show()
 # figure()
-plot(env.env.bg_history)
+# plot(env.env.bg_history)
+figure()
+plot(iob)
 # ylim(0, 300)
 show()
-title('Anas meals -- spike meal and bolus')
+# title('Anas meals -- spike meal and bolus')
 
 
 ## Plotting iob and such
