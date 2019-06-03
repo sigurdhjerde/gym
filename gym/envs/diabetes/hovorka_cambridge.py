@@ -308,7 +308,7 @@ class HovorkaCambridgeBase(gym.Env):
                 
             if self.meal_indicator[self.num_iters] > 0:
                 ### insulin_rate = action + np.round(max((self.meal_indicator[self.num_iters] * (180 / self.bolus)) + corrBolus - max(self.insulinOnBoard, 0), 0), 1)
-                insulin_rate = action + round(max((self.meal_indicator[self.num_iters] * (180 / self.bolus)) - max(self.insulinOnBoard, 0), 0), 1)
+                insulin_rate = action + np.round(max((self.meal_indicator[self.num_iters] * (180 / self.bolus)) - max(self.insulinOnBoard, 0), 0), 1)
                 # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus)) - self.insulinOnBoard
             else:
                 insulin_rate = action
