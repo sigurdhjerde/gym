@@ -108,6 +108,8 @@ class HovorkaCambridgeBase(gym.Env):
         ## P, init_basal_optimal = hovorka_cambridge_pars(0)
         P = hovorka_parameters(70)
         init_basal_optimal = 6.43
+        TDD = (init_basal_optimal*1440)/0.45     
+        self.CF = 100/TDD
         self.P = P
         self.init_basal_optimal = init_basal_optimal
 
@@ -300,10 +302,17 @@ class HovorkaCambridgeBase(gym.Env):
             # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )/self.eating_time
             # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )/30
             
-                #insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus)) - self.insulinOnBoard
+                #insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus)) - self.insulinOnBoard    
                 
-            
-            insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
+            corrBolus = (self.integrator.y[-1] * 18 - 108) / self.CF  
+                
+            if self.meal_indicator[self.num_iters] > 0:
+                insulin_rate = round(max((self.meal_indicator[self.num_iters] * (180 / self.bolus)) + corrBolus - max(self.insulinOnBoard, 0), 0), 1)
+                ### insulin_rate = round(max((self.meal_indicator[self.num_iters] * (180 / self.bolus)) - max(self.insulinOnBoard, 0), 0), 1)
+                # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus)) - self.insulinOnBoard
+            else:
+                insulin_rate = action
+                ### insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
             ### insulin_rate = action + self.init_basal_optimal + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
             ## insulin_rate = action
             ## insulin_rate = action + self.init_basal_optimal
