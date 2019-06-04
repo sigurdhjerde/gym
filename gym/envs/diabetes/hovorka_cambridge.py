@@ -108,12 +108,13 @@ class HovorkaCambridgeBase(gym.Env):
         ## P, init_basal_optimal = hovorka_cambridge_pars(0)
         P = hovorka_parameters(70)
         init_basal_optimal = 6.43
-        TDD = (init_basal_optimal*1440)/0.45     
+        # TDD = (init_basal_optimal*1440)/0.45     
+        TDD = (init_basal_optimal*1440/1000)/0.45
         self.CF = 100/TDD
         self.P = P
         self.init_basal_optimal = init_basal_optimal
 
-        self.action_space = spaces.Box(0, 3*self.init_basal_optimal, (1,), dtype=np.float32)
+        self.action_space = spaces.Box(0, 2*self.init_basal_optimal, (1,), dtype=np.float32)
         ### self.action_space = spaces.Box(-self.init_basal_optimal, 2 * self.init_basal_optimal, (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(0, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(-self.init_basal_optimal, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
