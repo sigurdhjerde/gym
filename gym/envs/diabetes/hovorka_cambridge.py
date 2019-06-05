@@ -111,7 +111,7 @@ class HovorkaCambridgeBase(gym.Env):
         self.P = P
         self.init_basal_optimal = init_basal_optimal
 
-        self.action_space = spaces.Box(0, 3*self.init_basal_optimal, (1,), dtype=np.float32)
+        self.action_space = spaces.Box(0, 2*self.init_basal_optimal, (1,), dtype=np.float32)
         ### self.action_space = spaces.Box(-self.init_basal_optimal, 2 * self.init_basal_optimal, (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(0, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(-self.init_basal_optimal, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
@@ -288,10 +288,10 @@ class HovorkaCambridgeBase(gym.Env):
                 self.bolusHistoryTime.append(self.num_iters)
                 # self.lastBolusTime = self.num_iters
 
-            self.insulinOnBoard = np.zeros(1)
-            if self.bolusHistoryIndex > 0:
-                for b in range(self.bolusHistoryIndex):
-                    self.insulinOnBoard = self.insulinOnBoard + self.bolusHistoryValue[b] * self.scalableExpIOB(self.num_iters - self.bolusHistoryTime[b], 75, 300)
+            # self.insulinOnBoard = np.zeros(1)
+            # if self.bolusHistoryIndex > 0:
+            #     for b in range(self.bolusHistoryIndex):
+            #         self.insulinOnBoard = self.insulinOnBoard + self.bolusHistoryValue[b] * self.scalableExpIOB(self.num_iters - self.bolusHistoryTime[b], 75, 300)
 
             # print(self.insulinOnBoard)
             # print(self.num_iters)
