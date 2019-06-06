@@ -93,7 +93,7 @@ class HovorkaCambridgeBase(gym.Env):
         self.CGMgamma = -0.5444   # Johnson parameter of recalibrated and synchronized sensor error.
         self.CGMerror = 0
         self.sensor_noise = np.random.rand(1)
-        self.CGMaux = []
+        # self.CGMaux = []
         # self.sensorNoiseValue = 0 # Set a value
 
         # ====================================
@@ -114,7 +114,7 @@ class HovorkaCambridgeBase(gym.Env):
         self.P = P
         self.init_basal_optimal = init_basal_optimal
 
-        self.action_space = spaces.Box(0, 2*self.init_basal_optimal, (1,), dtype=np.float32)
+        self.action_space = spaces.Box(0, 3*self.init_basal_optimal, (1,), dtype=np.float32)
         ### self.action_space = spaces.Box(-self.init_basal_optimal, 2 * self.init_basal_optimal, (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(0, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(-self.init_basal_optimal, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
@@ -348,9 +348,9 @@ class HovorkaCambridgeBase(gym.Env):
             # ===============
 
             # johnson
-            self.sensor_noise = 0.7 * (self.sensor_noise[0] + np.random.randn(1))
+            ### self.sensor_noise = 0.7 * (self.sensor_noise[0] + np.random.randn(1))
             # paramMCHO = 180
-            self.CGMerror = self.CGMepsilon + self.CGMlambda * np.sinh((self.sensor_noise[0] - self.CGMgamma) / self.CGMdelta)
+            ### self.CGMerror = self.CGMepsilon + self.CGMlambda * np.sinh((self.sensor_noise[0] - self.CGMgamma) / self.CGMdelta)
 
             # # ar(1), colored}
             # phi = 0.8
@@ -437,6 +437,17 @@ class HovorkaCambridgeBase(gym.Env):
 
     def reset(self):
         #TODO: Insert init code here!
+
+        # Reset bolus history
+        self.bolusHistoryIndex = 0
+        self.bolusHistoryValue = []
+        self.bolusHistoryTime = []
+        self.insulinOnBoard = np.zeros(1)
+
+        # Reset sensor model
+        self.CGMerror = 0
+        self.sensor_noise = np.random.rand(1)
+        # self.CGMaux = []
 
         # re init -- in case the init basal has been changed
         if self.reset_basal_manually is None:
