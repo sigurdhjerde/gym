@@ -3,6 +3,8 @@ OPENAI gym environment for the Hovorka model using the cambridge parameter set
 
 The reason we are doing this is that the cambridge model is very slow!
 
+TODO: These comments are outdated
+
 This is the base class for the Hovorka models.
     - Actions runs for a longer interval (default 30 mins)
     to get closer to a markov decision process.
@@ -108,7 +110,7 @@ class HovorkaCambridgeBase(gym.Env):
         ## P, init_basal_optimal = hovorka_cambridge_pars(0)
         P = hovorka_parameters(70)
         init_basal_optimal = 6.43
-        # TDD = (init_basal_optimal*1440)/0.45     
+        # TDD = (init_basal_optimal*1440)/0.45
         TDD = (init_basal_optimal*1440/1000)/0.45
         self.CF = 100/TDD
         self.P = P
@@ -302,9 +304,9 @@ class HovorkaCambridgeBase(gym.Env):
             # Basal rate = action, bolus calculated from carb ratio
             # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )/self.eating_time
             # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus) )/30
-            
+
                 #insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus)) - self.insulinOnBoard    
-                
+
             ### corrBolus = (self.integrator.y[-1] * 18 - 108) / self.CF  
                 
             if self.meal_indicator[self.num_iters] > 0:
