@@ -7,7 +7,7 @@ from gym.envs.cambridge_model.stochastic_subjects.subject_stochastic import samp
 
 env = gym.make('HovorkaCambridge-v0')
 
-def test_parameters(env, P, basal_rate=6.43):
+def parameter_test(env, P, basal_rate=6.43):
 
     env.env.reset_basal_manually = basal_rate
     env.reset()
@@ -26,12 +26,12 @@ def test_parameters(env, P, basal_rate=6.43):
 
     not_converging = False
 
-    if env.env.bg_history[600] > 150:
+    if env.env.bg_history[1200] > 150:
         not_converging = True
 
     no_meal_spike = False
 
-    if env.env.bg_history[125] < 200:
+    if env.env.bg_history[240] < 200:
         no_meal_spike = True
 
     return p_too_high, not_converging, no_meal_spike, env.env.bg_history
@@ -79,7 +79,7 @@ def check_initial_insulin_bg(env, P):
     virtual patient at 6 mmol/l
     '''
 
-    insulin_vector = np.linspace(2, 15, 100)
+    insulin_vector = np.linspace(2, 100, 100)
 
     S = []
 
@@ -111,16 +111,16 @@ def generate_parameters(num_pars):
 
         # Cheking the parameters
         ob = check_initial_insulin_bg(env, P)
-        p_too_high, not_converging, no_meal_spike, bg = test_parameters(env, P, ob)
+        p_too_high, not_converging, no_meal_spike, bg = parameter_test(env, P, ob)
         p_too_low = np.any(np.array(P)<0)
 
         # If insulin absorption is too slow, cut!
         # ins_ab_too_slow = P[1]>90
 
         # if not (p_too_high or p_too_low or ob<8 or ins_ab_too_slow):
-        # if not (p_too_high or p_too_low or ob<8 or no_meal_spike or not_converging):
+        if not (p_too_high or p_too_low or ob<8 or not_converging):
         # if not (p_too_high or p_too_low or ob<8 or ins_ab_too_slow or not_converging):
-        if not (p_too_low or ob<8):
+        # if not (p_too_low or ob<8):
             pars[:, t] = P
             bw[t] = BW
             optimal_basal[t] = ob
@@ -129,6 +129,21 @@ def generate_parameters(num_pars):
 
     return pars, bw, optimal_basal, bg_hist
 
+def calculate_carb_factor(P):
+    ''' Calculate the carb factor as Anas is doing it
+    '''
+    MCHO = 180
+    St = P[5]/P[4]
+    Sd = P[7]/P[6]
+    basal_glucose = 6
+    Vg = P[12]
+    ke = P[10]
+    Vi = P[11]
+
+    carb_factor = (MCHO * (1.4 * max(St, 16e-4) + 0.6 * min(max(Sd, 3e-4), 12e-4)) * basal_glucose * Vg) / (ke * Vi)
+    
+    return carb_factor
+
 
 # init_basal_range = np.linspace(6, 8, 20)
 
@@ -136,8 +151,8 @@ def generate_parameters(num_pars):
 if __name__ == '__main__':
 
     # print('main')
-    pars, bw, optimal_basal, bg_hist = generate_parameters(500)
-    np.save('parameters_hovorka_new_min_8', pars)
-    np.save('parameters_hovorka_new_min_8_bw', bw)
-    np.save('optimal_basal_min_8', optimal_basal)
+    pars, bw, optimal_basal, bg_hist = generate_parameters(50)
+    # np.save('parameters_hovorka_new_min_8', pars)
+    # np.save('parameters_hovorka_new_min_8_bw', bw)
+    # np.save('optimal_basal_min_8', optimal_basal)
 
