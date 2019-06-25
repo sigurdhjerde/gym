@@ -81,10 +81,10 @@ class HovorkaCambridgeBase(gym.Env):
         # self.action_space = spaces.Box(0, 20, (1,), dtype=np.float32)
 
         # Initialize bolus history
-        self.bolusHistoryIndex = 0
-        self.bolusHistoryValue = []
-        self.bolusHistoryTime = []
-        self.insulinOnBoard = np.zeros(1)
+        # self.bolusHistoryIndex = 0
+        # self.bolusHistoryValue = []
+        # self.bolusHistoryTime = []
+        # self.insulinOnBoard = np.zeros(1)
 
         # Initialize sensor model
         self.CGMlambda = 15.96    # Johnson parameter of recalibrated and synchronized sensor error.
@@ -93,7 +93,7 @@ class HovorkaCambridgeBase(gym.Env):
         self.CGMgamma = -0.5444   # Johnson parameter of recalibrated and synchronized sensor error.
         self.CGMerror = 0
         self.sensor_noise = np.random.rand(1)
-        self.CGMaux = []
+        # self.CGMaux = []
         # self.sensorNoiseValue = 0 # Set a value
 
         # ====================================
@@ -282,10 +282,10 @@ class HovorkaCambridgeBase(gym.Env):
             # ===============================================
 
             # Add bolus to history
-            if self.meal_indicator[self.num_iters] > 0:
-                self.bolusHistoryIndex = self.bolusHistoryIndex + 1
-                self.bolusHistoryValue.append(self.meal_indicator[self.num_iters] * (180/self.bolus))
-                self.bolusHistoryTime.append(self.num_iters)
+            # if self.meal_indicator[self.num_iters] > 0:
+            #     self.bolusHistoryIndex = self.bolusHistoryIndex + 1
+            #     self.bolusHistoryValue.append(self.meal_indicator[self.num_iters] * (180/self.bolus))
+            #     self.bolusHistoryTime.append(self.num_iters)
                 # self.lastBolusTime = self.num_iters
 
             # self.insulinOnBoard = np.zeros(1)
@@ -338,9 +338,9 @@ class HovorkaCambridgeBase(gym.Env):
             # ===============
 
             # johnson
-            self.sensor_noise = 0.7 * (self.sensor_noise[0] + np.random.randn(1))
+            ### self.sensor_noise = 0.7 * (self.sensor_noise[0] + np.random.randn(1))
             # paramMCHO = 180
-            self.CGMerror = self.CGMepsilon + self.CGMlambda * np.sinh((self.sensor_noise[0] - self.CGMgamma) / self.CGMdelta)
+            ### self.CGMerror = self.CGMepsilon + self.CGMlambda * np.sinh((self.sensor_noise[0] - self.CGMgamma) / self.CGMdelta)
 
             # # ar(1), colored}
             # phi = 0.8
@@ -427,6 +427,11 @@ class HovorkaCambridgeBase(gym.Env):
 
     def reset(self):
         #TODO: Insert init code here!
+
+        # Reset sensor noise model
+        self.CGMerror = 0
+        self.sensor_noise = np.random.rand(1)
+        # self.CGMaux = []
 
         # re init -- in case the init basal has been changed
         if self.reset_basal_manually is None:
