@@ -29,8 +29,8 @@ env.env.reset_basal_manually = init_basal_optimal
 # ==============
 # Manual meal manipulation! Comparison to Anas El Fathi stuff
 # env.env.eating_time = 1
-# meal_amount = np.array([40, 80, 60, 30])  #+ np.random.choice(np.linspace(-15, 15, 7, dtype=int), 4)
-# meal_times = np.array([8*60, 12*60, 18*60, 22*60]) + np.random.choice(np.linspace(-30,30,3, dtype=int), 4)
+env.env.meal_amount = np.array([40, 80, 60, 30])  #+ np.random.choice(np.linspace(-15, 15, 7, dtype=int), 4)
+env.env.meal_times = np.array([8*60, 12*60, 18*60, 22*60]) # + np.random.choice(np.linspace(-30,30,3, dtype=int), 4)
 
 # meal_amount = np.array([40, 80, 60, 30])
 # env.env.meals = np.zeros(1440)
@@ -120,8 +120,8 @@ plot(env.env.bg_history)
 # show()
 # figure()
 # plot(env.env.bg_history)
-figure()
-plot(iob)
+# figure()
+# plot(iob)
 # ylim(0, 300)
 show()
 # title('Anas meals -- spike meal and bolus')

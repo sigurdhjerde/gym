@@ -106,6 +106,42 @@ class RewardFunction:
             for i in range(len(blood_glucose_level)):
                 reward = reward - (blood_glucose_level[i]/18 - y(t(i)))**2
 
+        elif reward_flag == 'asy_tight':
+            ''' Asymmetric tight reward function '''
+            severe_low_bg = 54
+            low_bg = 90
+            high_bg = 180
+            reward_aux = []
+
+            # if np.min(blood_glucose_level) < severe_low_bg:
+            for i in range(len(blood_glucose_level)):
+                if blood_glucose_level[i] < severe_low_bg:
+                    reward_aux.append(-100)
+                    # reward_aux.append(-10)
+                    # self.tir = 0
+                # elif severe_low_bg <= blood_glucose_level < low_bg:
+                elif severe_low_bg <= blood_glucose_level[i] < low_bg:
+                    reward_aux.append(np.exp((np.log(117.455)/low_bg) * blood_glucose_level[i]) - 117.455)
+                    # reward_aux.append(np.exp((np.log(19.157) / low_bg) * blood_glucose_level[i]) - 19.157)
+                    # self.tir = 0
+                # elif low_bg <= blood_glucose_level < bg_ref:
+                elif low_bg <= blood_glucose_level[i] < bg_ref:
+                    reward_aux.append(((1 / 18) * blood_glucose_level[i] - 5))
+                    # reward_aux.append(((1/36)*blood_glucose_level[i] - 2) + self.tir)
+                    # self.tir = self.tir + 1
+                # elif bg_ref <= blood_glucose_level <= high_bg:
+                elif bg_ref <= blood_glucose_level[i] <= high_bg:
+                    reward_aux.append(((-1 / 72) * blood_glucose_level[i] + (5 / 2)))
+                    # reward_aux.append(((-1/72)*blood_glucose_level[i] + (5/2)) + self.tir)
+                    # self.tir = self.tir + 1
+                # else:
+                elif high_bg < blood_glucose_level[i]:
+                    reward_aux.append(0)
+                    # reward_aux.append(-9)
+                    # self.tir = 0
+
+            reward = reward_aux
+            
         elif reward_flag == 'asymmetric':
             ''' Asymmetric reward function '''
             severe_low_bg = 54

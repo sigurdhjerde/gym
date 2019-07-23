@@ -92,9 +92,9 @@ class HovorkaCambridgeBase(gym.Env):
         self.CGMdelta = 1.6898    # Johnson parameter of recalibrated and synchronized sensor error.
         self.CGMgamma = -0.5444   # Johnson parameter of recalibrated and synchronized sensor error.
         self.CGMerror = 0
-        self.sensor_noise = np.random.rand(1)
+        self.sensor_noise = np.random.randn(1)
         # self.CGMaux = []
-        # self.sensorNoiseValue = 0 # Set a value
+        self.sensorNoiseValue = 0.07 # Set a value
 
         # ====================================
         # Normalized action space!!
@@ -111,8 +111,8 @@ class HovorkaCambridgeBase(gym.Env):
         self.P = P
         self.init_basal_optimal = init_basal_optimal
 
-        self.action_space = spaces.Box(0, 2*self.init_basal_optimal, (1,), dtype=np.float32)
-        ### self.action_space = spaces.Box(-self.init_basal_optimal, 2 * self.init_basal_optimal, (1,), dtype=np.float32)
+        ### self.action_space = spaces.Box(0, 3*self.init_basal_optimal, (1,), dtype=np.float32)
+        self.action_space = spaces.Box(-self.init_basal_optimal, self.init_basal_optimal, (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(0, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(-self.init_basal_optimal, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
 
@@ -162,7 +162,7 @@ class HovorkaCambridgeBase(gym.Env):
         # initial_bg = 106
         # initial_insulin = np.zeros(4)
         initial_insulin = np.ones(4) * self.init_basal_optimal
-        initial_iob = np.zeros(1)
+        # initial_iob = np.zeros(1)
         ### self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin, initial_iob])
         self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
 
@@ -217,6 +217,7 @@ class HovorkaCambridgeBase(gym.Env):
         # meal_amounts = [0]
         # reward_flag = 'gaussian'
         reward_flag = 'asymmetric'
+        # reward_flag = 'asy_tight'
         bg_init_flag = 'random'
         # bg_init_flag = 'fixed'
         # action_space = spaces.box(0, 30, 1)
@@ -303,8 +304,8 @@ class HovorkaCambridgeBase(gym.Env):
                 #insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus)) - self.insulinOnBoard
                 
             
-            insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
-            ### insulin_rate = action + self.init_basal_optimal + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
+            ### insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
+            insulin_rate = action + self.init_basal_optimal + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
             ## insulin_rate = action
             ## insulin_rate = action + self.init_basal_optimal
             # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus)) - self.insulinOnBoard
@@ -336,18 +337,19 @@ class HovorkaCambridgeBase(gym.Env):
             # ===============
             # CGM noise
             # ===============
-
+            
+            ## if i % 5 == 0:
             # johnson
-            ### self.sensor_noise = 0.7 * (self.sensor_noise[0] + np.random.randn(1))
+            # self.sensor_noise = 0.7 * (self.sensor_noise[0] + np.random.randn(1))
             # paramMCHO = 180
-            ### self.CGMerror = self.CGMepsilon + self.CGMlambda * np.sinh((self.sensor_noise[0] - self.CGMgamma) / self.CGMdelta)
-
+            # self.CGMerror = self.CGMepsilon + self.CGMlambda * np.sinh((self.sensor_noise[0] - self.CGMgamma) / self.CGMdelta)
             # # ar(1), colored}
+            # if i % 5 == 0:
             # phi = 0.8
-            # self.CGMerror = phi * self.CGMerror + np.sqrt(1 - phi ^ 2) * self.sensorNoiseValue * np.randn(1)
+            # self.CGMerror = phi * self.CGMerror + np.sqrt(1 - phi ** 2) * self.sensorNoiseValue * np.random.randn(1)[0]
 
             # # mult
-            # self.CGMerror = self.sensorNoiseValue * self.state(self.integrator.y[-1]) * np.random.randn(1)
+            # self.CGMerror = self.sensorNoiseValue * self.state(self.integrator.y[-1]) * np.random.randn(1)[0]
 
             # # white, add
             # self.CGMerror = self.sensorNoiseValue * np.random.randn(1)
@@ -454,7 +456,7 @@ class HovorkaCambridgeBase(gym.Env):
         # initial_bg = 106
         # initial_insulin = np.zeros(4)
         initial_insulin = np.ones(4) * self.init_basal_optimal
-        initial_iob = np.zeros(1)
+        # initial_iob = np.zeros(1)
         # self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time/self.n_solver_steps), initial_insulin, initial_iob])
         ### self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin, initial_iob])
         self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin])
