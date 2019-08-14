@@ -57,7 +57,8 @@ class HovorkaCambridgeBase(gym.Env):
         """
         Initializing the simulation environment.
         """
-
+        np.random.seed(1) ### Fixing seed
+        
         self.previous_action = 0
 
         # State space
@@ -111,8 +112,8 @@ class HovorkaCambridgeBase(gym.Env):
         self.P = P
         self.init_basal_optimal = init_basal_optimal
 
-        ### self.action_space = spaces.Box(0, 3*self.init_basal_optimal, (1,), dtype=np.float32)
-        self.action_space = spaces.Box(-self.init_basal_optimal, self.init_basal_optimal, (1,), dtype=np.float32)
+        ### self.action_space = spaces.Box(0, 2*self.init_basal_optimal, (1,), dtype=np.float32)
+        self.action_space = spaces.Box(-self.init_basal_optimal, 2*self.init_basal_optimal, (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(0, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(-self.init_basal_optimal, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
 
@@ -197,6 +198,7 @@ class HovorkaCambridgeBase(gym.Env):
 
         # TODO: This number is arbitrary
         self.max_iter = 1440
+        # self.max_iter = 2160
 
         # Reward flag
         self.reward_flag = reward_flag

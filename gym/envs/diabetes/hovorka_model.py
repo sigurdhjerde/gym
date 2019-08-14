@@ -85,7 +85,8 @@ def hovorka_model(t, x, u, D, P): ## This is the ode version
     if len(P) == 15:
         ka_int = 0.073
         R_cl = 0.003
-        R_thr = 9
+        # R_thr = 9
+        R_thr = 14
     elif len(P) == 18:
         R_cl = P[16]
         ka_int = P[15]
@@ -100,10 +101,13 @@ def hovorka_model(t, x, u, D, P): ## This is the ode version
     # Constitutive equations
     G = Q1/V_G                 # Glucose concentration [mmol/L]
 
-    if (G>=4.5):
-        F_01c = F_01           # Consumption of glucose by the central nervous system [mmol/min
-    else:
-        F_01c = F_01*G/4.5     # Consumption of glucose by the central nervous system [mmol/min]
+    # if (G>=4.5):
+    #     F_01c = F_01           # Consumption of glucose by the central nervous system [mmol/min
+    # else:
+    #     F_01c = F_01*G/4.5     # Consumption of glucose by the central nervous system [mmol/min]
+
+    F_01s = F_01/0.85
+    F_01c = F_01s*G / (G + 1)
 
     # if (G>=9):
         # F_R = 0.003*(G-9)*V_G  # Renal excretion of glucose in the kidneys [mmol/min]
@@ -120,14 +124,18 @@ def hovorka_model(t, x, u, D, P): ## This is the ode version
 
     xdot[ 0 ] = A_G*D-D1/tau_G                                # dD1
     xdot[ 1 ] = D1/tau_G-U_G                                  # dD2
+   
     xdot[ 2 ] = u-S1/tau_I                                    # dS1
     xdot[ 3 ] = S1/tau_I-U_I                                  # dS2
-    xdot[ 4 ] = -(F_01c+F_R)-x1*Q1+k_12*Q2+U_G+EGP_0*(1-x3)   # dQ1
+   
+    xdot[ 4 ] = -(F_01c+F_R) - x1*Q1 + k_12*Q2 + U_G + max(EGP_0*(1-x3), 0)   # dQ1
     xdot[ 5 ] = x1*Q1-(k_12+x2)*Q2                            # dQ2
+
     xdot[ 6 ] = U_I/V_I-k_e*I                                 # dI
+    
     xdot[ 7 ] = k_b1*I-k_a1*x1                                # dx1
     xdot[ 8 ] = k_b2*I-k_a2*x2                                # dx2
-    xdot[ 9 ] = k_b3*I-k_a3*x3                               # dx3
+    xdot[ 9 ] = k_b3*I-k_a3*x3                                # dx3
 
     # ===============
     # CGM delay
