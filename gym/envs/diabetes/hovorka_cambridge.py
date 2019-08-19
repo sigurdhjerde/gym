@@ -20,6 +20,9 @@ This is the base class for the Hovorka models.
         - check initial basal rates
 
 """
+# import numpy as np
+# np.random.seed(1)
+
 
 import logging
 import gym
@@ -58,6 +61,10 @@ class HovorkaCambridgeBase(gym.Env):
         Initializing the simulation environment.
         """
         np.random.seed(1) ### Fixing seed
+        
+        # self.meals_time_py = []
+        # self.meals_carb_py = []
+        # self.meals_carbestimate_py = []
         
         self.previous_action = 0
 
@@ -112,8 +119,8 @@ class HovorkaCambridgeBase(gym.Env):
         self.P = P
         self.init_basal_optimal = init_basal_optimal
 
-        ### self.action_space = spaces.Box(0, 2*self.init_basal_optimal, (1,), dtype=np.float32)
-        self.action_space = spaces.Box(-self.init_basal_optimal, 2*self.init_basal_optimal, (1,), dtype=np.float32)
+        self.action_space = spaces.Box(0, 3*self.init_basal_optimal, (1,), dtype=np.float32)
+        ### self.action_space = spaces.Box(-self.init_basal_optimal, self.init_basal_optimal, (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(0, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(-self.init_basal_optimal, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
 
@@ -181,6 +188,9 @@ class HovorkaCambridgeBase(gym.Env):
         # eating_time = self.n_solver_steps
         eating_time = 1
         meals, meal_indicator = meal_generator(eating_time=eating_time, premeal_bolus_time=0)
+        # self.meals_carb_py.append(meals[0][np.nonzero(meals)[1]])
+        # self.meals_carbestimate_py.append(meal_indicator[0][np.nonzero(meal_indicator)[1]])
+        # self.meals_time_py.append(np.nonzero(meals))
         # meals = np.zeros(1440)
         # meal_indicator = np.zeros(1440)
 
@@ -198,6 +208,7 @@ class HovorkaCambridgeBase(gym.Env):
 
         # TODO: This number is arbitrary
         self.max_iter = 1440
+        # self.max_iter = 1470
         # self.max_iter = 2160
 
         # Reward flag
@@ -218,8 +229,8 @@ class HovorkaCambridgeBase(gym.Env):
         # meal_times = [0]
         # meal_amounts = [0]
         # reward_flag = 'gaussian'
-        reward_flag = 'asymmetric'
-        # reward_flag = 'asy_tight'
+        # reward_flag = 'asymmetric'
+        reward_flag = 'asy_tight'
         bg_init_flag = 'random'
         # bg_init_flag = 'fixed'
         # action_space = spaces.box(0, 30, 1)
@@ -306,8 +317,8 @@ class HovorkaCambridgeBase(gym.Env):
                 #insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus)) - self.insulinOnBoard
                 
             
-            ### insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
-            insulin_rate = action + self.init_basal_optimal + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
+            insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
+            ### insulin_rate = action + self.init_basal_optimal + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
             ## insulin_rate = action
             ## insulin_rate = action + self.init_basal_optimal
             # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus)) - self.insulinOnBoard
