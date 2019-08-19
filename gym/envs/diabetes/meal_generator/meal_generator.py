@@ -65,10 +65,12 @@ def meal_generator(eating_time=1, premeal_bolus_time=0, meal_uncertainty_grams=2
     ####### meals array([23.57606377, 79.53611082, 47.24522753, 14.68298779])
     ###### meal indicator array([20.61570784, 68.66430426, 46.07904586, 10.63029771])
     # Meals indicates the number of carbs taken at time t
-    meals = np.zeros(1440)
+    # meals = np.zeros(1440)
+    meals = np.zeros(2160)
 
     # 'meal_indicator' indicates time of bolus - default 30 minutes before meal
-    meal_indicator = np.zeros(1440)
+    # meal_indicator = np.zeros(1440)
+    meal_indicator = np.zeros(2160)
 
     for i in range(len(meal_times)):
 
@@ -79,8 +81,10 @@ def meal_generator(eating_time=1, premeal_bolus_time=0, meal_uncertainty_grams=2
         meal_indicator[meal_times[i]-premeal_bolus_time:meal_times[i]-premeal_bolus_time + eating_time] = guessed_meal_amount[i]/eating_time * 1000 / 180
 
     if no_meals:
-        meals = np.zeros(1440)
-        meal_indicator = np.zeros(1440)
+        # meals = np.zeros(1440)
+        # meal_indicator = np.zeros(1440)
+        meals = np.zeros(2160)
+        meal_indicator = np.zeros(2160)
 
     # Hack
     # meals = np.zeros(1440)

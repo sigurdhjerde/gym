@@ -209,7 +209,7 @@ class HovorkaCambridgeBase(gym.Env):
         # TODO: This number is arbitrary
         self.max_iter = 1440
         # self.max_iter = 1470
-        # self.max_iter = 2160
+        self.max_iter = 2160
 
         # Reward flag
         self.reward_flag = reward_flag

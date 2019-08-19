@@ -92,7 +92,7 @@ iob = []
 # env.env.meal_indicator = np.zeros(1440)
 env.reset()
 
-for i in range(48):
+for i in range(72):
 
     # Step for the minimal/hovorka model
     s, r, d, i = env.step(np.array([init_basal_optimal]))
