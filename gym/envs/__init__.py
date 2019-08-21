@@ -40,6 +40,13 @@ register(
         timestep_limit = 48,
         max_episode_steps= 48
         )
+# Hovorka model with Anas' 100 patient params
+register(
+        id = 'AnasPatient-v0',
+        entry_point = 'gym.envs.diabetes.anas_patient:AnasPatient',
+        timestep_limit = 48,
+        max_episode_steps= 48
+        )
 # ================================================
 # Cambridge model
 # ================================================
