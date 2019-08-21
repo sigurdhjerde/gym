@@ -119,8 +119,8 @@ class HovorkaCambridgeBase(gym.Env):
         self.P = P
         self.init_basal_optimal = init_basal_optimal
 
-        self.action_space = spaces.Box(0, 3*self.init_basal_optimal, (1,), dtype=np.float32)
-        ### self.action_space = spaces.Box(-self.init_basal_optimal, self.init_basal_optimal, (1,), dtype=np.float32)
+        ### self.action_space = spaces.Box(0, 3*self.init_basal_optimal, (1,), dtype=np.float32)
+        self.action_space = spaces.Box(-self.init_basal_optimal, 2*self.init_basal_optimal, (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(0, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(-self.init_basal_optimal, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
 
@@ -207,8 +207,7 @@ class HovorkaCambridgeBase(gym.Env):
         self.bg_threshold_high = 500
 
         # TODO: This number is arbitrary
-        self.max_iter = 1440
-        # self.max_iter = 1470
+        # self.max_iter = 1440
         self.max_iter = 2160
 
         # Reward flag
@@ -229,8 +228,8 @@ class HovorkaCambridgeBase(gym.Env):
         # meal_times = [0]
         # meal_amounts = [0]
         # reward_flag = 'gaussian'
-        # reward_flag = 'asymmetric'
-        reward_flag = 'asy_tight'
+        reward_flag = 'asymmetric'
+        # reward_flag = 'asy_tight'
         bg_init_flag = 'random'
         # bg_init_flag = 'fixed'
         # action_space = spaces.box(0, 30, 1)
@@ -317,8 +316,8 @@ class HovorkaCambridgeBase(gym.Env):
                 #insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus)) - self.insulinOnBoard
                 
             
-            insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
-            ### insulin_rate = action + self.init_basal_optimal + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
+            ### insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
+            insulin_rate = action + self.init_basal_optimal + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
             ## insulin_rate = action
             ## insulin_rate = action + self.init_basal_optimal
             # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus)) - self.insulinOnBoard
