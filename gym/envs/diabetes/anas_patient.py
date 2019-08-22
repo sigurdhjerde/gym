@@ -43,6 +43,8 @@ class AnasPatient(gym.Env):
         """
         Initializing the simulation environment.
         """
+        ### Fixing seed
+        np.random.seed(1)
 
         self.previous_action = 0
 
@@ -139,7 +141,7 @@ class AnasPatient(gym.Env):
         self.bg_threshold_high = 500
 
         # TODO: This number is arbitrary
-        self.max_iter = 1440
+        self.max_iter = 2160
 
         # Reward flag
         self.reward_flag = reward_flag
