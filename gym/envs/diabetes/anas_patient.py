@@ -9,7 +9,7 @@ from gym.envs.diabetes import hovorka_cambridge
 
 # Importing matlab list of Anas patient parameters
 import sys
-sys.path.insert(0, '/home/jonas/Documents/git/pg_diabetes/garage/')
+sys.path.insert(0, '/home/miguel/git/pg_diabetes/garage/')
 from anas_patients.load_mcgill_patients import matlab_to_python
 
 import numpy as np
