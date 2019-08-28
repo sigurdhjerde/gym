@@ -316,9 +316,9 @@ class HovorkaCambridgeBase(gym.Env):
                 #insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus)) - self.insulinOnBoard
                 
             
-            insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
+            # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
             ### insulin_rate = action + self.init_basal_optimal + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
-            ## insulin_rate = action
+            insulin_rate = action
             ## insulin_rate = action + self.init_basal_optimal
             # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180/self.bolus)) - self.insulinOnBoard
 
