@@ -100,7 +100,7 @@ class HovorkaCambridgeBase(gym.Env):
         # self.CGMdelta = 1.6898    # Johnson parameter of recalibrated and synchronized sensor error.
         # self.CGMgamma = -0.5444   # Johnson parameter of recalibrated and synchronized sensor error.
         # self.CGMerror = 0
-        # self.sensor_noise = np.random.randn(1)
+        self.sensor_noise = np.random.randn(1)
         # self.CGMaux = []
         # self.sensorNoiseValue = 0.07 # Set a value
 
@@ -444,7 +444,7 @@ class HovorkaCambridgeBase(gym.Env):
 
         # Reset sensor noise model
         # self.CGMerror = 0
-        # self.sensor_noise = np.random.rand(1)
+        self.sensor_noise = np.random.rand(1)
         # self.CGMaux = []
 
         # re init -- in case the init basal has been changed
