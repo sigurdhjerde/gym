@@ -70,7 +70,7 @@ class AnasPatient(gym.Env):
         # Initial basal rate TODO: update!
         self.init_basal = basal_rate[0]
 
-        self.action_space = spaces.Box(0, 2*self.init_basal, (1,), dtype=np.float32)
+        self.action_space = spaces.Box(0, 8*self.init_basal, (1,), dtype=np.float32)
 
         # Flag for manually resetting the init
         self.reset_basal_manually = None
@@ -226,7 +226,9 @@ class AnasPatient(gym.Env):
 
 
             # action is basal rate, bolus is automatically added if there is a meal
-            insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
+            # insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
+            insulin_rate = action + ((self.meal_indicator[self.num_iters]>0) * self.bolus)
+            # insulin_rate = action + self.bolus
 
             # Setting the carb and insulin parameter in the model
             self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
@@ -322,9 +324,9 @@ class AnasPatient(gym.Env):
         initial_insulin = np.ones(4) * self.init_basal
 
         # Changing observation space if something changes
-        # self.observation_space_shape = self.step_time / self.solver_time
-        # self.observation_space = spaces.Box(0, 500, (int(self.observation_space_shape + 4),), dtype=np.float32)
-        # self.action_space.high = np.array([2*self.init_basal], dtype=np.float32)
+        self.observation_space_shape = self.step_time / self.solver_time
+        self.observation_space = spaces.Box(0, 500, (int(self.observation_space_shape + 4),), dtype=np.float32)
+        self.action_space.high = np.array([8*self.init_basal], dtype=np.float32)
 
         self.state = np.concatenate([np.repeat(initial_bg, self.observation_space_shape), initial_insulin])
 
