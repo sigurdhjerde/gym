@@ -9,7 +9,7 @@ def meal_generator(eating_time=1, premeal_bolus_time=0, meal_uncertainty_grams=2
     # Fixing the random seed
     if seed is not None:
         np.random.seed(seed)
-
+    
     # ==========================================
     # HACK to manually fix the random seed
     # ==========================================

@@ -4,9 +4,11 @@ import seaborn as sns
 sns.set()
 
 from pylab import plot, figure, title, show, ion, legend, ylim, subplot
+# import matplotlib.pyplot as plt
 
 # from gym.envs.diabetes.hovorka_cambride_pars import hovorka_cambridge_pars
 from gym.envs.diabetes.hovorka_model import hovorka_parameters
+# from scipy.interpolate import make_interp_spline, BSpline
 
 # env = gym.make('HovorkaGaussian-v0')
 # env = gym.make('HovorkaGaussian-v0')
@@ -111,6 +113,10 @@ for i in range(72):
 
 # env.render()
 figure()
+# xnew = np.linspace(0, 2159, 5000)
+# spl = make_interp_spline(np.arange(2160), env.env.bg_history, k=3)
+# bg_smooth = spl(xnew)
+# plt.plot(xnew, bg_smooth)
 plot(env.env.bg_history)
 # plot(bg)
 # plot(cgm)

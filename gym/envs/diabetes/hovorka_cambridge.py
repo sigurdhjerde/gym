@@ -95,14 +95,14 @@ class HovorkaCambridgeBase(gym.Env):
         # self.insulinOnBoard = np.zeros(1)
 
         # Initialize sensor model
-        self.CGMlambda = 15.96    # Johnson parameter of recalibrated and synchronized sensor error.
-        self.CGMepsilon = -5.471  # Johnson parameter of recalibrated and synchronized sensor error.
-        self.CGMdelta = 1.6898    # Johnson parameter of recalibrated and synchronized sensor error.
-        self.CGMgamma = -0.5444   # Johnson parameter of recalibrated and synchronized sensor error.
-        self.CGMerror = 0
+        # self.CGMlambda = 15.96    # Johnson parameter of recalibrated and synchronized sensor error.
+        # self.CGMepsilon = -5.471  # Johnson parameter of recalibrated and synchronized sensor error.
+        # self.CGMdelta = 1.6898    # Johnson parameter of recalibrated and synchronized sensor error.
+        # self.CGMgamma = -0.5444   # Johnson parameter of recalibrated and synchronized sensor error.
+        # self.CGMerror = 0
         self.sensor_noise = np.random.randn(1)
         # self.CGMaux = []
-        self.sensorNoiseValue = 0.07 # Set a value
+        # self.sensorNoiseValue = 0.07 # Set a value
 
         # ====================================
         # Normalized action space!!
@@ -350,11 +350,11 @@ class HovorkaCambridgeBase(gym.Env):
             # CGM noise
             # ===============
             
-            ## if i % 5 == 0:
-            # johnson
-            # self.sensor_noise = 0.7 * (self.sensor_noise[0] + np.random.randn(1))
-            # paramMCHO = 180
-            # self.CGMerror = self.CGMepsilon + self.CGMlambda * np.sinh((self.sensor_noise[0] - self.CGMgamma) / self.CGMdelta)
+            # if i % 5 == 0:
+            # # johnson
+            #     self.sensor_noise = 0.7 * (self.sensor_noise[0] + np.random.randn(1))
+            # # paramMCHO = 180
+            #     self.CGMerror = self.CGMepsilon + self.CGMlambda * np.sinh((self.sensor_noise[0] - self.CGMgamma) / self.CGMdelta)
             # # ar(1), colored}
             # if i % 5 == 0:
             # phi = 0.8
@@ -443,7 +443,7 @@ class HovorkaCambridgeBase(gym.Env):
         #TODO: Insert init code here!
 
         # Reset sensor noise model
-        self.CGMerror = 0
+        # self.CGMerror = 0
         self.sensor_noise = np.random.rand(1)
         # self.CGMaux = []
 
