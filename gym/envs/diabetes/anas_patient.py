@@ -47,7 +47,7 @@ class AnasPatient(hovorka_cambridge.HovorkaCambridgeBase):
 
         # Bolus carb factor -- [g/U]
         # self.bolus = 25
-        self.bolus = 30
+        # self.bolus = 30
 
         ## Loading variable parameters
         # meal_times, meal_amounts, reward_flag, bg_init_flag, max_insulin_action = self._update_parameters()
@@ -80,7 +80,8 @@ class AnasPatient(hovorka_cambridge.HovorkaCambridgeBase):
         init_basal_optimal = init_basal
         self.P = P
         self.init_basal_optimal = init_basal_optimal
-
+        self.bolus = carb_factor
+        
         self.action_space = spaces.Box(0, 2*self.init_basal_optimal[0], (1,), dtype=np.float32)
         ### self.action_space = spaces.Box(-self.init_basal_optimal, self.init_basal_optimal, (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(0, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
