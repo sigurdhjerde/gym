@@ -299,7 +299,7 @@ class HovorkaCambridgeBase(gym.Env):
             #     self.bolusHistoryIndex = self.bolusHistoryIndex + 1
             #     self.bolusHistoryValue.append(self.meal_indicator[self.num_iters] * (180/self.bolus))
             #     self.bolusHistoryTime.append(self.num_iters)
-                # self.lastBolusTime = self.num_iters
+            #     # self.lastBolusTime = self.num_iters
 
             # self.insulinOnBoard = np.zeros(1)
             # if self.bolusHistoryIndex > 0:

@@ -10,7 +10,7 @@ sns.set()
 import matplotlib.pyplot as plt
 
 import sys
-sys.path.insert(0, '/home/jonas/Documents/git/pg_diabetes/garage/')
+sys.path.insert(0, '/home/miguel/git/pg_diabetes/garage/')
 from anas_patients.load_mcgill_patients import matlab_to_python
 
 from gym.envs.registration import register
