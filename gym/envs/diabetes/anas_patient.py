@@ -30,11 +30,11 @@ class AnasPatient(hovorka_cambridge.HovorkaCambridgeBase):
         Initializing the simulation environment.
         """
         np.random.seed(1) ### Fixing seed
-        
+
         # self.meals_time_py = []
         # self.meals_carb_py = []
         # self.meals_carbestimate_py = []
-        
+
         self.previous_action = 0
 
         # State space
@@ -81,7 +81,7 @@ class AnasPatient(hovorka_cambridge.HovorkaCambridgeBase):
         self.P = P
         self.init_basal_optimal = init_basal_optimal
         self.bolus = carb_factor
-        
+
         self.action_space = spaces.Box(0, 2*self.init_basal_optimal[0], (1,), dtype=np.float32)
         ### self.action_space = spaces.Box(-self.init_basal_optimal, self.init_basal_optimal, (1,), dtype=np.float32)
         ## self.action_space = spaces.Box(0, (100 * 1000 / self.bolus), (1,), dtype=np.float32)
