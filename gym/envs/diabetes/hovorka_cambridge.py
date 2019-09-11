@@ -89,10 +89,10 @@ class HovorkaCambridgeBase(gym.Env):
         # self.action_space = spaces.Box(0, 20, (1,), dtype=np.float32)
 
         # Initialize bolus history
-        # self.bolusHistoryIndex = 0
-        # self.bolusHistoryValue = []
-        # self.bolusHistoryTime = []
-        # self.insulinOnBoard = np.zeros(1)
+        self.bolusHistoryIndex = 0
+        self.bolusHistoryValue = []
+        self.bolusHistoryTime = []
+        self.insulinOnBoard = np.zeros(1)
 
         # Initialize sensor model
         # self.CGMlambda = 15.96    # Johnson parameter of recalibrated and synchronized sensor error.
@@ -170,9 +170,9 @@ class HovorkaCambridgeBase(gym.Env):
         # initial_bg = 106
         # initial_insulin = np.zeros(4)
         initial_insulin = np.ones(4) * self.init_basal_optimal
-        # initial_iob = np.zeros(1)
-        ### self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin, initial_iob])
-        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
+        initial_iob = np.zeros(1)
+        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin, initial_iob])
+        ### self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
 
         self.simulation_state = X0
 
@@ -295,16 +295,16 @@ class HovorkaCambridgeBase(gym.Env):
             # ===============================================
 
             # Add bolus to history
-            # if self.meal_indicator[self.num_iters] > 0:
-            #     self.bolusHistoryIndex = self.bolusHistoryIndex + 1
-            #     self.bolusHistoryValue.append(self.meal_indicator[self.num_iters] * (180/self.bolus))
-            #     self.bolusHistoryTime.append(self.num_iters)
-            #     # self.lastBolusTime = self.num_iters
+            if self.meal_indicator[self.num_iters] > 0:
+                self.bolusHistoryIndex = self.bolusHistoryIndex + 1
+                self.bolusHistoryValue.append(self.meal_indicator[self.num_iters] * (180/self.bolus))
+                self.bolusHistoryTime.append(self.num_iters)
+                # self.lastBolusTime = self.num_iters
 
-            # self.insulinOnBoard = np.zeros(1)
-            # if self.bolusHistoryIndex > 0:
-            #     for b in range(self.bolusHistoryIndex):
-            #         self.insulinOnBoard = self.insulinOnBoard + self.bolusHistoryValue[b] * self.scalableExpIOB(self.num_iters - self.bolusHistoryTime[b], 75, 300)
+            self.insulinOnBoard = np.zeros(1)
+            if self.bolusHistoryIndex > 0:
+                for b in range(self.bolusHistoryIndex):
+                    self.insulinOnBoard = self.insulinOnBoard + self.bolusHistoryValue[b] * self.scalableExpIOB(self.num_iters - self.bolusHistoryTime[b], 75, 300)
 
             # print(self.insulinOnBoard)
             # print(self.num_iters)
@@ -315,8 +315,11 @@ class HovorkaCambridgeBase(gym.Env):
             
                 #insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus)) - self.insulinOnBoard
                 
-            
-            insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
+            if self.meal_indicator[self.num_iters] > 0:
+                insulin_rate = action + np.round(max((self.meal_indicator[self.num_iters] * (180 / self.bolus)) - max(self.insulinOnBoard, 0), 0), 1)
+            else:
+                insulin_rate = action
+            #### insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
             ### insulin_rate = action + self.init_basal_optimal + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
             ## insulin_rate = action
             ## insulin_rate = action + self.init_basal_optimal
@@ -395,8 +398,8 @@ class HovorkaCambridgeBase(gym.Env):
         # print(self.insulinOnBoard)
         # print(self.num_iters)
 
-        ### self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:])), self.insulinOnBoard])
-        self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:]))])
+        self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:])), self.insulinOnBoard])
+        ### self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:]))])
 
         #Set environment done = True if blood_glucose_level is negative
         done = 0
@@ -442,6 +445,12 @@ class HovorkaCambridgeBase(gym.Env):
     def reset(self):
         #TODO: Insert init code here!
 
+        # Reset bolus history
+        self.bolusHistoryIndex = 0
+        self.bolusHistoryValue = []
+        self.bolusHistoryTime = []
+        self.insulinOnBoard = np.zeros(1)
+
         # Reset sensor noise model
         # self.CGMerror = 0
         self.sensor_noise = np.random.rand(1)
@@ -468,10 +477,10 @@ class HovorkaCambridgeBase(gym.Env):
         # initial_bg = 106
         # initial_insulin = np.zeros(4)
         initial_insulin = np.ones(4) * self.init_basal_optimal
-        # initial_iob = np.zeros(1)
+        initial_iob = np.zeros(1)
         # self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time/self.n_solver_steps), initial_insulin, initial_iob])
-        ### self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin, initial_iob])
-        self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin])
+        self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin, initial_iob])
+        ### self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin])
 
         self.simulation_state = X0
         self.bg_history = []
