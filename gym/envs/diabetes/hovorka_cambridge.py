@@ -294,13 +294,6 @@ class HovorkaCambridgeBase(gym.Env):
             # Solving one step of the Hovorka model
             # ===============================================
 
-            # Add bolus to history
-            if self.meal_indicator[self.num_iters] > 0:
-                self.bolusHistoryIndex = self.bolusHistoryIndex + 1
-                self.bolusHistoryValue.append(self.meal_indicator[self.num_iters] * (180/self.bolus))
-                self.bolusHistoryTime.append(self.num_iters)
-                # self.lastBolusTime = self.num_iters
-
             self.insulinOnBoard = np.zeros(1)
             if self.bolusHistoryIndex > 0:
                 for b in range(self.bolusHistoryIndex):
@@ -319,6 +312,14 @@ class HovorkaCambridgeBase(gym.Env):
                 insulin_rate = action + np.round(max((self.meal_indicator[self.num_iters] * (180 / self.bolus)) - max(self.insulinOnBoard, 0), 0), 1)
             else:
                 insulin_rate = action
+              
+            # Add bolus to history    
+            if self.meal_indicator[self.num_iters] > 0:
+                self.bolusHistoryIndex = self.bolusHistoryIndex + 1
+                self.bolusHistoryValue.append(self.meal_indicator[self.num_iters] * (180/self.bolus))
+                self.bolusHistoryTime.append(self.num_iters)
+                ##     self.lastBolusTime = self.num_iters
+            
             #### insulin_rate = action + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
             ### insulin_rate = action + self.init_basal_optimal + (self.meal_indicator[self.num_iters] * (180 / self.bolus))
             ## insulin_rate = action
