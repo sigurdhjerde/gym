@@ -277,19 +277,14 @@ class HovorkaCambridgeBase(gym.Env):
 
 
     def reset(self):
-        #TODO: Insert init code here!
+        '''
+        This is basically a copy of the init function
+        '''
 
-        # Reset sensor noise model
-        # self.CGMerror = 0
-        self.sensor_noise = np.random.rand(1)
-        # self.CGMaux = []
 
         # re init -- in case the init basal has been changed
         if self.reset_basal_manually is None:
-            # self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
             self.init_basal = np.random.choice(np.linspace(self.init_basal_optimal-2, self.init_basal_optimal, 10))
-            # self.init_basal = 6.43
-            # self.init_basal = 6.1
         else:
             self.init_basal = self.reset_basal_manually
 
@@ -302,18 +297,12 @@ class HovorkaCambridgeBase(gym.Env):
 
         # State is BG, simulation_state is parameters of hovorka model
         initial_bg = X0[-1] * 18
-        # initial_bg = 106
-        # initial_insulin = np.zeros(4)
         initial_insulin = np.ones(4) * self.init_basal_optimal
-        # initial_iob = np.zeros(1)
-        # self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time/self.n_solver_steps), initial_insulin, initial_iob])
-        ### self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin, initial_iob])
         self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin])
 
         self.simulation_state = X0
         self.bg_history = []
         self.insulin_history = initial_insulin
-        # self.insulin_history = []
 
         self.num_iters = 0
 
@@ -330,7 +319,7 @@ class HovorkaCambridgeBase(gym.Env):
 
 
     def render(self, mode='human', close=False):
-        #TODO: Clean up plotting routine
+        #TODO: Clean up plotting routine -- this is messy!
 
         # return None
         if mode == 'rgb_array':
