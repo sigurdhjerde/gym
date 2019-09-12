@@ -58,10 +58,10 @@ class AnasPatient(hovorka_cambridge.HovorkaCambridgeBase):
         # self.action_space = spaces.Box(0, 20, (1,), dtype=np.float32)
 
         # Initialize bolus history
-        # self.bolusHistoryIndex = 0
-        # self.bolusHistoryValue = []
-        # self.bolusHistoryTime = []
-        # self.insulinOnBoard = np.zeros(1)
+        self.bolusHistoryIndex = 0
+        self.bolusHistoryValue = []
+        self.bolusHistoryTime = []
+        self.insulinOnBoard = np.zeros(1)
 
         # Initialize sensor model
         self.CGMlambda = 15.96    # Johnson parameter of recalibrated and synchronized sensor error.
@@ -125,17 +125,17 @@ class AnasPatient(hovorka_cambridge.HovorkaCambridgeBase):
         self.simulation_time = 30
         self.n_solver_steps = 1
         self.stepsize = int(self.simulation_time/self.n_solver_steps)
-        ### self.observation_space = spaces.Box(0, 500, (int(self.stepsize + 4 + 1),), dtype=np.float32)
-        self.observation_space = spaces.Box(0, 500, (int(self.stepsize + 4),), dtype=np.float32)
+        self.observation_space = spaces.Box(0, 500, (int(self.stepsize + 4 + 1),), dtype=np.float32)
+        ### self.observation_space = spaces.Box(0, 500, (int(self.stepsize + 4),), dtype=np.float32)
 
         # State is BG, simulation_state is parameters of hovorka model
         initial_bg = X0[-1] * 18
         # initial_bg = 106
         # initial_insulin = np.zeros(4)
         initial_insulin = np.ones(4) * self.init_basal_optimal
-        # initial_iob = np.zeros(1)
-        ### self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin, initial_iob])
-        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
+        initial_iob = np.zeros(1)
+        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin, initial_iob])
+        ### self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
 
         self.simulation_state = X0
 
