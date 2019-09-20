@@ -8,7 +8,7 @@ This is the base class for the Hovorka models.
     to get closer to a markov decision process.
     - The model includes meals
     - Default 34 dim observation space (30 min BG and last four actions)
-    - Default action space 0 to 50 mU/min of insulin
+    - Default action space 0 to twice the basal rate (2*init_basal_optimal) mU/min of insulin
     - Rendering disabled by default
 
     - Initialization and reset: Random initialization and no meals!
