@@ -1,7 +1,6 @@
 """
-OPENAI gym environment for the Hovorka model using the cambridge parameter set
+OPENAI gym environment for the Hovorka model
 
-The reason we are doing this is that the cambridge model is very slow!
 
 This is the base class for the Hovorka models.
     - Actions runs for a longer interval (default 30 mins)
@@ -15,6 +14,7 @@ This is the base class for the Hovorka models.
 
 
     - TODO:
+        - Update this documentation!!!!!
         - Double check parameters - renal threshold et al
         - Check difference in previous insulin compared to cambridge model
         - check initial basal rates
@@ -33,15 +33,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Hovorka simulator
-from gym.envs.diabetes.hovorka_model import hovorka_model, hovorka_model_tuple
-from gym.envs.diabetes.reward_function import calculate_reward
-from gym.envs.diabetes.hovorka_cambride_pars import hovorka_cambridge_pars
+from gym.envs.diabetes.hovorka_model import hovorka_parameters, hovorka_model, hovorka_model_tuple
+from gym.envs.diabetes.reward_function import RewardFunction
 
 # ODE solver stuff
 from scipy.integrate import ode
 from scipy.optimize import fsolve
 
 logger = logging.getLogger(__name__)
+
+rewardFunction = RewardFunction()
 
 class HovorkaCambridgeBase(gym.Env):
     # TODO: fix metadata??
@@ -55,47 +56,55 @@ class HovorkaCambridgeBase(gym.Env):
         Initializing the simulation environment.
         """
 
+        # Fixing the random seed -- for reproducible experiments
+        np.random.seed(1)
+
+        # Miguel: Why is this needed?
         self.previous_action = 0
 
-        # State space
-        # TODO: remove manual size specification of state space
-        self.observation_space = spaces.Box(0, 500, (34,), dtype=np.float32)
-        # self.observation_space = spaces.Box(0, 500, 1)
+        # Bolus carb factor -- [g/U]
+        self.bolus = 30
 
-        # Bolus rate -- [mU/mmol]
-        self.bolus = 0
-        # self.bolus = 8.3
-
-        ## Loading variable parameters
-        # meal_times, meal_amounts, reward_flag, bg_init_flag, max_insulin_action = self._update_parameters()
+        ## Loading variable parameters -- used if environment is extended
         reward_flag, bg_init_flag = self._update_parameters()
 
 
-        # Action space
-        self.action_space = spaces.Box(0, 50, (1,), dtype=np.float32)
+        # Miguel: CamelCase is not used in rest of code
 
-        # ====================================
-        # Normalized action space!!
-        # ====================================
-        # self.action_space = spaces.Box(-1, 1, (1,))
+        # Initialize bolus history -- used for insulin on board
+        self.bolusHistoryIndex = 0
+        self.bolusHistoryValue = []
+        self.bolusHistoryTime = []
+        self.insulinOnBoard = np.zeros(1)
 
-        # Increasing the max bolus rate
-        # self.action_space = spaces.Box(0, 150, 1)
+        # Initialize sensor model -- Miguel: do we need all of this?
+        # self.CGMlambda = 15.96    # Johnson parameter of recalibrated and synchronized sensor error.
+        # self.CGMepsilon = -5.471  # Johnson parameter of recalibrated and synchronized sensor error.
+        # self.CGMdelta = 1.6898    # Johnson parameter of recalibrated and synchronized sensor error.
+        # self.CGMgamma = -0.5444   # Johnson parameter of recalibrated and synchronized sensor error.
+        # self.CGMerror = 0
+        self.sensor_noise = np.random.randn(1)
+        # self.CGMaux = []
+        # self.sensorNoiseValue = 0.07 # Set a value
 
-        # Cambridge parameters
-        P, init_basal_optimal = hovorka_cambridge_pars(0)
+
+        # Model parameters
+        P = hovorka_parameters(70)
+        init_basal_optimal = 6.43
         self.P = P
         self.init_basal_optimal = init_basal_optimal
 
-        # Initial basal -- this rate dictates the initial BG value
+        # Initializing the action space
+        self.action_space = spaces.Box(0, 2*self.init_basal_optimal, (1,), dtype=np.float32)
+
+        # Initial basal rate -- used for init and reset. Either randomly initialized or by a fixed value.
 
         if bg_init_flag == 'random':
-            # self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
             self.init_basal = np.random.choice(np.linspace(init_basal_optimal-2, init_basal_optimal, 10))
         elif bg_init_flag == 'fixed':
             self.init_basal = init_basal_optimal
 
-        # Flag for manually resetting the init
+        # Flag for manually resetting the init when the episode restarts
         self.reset_basal_manually = None
 
         self._seed()
@@ -117,34 +126,39 @@ class HovorkaCambridgeBase(gym.Env):
         self.integrator.set_integrator('vode', method='bdf', order=5)
         self.integrator.set_initial_value(X0, 0)
 
-        # Simulation time in minutes
+        # Simulation time in minutes -- the default is solving the simulator 30 minutes at a time
+        # with a solver time of one minute.
         self.simulation_time = 30
+        self.n_solver_steps = 1
+        self.stepsize = int(self.simulation_time/self.n_solver_steps)
+
+        # State space for the environment -- [30 min of BG, last 4 insulin action, bolus (if given) during last 30 mins]
+        self.observation_space = spaces.Box(0, 500, (int(self.stepsize + 4 + 2),), dtype=np.float32)
 
         # State is BG, simulation_state is parameters of hovorka model
         initial_bg = X0[-1] * 18
-        initial_insulin = np.zeros(4)
-        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
+        initial_insulin = np.ones(4) * self.init_basal_optimal
+        initial_iob = np.zeros(1)
+
+        # Initial state
+        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin, initial_iob, np.zeros(1)])
 
         self.simulation_state = X0
 
-        # Keeping track of entire blood glucose level for each episode
+        # Keeping track of entire blood glucose level and insulin for each episode
         self.bg_history = []
         self.insulin_history = initial_insulin
-        # self.insulin_history = []
-        self.carb_history = []
 
         # ====================
         # Meal setup
         # ====================
 
-        # NOTE: This has changed in the spike_meal_bolus fork!
-        eating_time = 30
-        meals, meal_indicator = meal_generator(eating_time=eating_time)
-        # meals = np.zeros(1440)
+        # Default eating time is considered one minute -- empirically the simulations are not too sensitive to this choice.
+        eating_time = 1
 
-        # meal_indicator = np.zeros(1440)
+        # Meals are carb intake and meal_indicator is the counted carbs by the patient
+        meals, meal_indicator = meal_generator(eating_time=eating_time, premeal_bolus_time=0)
 
-        # TODO: Clean up these
         self.meals = meals
         self.meal_indicator = meal_indicator
         self.eating_time = eating_time
@@ -152,12 +166,12 @@ class HovorkaCambridgeBase(gym.Env):
         # Counter for number of iterations
         self.num_iters = 0
 
-        # If blood glucose is less than zero, the simulator is out of bounds.
+        # If blood glucose is less than zero or above 500, the simulator is considered out of bounds.
         self.bg_threshold_low = 0
         self.bg_threshold_high = 500
 
-        # TODO: This number is arbitrary
-        self.max_iter = 1440
+        # The max episode lenght is 36 hours
+        self.max_iter = 2160
 
         # Reward flag
         self.reward_flag = reward_flag
@@ -169,22 +183,51 @@ class HovorkaCambridgeBase(gym.Env):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
+
     def _update_parameters(self):
         ''' Update parameters of model,
         this is only used for inherited classes'''
 
-        # meal_times = [0]
-        # meal_amounts = [0]
-        reward_flag = 'gaussian'
-        bg_init_flag = 'random'
-        # action_space = spaces.box(0, 30, 1)
+        # Default reward is the asymmetric reward
+        reward_flag = 'asymmetric'
 
-        # return meal_times, meal_amounts, reward_flag, bg_init_flag
+        # bg is randomly initialized per episode by default
+        bg_init_flag = 'random'
+
         return reward_flag, bg_init_flag
+
+
+    # Miguel: again with CamelCase. Not a big problem, but looks a bit weird.
+    def scalableExpIOB(self, t, tp, td):
+            #SCALABLEEXPIOB
+            # Calculates the insulin bolus on board using a decay
+            # expenontiel. Function taken from
+            # https://github.com/ps2/LoopIOB/blob/master/ScalableExp.ipynb
+            # Original contributor Dragan Maksimovic (@dm61)
+            #
+            # Inputs:
+            #    - t: Time duration after bolus delivery.
+            #    - tp: Time of peak action of insulin.
+            #    - td: Time duration of insulin action.
+            #
+            # For more info on tp and td:
+            # http://guidelines.diabetes.ca/cdacpg_resources/Ch12_Table1_Types_of_Insulin_updated_Aug_5.pdf
+            #
+
+            if t > td:
+                iob = 0
+                return iob
+            else:
+                tau = tp * (1 - tp / td) / (1 - 2 * tp / td)
+                a = 2 * tau / td
+                S = 1 / (1 - a + (1 + a) * np.exp(-td/tau))
+                iob = 1 - S * (1 - a) * ((t**2 / (tau * td * (1 - a)) - t / tau - 1) * np.exp(-t/tau) + 1)
+                return iob
 
     def step(self, action):
         """
-        Take action. Action is mU/ml of insulin
+        Take action. In the diabetes simulation this means increase, decrease or do nothing
+        to the insulin to carb ratio (bolus).
         """
         if action > self.action_space.high:
             action = self.action_space.high
@@ -193,60 +236,98 @@ class HovorkaCambridgeBase(gym.Env):
 
         # assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
-        # Converting scaled action
-        # ub = 50
-        # lb = 0
-        # action = lb + (action + 1) * .5 * (ub - lb)
-
         self.integrator.set_initial_value(self.simulation_state, self.num_iters)
 
         bg = []
-        insulin = []
-        carbs = []
-        # ==========================
-        # Integration loop
-        # ==========================
+        bolus_given = np.zeros(1)
+
         for i in range(self.simulation_time):
 
             # ===============================================
             # Solving one step of the Hovorka model
             # ===============================================
 
-            insulin_rate = action + (self.meal_indicator[self.num_iters] * self.bolus)/self.eating_time
+            # Calculating insulin on board
+            self.insulinOnBoard = np.zeros(1)
+            if self.bolusHistoryIndex > 0:
+                for b in range(self.bolusHistoryIndex):
+                    self.insulinOnBoard = self.insulinOnBoard + self.bolusHistoryValue[b] * self.scalableExpIOB(self.num_iters - self.bolusHistoryTime[b], 75, 300)
 
-            # TODO: remove!
-            # Manual bolus given directly!
-            # insulin_rate = action + self.meal_indicator[self.num_iters]
+            # If there is a meal, give a bolus
+            if self.meal_indicator[self.num_iters] > 0:
+                insulin_rate = action + np.round(max(self.meal_indicator[self.num_iters] * (180 / self.bolus), 0), 1)
+            else:
+                insulin_rate = action
 
+            bolus_given =  bolus_given + self.meal_indicator[self.num_iters] * (180 / self.bolus)
+
+            # Add given bolus to history
+            if self.meal_indicator[self.num_iters] > 0:
+                self.bolusHistoryIndex = self.bolusHistoryIndex + 1
+                self.bolusHistoryValue.append(self.meal_indicator[self.num_iters] * (180/self.bolus))
+                self.bolusHistoryTime.append(self.num_iters)
+
+
+            # Updating the carb and insulin parameters in the model
             self.integrator.set_f_params(insulin_rate, self.meals[self.num_iters], self.P)
-            # print(self.integrator.f_params[1])
-            # self.integrator.set_f_params(insulin_rate, 0, self.P)
 
+            # Integration step
             self.integrator.integrate(self.integrator.t + 1)
 
-            self.num_iters += 1
-            bg.append(self.integrator.y[-1] * 18)
-            # insulin.append(np.array([insulin_rate]))
+            # ===============
+            # CGM noise -- uncomment if CGM noise is to be addded
+            # ===============
 
-            carbs.append(self.integrator.y[0])
-            # print(carbs)
+            # if i % 5 == 0:
+            # # johnson
+            #     self.sensor_noise = 0.7 * (self.sensor_noise[0] + np.random.randn(1))
+            # # paramMCHO = 180
+            #     self.CGMerror = self.CGMepsilon + self.CGMlambda * np.sinh((self.sensor_noise[0] - self.CGMgamma) / self.CGMdelta)
+            # # ar(1), colored}
+            # if i % 5 == 0:
+            # phi = 0.8
+            # self.CGMerror = phi * self.CGMerror + np.sqrt(1 - phi ** 2) * self.sensorNoiseValue * np.random.randn(1)[0]
+
+            # # mult
+            # self.CGMerror = self.sensorNoiseValue * self.state(self.integrator.y[-1]) * np.random.randn(1)[0]
+
+            # # white, add
+            # self.CGMerror = self.sensorNoiseValue * np.random.randn(1)
+
+            # # No noise
+            # self.CGMerror = 0
+
+            # self.CGMaux.append(self.CGMerror)
+
+            # bg.append(self.integrator.y[-1] * 18 + self.CGMerror)
+
+            # Stop uncomment here! Miguel: double check this!
+            # =================================================================
+
+            bg.append(self.integrator.y[-1] * 18)
+
+            # self.num_iters += 5
+            self.num_iters += self.n_solver_steps
 
         # Updating environment parameters
         self.simulation_state = self.integrator.y
 
-        # Recording bg history for plotting
+        # Recording bg history for plotting and insulin for the state space
         self.bg_history = np.concatenate([self.bg_history, bg])
-        self.carb_history = np.concatenate([self.carb_history, carbs])
         self.insulin_history = np.concatenate([self.insulin_history, insulin_rate])
-        # self.insulin_history.append(insulin)
+
+        # Miguel: What is this?
+        # self.insulinOnBoard = np.zeros(1)
+        # if self.bolusHistoryIndex > 0:
+        #     for b in range(self.bolusHistoryIndex):
+        #         self.insulinOnBoard = self.insulinOnBoard + self.bolusHistoryValue[b] * self.scalableExpIOB(self.num_iters - self.bolusHistoryTime[b], 75, 300)
 
         # Updating state
+        self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:])), self.insulinOnBoard, bolus_given])
 
-        self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:]))])
-
-        #Set environment done = True if blood_glucose_level is negative
         done = 0
 
+        #Set environment done = True if blood_glucose_level is negative, out of bounds or over the time limit
         if (np.max(bg) > self.bg_threshold_high or np.max(bg) < self.bg_threshold_low):
             done = 1
 
@@ -261,9 +342,9 @@ class HovorkaCambridgeBase(gym.Env):
 
         if not done:
             if self.reward_flag != 'gaussian_with_insulin':
-                reward = calculate_reward(np.array(bg), self.reward_flag, 108)
+                reward = rewardFunction.calculate_reward(np.array(bg), self.reward_flag, 108)
             else:
-                reward = calculate_reward(np.array(bg), 'gaussian_with_insulin', 108, action)
+                reward = rewardFunction.calculate_reward(np.array(bg), 'gaussian_with_insulin', 108, action)
 
         elif self.steps_beyond_done is None:
             # Blood glucose below zero -- simulation out of bounds
@@ -271,29 +352,39 @@ class HovorkaCambridgeBase(gym.Env):
             # reward = 0.0
             # reward = -1000
             if self.reward_flag != 'gaussian_with_insulin':
-                reward = calculate_reward(np.array(bg), self.reward_flag, 108)
+                reward = rewardFunction.calculate_reward(np.array(bg), self.reward_flag, 108)
             else:
-                reward = calculate_reward(np.array(bg), 'gaussian_with_insulin', 108, action)
+                reward = rewardFunction.calculate_reward(np.array(bg), 'gaussian_with_insulin', 108, action)
         else:
             if self.steps_beyond_done == 0:
                 logger.warning("You are calling 'step()' even though this environment has already returned done = True. You should always call 'reset()' once you receive 'done = True' -- any further steps are undefined behavior.")
             self.steps_beyond_done += 1
             reward = -1000
 
+        # Miguel: que pasa?
         self.previous_action = action
-
 
         return np.array(self.state), np.mean(reward), done, {}
 
 
     def reset(self):
-        #TODO: Insert init code here!
+        ''' Basically a copy of the _init function
 
-        # re init -- in case the init basal has been changed
+        '''
+
+        # Reset bolus history
+        self.bolusHistoryIndex = 0
+        self.bolusHistoryValue = []
+        self.bolusHistoryTime = []
+        self.insulinOnBoard = np.zeros(1)
+
+        # Reset sensor noise model -- Miguel: Make 
+        # self.CGMerror = 0
+        self.sensor_noise = np.random.rand(1)
+        # self.CGMaux = []
+
         if self.reset_basal_manually is None:
-            # self.init_basal = np.random.choice(np.linspace(4, 6.428, 50))
             self.init_basal = np.random.choice(np.linspace(self.init_basal_optimal-2, self.init_basal_optimal, 10))
-            # self.init_basal = 6
         else:
             self.init_basal = self.reset_basal_manually
 
@@ -306,21 +397,24 @@ class HovorkaCambridgeBase(gym.Env):
 
         # State is BG, simulation_state is parameters of hovorka model
         initial_bg = X0[-1] * 18
-        initial_insulin = np.zeros(4)
-        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
+        # initial_bg = 106
+        # initial_insulin = np.zeros(4)
+        initial_insulin = np.ones(4) * self.init_basal_optimal
+        initial_iob = np.zeros(1)
+        self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin, initial_iob, np.zeros(1)])
 
         self.simulation_state = X0
         self.bg_history = []
-        self.carb_history = []
         self.insulin_history = initial_insulin
-        # self.insulin_history = []
 
         self.num_iters = 0
 
 
-        # changing observation space if simulation time is changed
-        if self.simulation_time != 30:
-            self.observation_space = spaces.Box(0, 500, self.simulation_time + 4)
+        # changing observation space if simulation time is changed -- This is slow!
+        # if self.simulation_time != 30:
+        # if self.stepsize != 1:
+            # observation_space_shape = int(self.stepsize + 4 + 1)
+            # self.observation_space = spaces.Box(0, 500, (observation_space_shape,), dtype=np.float32)
 
 
         self.steps_beyond_done = None

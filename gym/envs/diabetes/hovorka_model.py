@@ -85,7 +85,8 @@ def hovorka_model(t, x, u, D, P): ## This is the ode version
     if len(P) == 15:
         ka_int = 0.073
         R_cl = 0.003
-        R_thr = 9
+        # R_thr = 9
+        R_thr = 14
     elif len(P) == 18:
         R_cl = P[16]
         ka_int = P[15]
@@ -100,10 +101,13 @@ def hovorka_model(t, x, u, D, P): ## This is the ode version
     # Constitutive equations
     G = Q1/V_G                 # Glucose concentration [mmol/L]
 
-    if (G>=4.5):
-        F_01c = F_01           # Consumption of glucose by the central nervous system [mmol/min
-    else:
-        F_01c = F_01*G/4.5     # Consumption of glucose by the central nervous system [mmol/min]
+    # if (G>=4.5):
+    #     F_01c = F_01           # Consumption of glucose by the central nervous system [mmol/min
+    # else:
+    #     F_01c = F_01*G/4.5     # Consumption of glucose by the central nervous system [mmol/min]
+
+    F_01s = F_01/0.85
+    F_01c = F_01s*G / (G + 1)
 
     # if (G>=9):
         # F_R = 0.003*(G-9)*V_G  # Renal excretion of glucose in the kidneys [mmol/min]
@@ -120,14 +124,19 @@ def hovorka_model(t, x, u, D, P): ## This is the ode version
 
     xdot[ 0 ] = A_G*D-D1/tau_G                                # dD1
     xdot[ 1 ] = D1/tau_G-U_G                                  # dD2
+   
     xdot[ 2 ] = u-S1/tau_I                                    # dS1
     xdot[ 3 ] = S1/tau_I-U_I                                  # dS2
-    xdot[ 4 ] = -(F_01c+F_R)-x1*Q1+k_12*Q2+U_G+EGP_0*(1-x3)   # dQ1
+   
+    xdot[ 4 ] = -(F_01c+F_R) - x1*Q1 + k_12*Q2 + U_G + max(EGP_0*(1-x3), 0)   # dQ1
     xdot[ 5 ] = x1*Q1-(k_12+x2)*Q2                            # dQ2
+
     xdot[ 6 ] = U_I/V_I-k_e*I                                 # dI
+    
     xdot[ 7 ] = k_b1*I-k_a1*x1                                # dx1
     xdot[ 8 ] = k_b2*I-k_a2*x2                                # dx2
-    xdot[ 9 ] = k_b3*I-k_a3*x3                               # dx3
+    xdot[ 9 ] = k_b3*I-k_a3*x3                                # dx3
+
     # ===============
     # CGM delay
     # ===============
@@ -146,77 +155,12 @@ def hovorka_model_tuple(x, *pars):
     #
     """
     # TODO: update syntax in docstring
-    import numpy as np
+    # import numpy as np
 
-    # Unpacking_parameters
     u, D, P = pars
 
+    t = 0
 
-    # Defining the various equation names
-    D1 = x[ 0 ]               # Amount of glucose in compartment 1 [mmol]
-    D2 = x[ 1 ]               # Amount of glucose in compartment 2 [mmol]
-    S1 = x[ 2 ]               # Amount of insulin in compartment 1 [mU]
-    S2 = x[ 3 ]               # Amount of insulin in compartment 2 [mU]
-    Q1 = x[ 4 ]               # Amount of glucose in the main blood stream [mmol]
-    Q2 = x[ 5 ]               # Amount of glucose in peripheral tissues [mmol]
-    I =  x[ 6 ]                # Plasma insulin concentration [mU/L]
-    x1 = x[ 7 ]               # Insluin in muscle tissues [1], x1*Q1 = Insulin dependent uptake of glucose in muscles
-    x2 = x[ 8 ]               # [1], x2*Q2 = Insulin dependent disposal of glucose in the muscle cells
-    x3 = x[ 9 ]              # Insulin in the liver [1], EGP_0*(1-x3) = Endogenous release of glucose by the liver
-    C = x[10]
-
-    # Unpack data
-    tau_G = P[ 0 ]               # Time-to-glucose absorption [min]
-    tau_I = P[ 1 ]               # Time-to-insulin absorption [min]
-    A_G = P[ 2 ]                 # Factor describing utilization of CHO to glucose [1]
-    k_12 = P[ 3 ]                # [1/min] k_12*Q2 = Transfer of glucose from peripheral tissues (ex. muscle to the blood)
-    k_a1 = P[ 4 ]                # Deactivation rate [1/min]
-    k_b1 = P[ 5 ]                # [L/(mU*min)]
-    k_a2 = P[ 6 ]                # Deactivation rate [1/min]
-    k_b2 = P[ 7 ]                # [L/(mU*min)]
-    k_a3 = P[ 8 ]                # Deactivation rate [1/min]
-    k_b3 = P[ 9 ]               # [L/(mU*min)]
-    k_e = P[ 10 ]                # Insulin elimination rate [1/min]
-    V_I = P[ 11 ]                # Insulin distribution volume [L]
-    V_G = P[ 12 ]                # Glucose distribution volume [L]
-    F_01 = P[ 13 ]               # Glucose consumption by the central nervous system [mmol/min]
-    EGP_0 = P[ 14 ]              # Liver glucose production rate [mmol/min]
-
-    # Certain parameters are defined
-    U_G = D2/tau_G             # Glucose absorption rate [mmol/min]
-    U_I = S2/tau_I             # Insulin absorption rate [mU/min]
-
-    # Constitutive equations
-    G = Q1/V_G                 # Glucose concentration [mmol/L]
-
-    if (G>=4.5):
-        F_01c = F_01           # Consumption of glucose by the central nervous system [mmol/min
-    else:
-        F_01c = F_01*G/4.5     # Consumption of glucose by the central nervous system [mmol/min]
-
-    if (G>=9):
-        F_R = 0.003*(G-9)*V_G  # Renal excretion of glucose in the kidneys [mmol/min]
-    else:
-        F_R = 0                # Renal excretion of glucose in the kidneys [mmol/min]
-
-
-    # Mass balances/differential equations
-    xdot = np.zeros (11);
-
-    xdot[ 0 ] = A_G*D-D1/tau_G                                # dD1
-    xdot[ 1 ] = D1/tau_G-U_G                                  # dD2
-    xdot[ 2 ] = u-S1/tau_I                                    # dS1
-    xdot[ 3 ] = S1/tau_I-U_I                                  # dS2
-    xdot[ 4 ] = -(F_01c+F_R)-x1*Q1+k_12*Q2+U_G+EGP_0*(1-x3)   # dQ1
-    xdot[ 5 ] = x1*Q1-(k_12+x2)*Q2                            # dQ2
-    xdot[ 6 ] = U_I/V_I-k_e*I                                 # dI
-    xdot[ 7 ] = k_b1*I-k_a1*x1                                # dx1
-    xdot[ 8 ] = k_b2*I-k_a2*x2                                # dx2
-    xdot[ 9 ] = k_b3*I-k_a3*x3                               # dx3
-    # ===============
-    # CGM delay
-    # ===============
-    ka_int = 0.073
-    xdot[10] = ka_int*(G - C)
+    xdot = hovorka_model(t, x, u, D, P)
 
     return xdot
