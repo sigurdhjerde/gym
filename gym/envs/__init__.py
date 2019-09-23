@@ -6,8 +6,8 @@ from gym.envs.registration import registry, register, make, spec
 register(
         id = 'HovorkaCambridge-v0',
         entry_point = 'gym.envs.diabetes.hovorka_cambridge:HovorkaCambridgeBase',
-        timestep_limit = 48,
-        max_episode_steps= 48
+        max_episode_steps = 72,
+        max_episode_steps= 72,
         )
 
 # Algorithmic
