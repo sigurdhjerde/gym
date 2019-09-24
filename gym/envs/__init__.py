@@ -7,7 +7,6 @@ register(
         id = 'HovorkaCambridge-v0',
         entry_point = 'gym.envs.diabetes.hovorka_cambridge:HovorkaCambridgeBase',
         max_episode_steps = 72,
-        max_episode_steps= 72,
         )
 
 # Algorithmic
