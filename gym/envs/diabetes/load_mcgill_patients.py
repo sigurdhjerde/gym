@@ -5,15 +5,6 @@ import numpy as np
 
 from scipy.io import loadmat
 
-# import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-sns.set()
-import logging
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 
 def matlab_to_python(patient_num):
     '''
@@ -94,35 +85,3 @@ def matlab_to_python(patient_num):
     carb_factor = params[21]
 
     return P, basal_rate.flatten(), carb_factor.flatten(), tdd
-
-
-
-
-if __name__=='__main__':
-    '''Loading the stable patients shared by Anas
-    '''
-
-    patients_all = loadmat('/home/jonas/Documents/git/EXTERNAL/artificial-pancreas-simulator-uit/library/virtual-patients/@HovorkaPatientUIT/patientAdultMcGill.mat')
-    params = patients_all['param']
-
-    # Testing a single patient
-
-    env = gym.make('HovorkaCambridge-v0')
-
-    plt.figure()
-    for i in range(100):
-        logger.info('Patient number ' + str(i))
-        P, basal_rate, carb_factor, _ = matlab_to_python(params[0][i])
-        env.env.P = P
-        env.env.reset_basal_manually = basal_rate
-        env.env.bolus = carb_factor
-
-        env.reset()
-    
-        for i in range(48):
-            env.step(basal_rate)
-
-        plt.plot(env.env.bg_history)
-        
-    plt.fill_between(range(1440), 70, 180, alpha=.20)
-    plt.show(block=False)
