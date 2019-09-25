@@ -7,7 +7,7 @@ Inherits mostly from the HovorkaCambridge environment
 
 from gym.envs.diabetes import hovorka_cambridge
 
-from load_mcgill_patients import matlab_to_python
+from gym.envs.diabetes.load_mcgill_patients import matlab_to_python
 
 import numpy as np
 
