@@ -4,10 +4,11 @@ from gym.envs.registration import registry, register, make, spec
 # Hovorka model
 # =====================================
 register(
-        id = 'HovorkaCambridge-v0',
-        entry_point = 'gym.envs.diabetes.hovorka_cambridge:HovorkaCambridgeBase',
-        max_episode_steps = 72,
-        )
+    id = 'HovorkaCambridge-v0',
+    entry_point = 'gym.envs.diabetes.hovorka_cambridge:HovorkaCambridgeBase',
+    # The true max episode steps are 72, but that becomes a bug in the TimeLimit wrapper..
+    max_episode_steps = 200,
+)
 
 # Algorithmic
 # ----------------------------------------
