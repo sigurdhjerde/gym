@@ -1,3 +1,5 @@
+**This is a fork containing the Hovorka Diabetes simulator environment**
+
 **Status:** Maintenance (expect bug fixes and minor updates)
 
 OpenAI Gym
