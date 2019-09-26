@@ -128,7 +128,7 @@ class HovorkaCambridgeBase(gym.Env):
         # The initial value of insulin is just 4 copies of the basal rate
         initial_insulin = np.ones(4) * self.init_basal_optimal
         initial_bg = X0[-1] * 18
-        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
+        self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin])
 
         self.simulation_state = X0
 
