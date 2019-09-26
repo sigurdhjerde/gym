@@ -1,7 +1,6 @@
 import gym
 
 from gym.envs.registration import register
-import numpy as np
 
 from scipy.io import loadmat
 
@@ -37,7 +36,7 @@ def matlab_to_python(patient_num):
               'Diet': 23
               'TDD': 24
     '''
-    patients_all = loadmat('patientAdultMcGill.mat')
+    patients_all = loadmat(gym.__path__[0] + '/envs/diabetes/patientAdultMcGill.mat')
     params_all = patients_all['param']
 
     params = params_all[0][patient_num]
