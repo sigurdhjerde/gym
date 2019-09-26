@@ -37,8 +37,7 @@ def matlab_to_python(patient_num):
               'Diet': 23
               'TDD': 24
     '''
-    # patients_all = loadmat('/home/miguel/git/pg_diabetes/garage/anas_patients/patientAdultMcGill.mat')
-    patients_all = loadmat('/home/jonas/Documents/git/pg_diabetes/garage/anas_patients/patientAdultMcGill.mat')
+    patients_all = loadmat('patientAdultMcGill.mat')
     params_all = patients_all['param']
 
     params = params_all[0][patient_num]
