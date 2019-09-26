@@ -42,6 +42,16 @@ register(
         timestep_limit = 72,
         max_episode_steps= 72
         )
+
+# Hovorka model with discretized action space
+register(
+         id = 'HovorkaCambridge-Sigurd-v0',
+         entry_point = 'gym.envs.diabetes.hovorka_cambridge_sigurd:HovorkaCambridgeBase_Sigurd',
+         # timestep_limit = 48,
+         # max_episode_steps = 48,
+         timestep_limit = 72,
+         max_episode_steps = 72
+         )
 # ================================================
 # Cambridge model
 # ================================================
