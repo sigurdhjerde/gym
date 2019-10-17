@@ -1,24 +1,18 @@
 """
 OPENAI gym environment for the Hovorka model using the cambridge parameter set
-
 The reason we are doing this is that the cambridge model is very slow!
-
 This is the base class for the Hovorka models.
     - Actions runs for a longer interval (default 30 mins)
     to get closer to a markov decision process.
     - The model includes meals
     - Default 34 dim observation space (30 min BG and last four actions)
-    - Default action space 0 to twice the basal rate (2*init_basal_optimal) mU/min of insulin
+    - Default action space 0 to 50 mU/min of insulin
     - Rendering disabled by default
-
     - Initialization and reset: Random initialization and no meals!
-
-
     - TODO:
         - Double check parameters - renal threshold et al
         - Check difference in previous insulin compared to cambridge model
         - check initial basal rates
-
 """
 # import numpy as np
 # np.random.seed(1)
@@ -84,7 +78,8 @@ class HovorkaCambridgeBase(gym.Env):
         self.init_basal_optimal = init_basal_optimal
 
         # This is the space of allowable actions -- from 0 insulin (stop the pump) to twice the basal rate
-        self.action_space = spaces.Box(0, 2*self.init_basal_optimal, (1,), dtype=np.float32)
+        self.action_space = spaces.Discrete(3)
+        #self.action_space = spaces.Box(0, 2*self.init_basal_optimal, (1,), dtype=np.float32)
 
         # Initialize episode randomly or at a fixed BG level
         if bg_init_flag == 'random':
@@ -128,7 +123,7 @@ class HovorkaCambridgeBase(gym.Env):
         # The initial value of insulin is just 4 copies of the basal rate
         initial_insulin = np.ones(4) * self.init_basal_optimal
         initial_bg = X0[-1] * 18
-        self.state = np.concatenate([np.repeat(initial_bg, self.stepsize), initial_insulin])
+        self.state = np.concatenate([np.repeat(initial_bg, self.simulation_time), initial_insulin])
 
         self.simulation_state = X0
 
@@ -191,12 +186,22 @@ class HovorkaCambridgeBase(gym.Env):
 
         # Manually checking and forcing the action to be within bounds insted of using assert.
         # We should be careful with this
-        if action > self.action_space.high:
-            action = self.action_space.high
-        elif action < self.action_space.low:
-            action = self.action_space.low
+        
+        if action == 0:
+              action = 0
+        elif action == 1:
+              action = self.init_basal_optimal
+        elif action == 2:
+              action = 5*self.init_basal_optimal
+        
+# =============================================================================
+#         if action > self.action_space.high:
+#             action = self.action_space.high
+#         elif action < self.action_space.low:
+#             action = self.action_space.low
+# =============================================================================
 
-        # assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
+        #assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
         self.integrator.set_initial_value(self.simulation_state, self.num_iters)
 
