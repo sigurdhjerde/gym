@@ -292,7 +292,7 @@ class HovorkaCambridgeBase_Sigurd(gym.Env):
         return np.array(self.state), np.mean(reward), done, {}
 
 
-    def reset(self):
+   def reset(self):
         '''
         This is basically a copy of the init function
         '''
@@ -313,11 +313,11 @@ class HovorkaCambridgeBase_Sigurd(gym.Env):
 
         # State is BG, simulation_state is parameters of hovorka model
         initial_bg = X0[-1] * 18
-        initial_insulin = np.ones(int(self.one_day)) * self.init_basal_optimal
+        initial_insulin = np.ones(int(self.one_day)) * self.init_basal
         self.state = np.concatenate([np.repeat(initial_bg, self.one_day), initial_insulin])
 
         self.simulation_state = X0
-        self.bg_history = []
+        self.bg_history = np.repeat(initial_bg, self.one_day)
         self.insulin_history = initial_insulin
 
         self.num_iters = 0
