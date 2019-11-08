@@ -172,7 +172,8 @@ class HovorkaCambridgeBase(gym.Env):
         this is only used for inherited classes'''
 
         reward_flag = 'asymmetric'
-
+        #reward_flag = 'gaussian'
+        
         bg_init_flag = 'random'
 
         return reward_flag, bg_init_flag
@@ -186,6 +187,8 @@ class HovorkaCambridgeBase(gym.Env):
 
         # Manually checking and forcing the action to be within bounds insted of using assert.
         # We should be careful with this
+        
+        assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
         
         if action == 0:
               action = 0
@@ -235,7 +238,7 @@ class HovorkaCambridgeBase(gym.Env):
 
         # Recording bg history for plotting
         self.bg_history = np.concatenate([self.bg_history, bg])
-        self.insulin_history = np.concatenate([self.insulin_history, insulin_rate])
+        self.insulin_history = np.concatenate([self.insulin_history, np.array([insulin_rate])])
 
         # Updating state (bg and insulin)
         self.state = np.concatenate([bg, list(reversed(self.insulin_history[-4:]))])
