@@ -171,8 +171,8 @@ class HovorkaCambridgeBase(gym.Env):
         ''' Update parameters of model,
         this is only used for inherited classes'''
 
-        reward_flag = 'asymmetric'
-        #reward_flag = 'gaussian'
+        #reward_flag = 'asymmetric'
+        reward_flag = 'gaussian'
         
         bg_init_flag = 'random'
 
