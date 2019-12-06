@@ -195,7 +195,7 @@ class HovorkaCambridgeBase(gym.Env):
         elif action == 1:
               action = self.init_basal_optimal
         elif action == 2:
-              action = 5*self.init_basal_optimal
+              action = 3*self.init_basal_optimal
         
 # =============================================================================
 #         if action > self.action_space.high:
