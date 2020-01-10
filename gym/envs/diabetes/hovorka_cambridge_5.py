@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 
 rewardFunction = RewardFunction()
 
-class HovorkaCambridgeBase(gym.Env):
+class HovorkaCambridgeBase5(gym.Env):
     # TODO: fix metadata??
     metadata = {
         'render.modes': ['human', 'rgb_array'],
